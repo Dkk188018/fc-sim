@@ -1,0 +1,1623 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FC Online 4 - 球员强化模拟器</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --surface: #111827;
+    --surface2: #161e2c;
+    --border: #1e2d3d;
+    --gold: #f0b90b;
+    --gold2: #d4a00a;
+    --gold-dark: #8b6914;
+    --success: #00c853;
+    --fail: #e53935;
+    --text: #e8eaed;
+    --text2: #9aa0b0;
+    --text3: #5a6070;
+    --accent: #2979ff;
+    --accent2: #1a50aa;
+    --purple: #9c27b0;
+    --orange: #ff6d00;
+    --red-glow: #ff1744;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Microsoft YaHei', 'PingFang SC', 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0 40px;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(41,121,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, rgba(156,39,176,0.04) 0%, transparent 60%);
+  }
+
+  .app { width: 560px; max-width: 100vw; padding: 0 16px; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .header .brand {
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .header h1 {
+    font-size: 30px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #f0b90b 0%, #ffd54f 40%, #ffab00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    letter-spacing: 2px;
+  }
+
+  /* Settings Panel */
+  .settings-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    margin-bottom: 8px;
+    user-select: none;
+    padding: 4px 0;
+  }
+  .settings-toggle:hover { color: var(--text); }
+  .settings-toggle .arrow {
+    transition: transform 0.25s;
+    font-size: 10px;
+  }
+  .settings-toggle .arrow.open { transform: rotate(90deg); }
+
+  .settings-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+    display: none;
+    animation: slideDown 0.25s ease-out;
+  }
+  .settings-panel.show { display: block; }
+  @keyframes slideDown {
+    0% { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .settings-grid .full { grid-column: 1 / -1; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+  }
+  .field select { cursor: pointer; }
+
+  /* Player Card */
+  .player-card-wrap { position: relative; margin-bottom: 14px; }
+  .player-card {
+    background: linear-gradient(145deg, #141c2c 0%, #1a2438 30%, #121a28 60%, #151e30 100%);
+    border: 1px solid #2a3850;
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s;
+  }
+  .player-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(240,185,11,0.03) 0%, transparent 40%, rgba(41,121,255,0.03) 100%);
+    pointer-events: none;
+  }
+  .player-card.enhance-flash { animation: cardFlash 0.15s ease-in-out 4; }
+  @keyframes cardFlash {
+    0%,100% { border-color: #2a3850; box-shadow: none; }
+    50% { border-color: #f0b90b; box-shadow: 0 0 20px rgba(240,185,11,0.25); }
+  }
+  .player-card.success-glow {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 24px rgba(0,200,83,0.3) !important;
+    transition: all 0.5s;
+  }
+  .player-card.fail-shake { animation: shake 0.4s ease-out; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    15% { transform: translateX(-8px); }
+    30% { transform: translateX(8px); }
+    45% { transform: translateX(-6px); }
+    60% { transform: translateX(6px); }
+    75% { transform: translateX(-3px); }
+    90% { transform: translateX(3px); }
+  }
+.player-avatar {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e3050, #152030);
+    border: 2px solid #334868;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: all 0.4s;
+  }
+  .player-avatar.elite { border-color: #f0b90b; box-shadow: 0 0 12px rgba(240,185,11,0.3); }
+  .player-avatar.legend { border-color: #9c27b0; box-shadow: 0 0 12px rgba(156,39,176,0.4); }
+  .player-avatar.ultimate { border-color: #ff6d00; box-shadow: 0 0 14px rgba(255,109,0,0.4); animation: ultimateGlow 2s ease-in-out infinite; }
+  @keyframes ultimateGlow {
+    0%,100% { box-shadow: 0 0 14px rgba(255,109,0,0.4); }
+    50% { box-shadow: 0 0 24px rgba(255,109,0,0.7), 0 0 40px rgba(255,152,0,0.3); }
+  }
+
+  .player-info { flex: 1; position: relative; z-index: 1; min-width: 0; }
+  .player-season {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .season-default { background: #2a3850; color: #8899bb; }
+  .season-toty { background: #1a3a6a; color: #6ab4ff; }
+  .season-tots { background: #1a4a3a; color: #4ae0a0; }
+  .season-icon { background: #2a1a3a; color: #c090e0; }
+  .season-hot { background: #4a1a1a; color: #ff7070; }
+  .season-live { background: #1a3a2a; color: #70d070; }
+  .season-25ucl { background: #0a1e3a; color: #6ab4ff; }
+  .player-name { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.3; }
+  .player-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .player-ovr-row { display: flex; align-items: baseline; gap: 10px; margin-top: 6px; }
+  .player-ovr {
+    font-size: 40px; font-weight: 900;
+    background: linear-gradient(180deg, #fff 0%, #d0d8e8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .player-ovr.bump { animation: ovrBump 0.5s ease-out; }
+  @keyframes ovrBump {
+    0% { transform: scale(1.4); filter: brightness(2); }
+    100% { transform: scale(1); filter: brightness(1); }
+  }
+  .enhance-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0b90b, #c8900a);
+    color: #1a0a00;
+    font-size: 13px;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 5px;
+    min-width: 36px;
+    box-shadow: 0 2px 8px rgba(240,185,11,0.3);
+  }
+
+  /* Trait / Extra info */
+  .card-extra {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .trait-slot {
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    border: 1px dashed #3a4860;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: #5a6070;
+  }
+  .trait-slot.active {
+    border: 1px solid #5a7090;
+    background: rgba(90,112,144,0.15);
+    color: #8899bb;
+  }
+  .est-value {
+    font-size: 11px;
+    color: var(--gold);
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  /* Progress Bar */
+  .progress-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .progress-title { font-size: 12px; color: var(--text2); font-weight: 600; }
+  .progress-rate { font-size: 12px; color: var(--text2); }
+  .progress-rate strong { color: #fff; }
+  .rate-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #3a4860;
+    color: #889;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: help;
+    vertical-align: middle;
+    margin-left: 2px;
+  }
+  .rate-help:hover { background: #f0b90b; color: #000; }
+
+  .progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .progress-step {
+    width: 26px; height: 26px;
+    border-radius: 5px;
+    background: #141c28;
+    border: 1px solid #222d3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #3a4860;
+    transition: all 0.35s;
+    flex-shrink: 0;
+  }
+  .progress-step.reached {
+    background: #182a20;
+    border-color: #2a4a30;
+    color: #6aaa70;
+  }
+  .progress-step.current {
+    background: linear-gradient(135deg, #6a3808, #4a2804);
+    border-color: #f0b90b;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(240,185,11,0.35);
+    animation: stepPulse 1s ease-in-out infinite;
+    transform: scale(1.1);
+    z-index: 1;
+  }
+  @keyframes stepPulse {
+    0%,100% { box-shadow: 0 0 10px rgba(240,185,11,0.35); }
+    50% { box-shadow: 0 0 18px rgba(240,185,11,0.55); }
+  }
+  .progress-arrow {
+    font-size: 10px;
+    color: #2a3850;
+    flex-shrink: 0;
+    margin: 0 1px;
+  }
+
+  /* Info Row */
+  .info-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .info-chip {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .info-chip .val { font-size: 16px; font-weight: 700; color: #fff; }
+  .info-chip .val.gold { color: var(--gold); }
+  .info-chip .val.green { color: var(--success); }
+  .info-chip .val.red { color: var(--fail); }
+  .info-chip .lbl { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* Protection */
+  .protect-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .protect-left { display: flex; align-items: center; gap: 10px; }
+  .toggle-switch {
+    position: relative;
+    width: 44px; height: 24px;
+    background: #2a3850;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+  .toggle-switch.on { background: #f0b90b; }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s;
+  }
+  .toggle-switch.on::after { transform: translateX(20px); }
+  .energy-slot {
+    flex: 1; height: 36px;
+    border-radius: 6px;
+    background: #1a2230;
+    border: 2px solid #2a3850;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .energy-slot:hover { border-color: #4a6090; }
+  .energy-slot .fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #2979ff 0%, #1a50cc 100%);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+  }
+  .energy-slot.filled {
+    border-color: #2979ff;
+    box-shadow: 0 0 8px rgba(41,121,255,0.3);
+  }
+  .protect-badge {
+    font-size: 11px;
+    background: rgba(240,185,11,0.15);
+    color: var(--gold);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .btn {
+    padding: 12px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    user-select: none;
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .btn-main {
+    flex: 1;
+    background: linear-gradient(180deg, #f0b90b 0%, #d4a00a 40%, #a07808 100%);
+    color: #1a0a00;
+    font-size: 20px;
+    letter-spacing: 4px;
+    box-shadow: 0 4px 16px rgba(240,185,11,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-main:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(240,185,11,0.45);
+  }
+  .btn-main:active:not(:disabled) { transform: translateY(1px); }
+  .btn-main.charging {
+    animation: btnCharge 0.2s ease-in-out infinite;
+    background: linear-gradient(180deg, #ffcc00 0%, #f0b90b 40%, #c8900a 100%);
+  }
+  @keyframes btnCharge {
+    0%,100% { box-shadow: 0 4px 16px rgba(240,185,11,0.3); }
+    50% { box-shadow: 0 4px 32px rgba(240,185,11,0.7), 0 0 60px rgba(240,185,11,0.3); }
+  }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text2);
+    font-size: 12px;
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover:not(:disabled) { background: #1e2a3a; color: #fff; }
+  .btn-secondary.active {
+    background: #1a2a5a;
+    border-color: var(--accent);
+    color: #aaccff;
+  }
+
+  /* Stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+  }
+  .stat-box .num { font-size: 20px; font-weight: 700; color: #fff; }
+  .stat-box .num.g { color: var(--gold); }
+  .stat-box .num.s { color: var(--success); }
+  .stat-box .num.f { color: var(--fail); }
+  .stat-box .tag { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* History */
+  .history-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .history-box::-webkit-scrollbar { width: 4px; }
+  .history-box::-webkit-scrollbar-thumb { background: #2a3850; border-radius: 2px; }
+  .history-title { font-size: 12px; color: var(--text2); margin-bottom: 8px; font-weight: 600; }
+  .history-list { list-style: none; }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 4px;
+    border-bottom: 1px solid rgba(30,40,56,0.6);
+    font-size: 12px;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .hist-num { color: var(--text3); font-size: 10px; min-width: 24px; }
+  .hist-tag {
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+  .hist-tag.win { background: rgba(0,200,83,0.15); color: var(--success); }
+  .hist-tag.lose { background: rgba(229,57,53,0.15); color: var(--fail); }
+.history-item {
+    position: relative;
+    cursor: default;
+  }
+  /* 成功次数统计hover弹窗 */
+  .stat-box.clickable { cursor: pointer; position: relative; }
+  .stat-box.clickable:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    transform: translateX(-50%);
+    background: #0a0a0a;
+    color: #f0b90b;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    white-space: pre;
+    z-index: 50;
+    pointer-events: none;
+    margin-bottom: 6px;
+    border: 1px solid #f0b90b;
+    line-height: 1.6;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  }
+  .hist-detail { color: var(--text2); flex: 1; }
+  .hist-empty { color: var(--text3); text-align: center; padding: 20px; font-size: 12px; }
+
+  /* Result Overlay */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
+  .overlay .modal {
+    background: linear-gradient(160deg, #1a2438, #111c2c);
+    border: 1px solid #2a3850;
+    border-radius: 16px;
+    padding: 36px 44px;
+    text-align: center;
+    min-width: 300px;
+    max-width: 380px;
+    animation: modalPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes modalPop {
+    0% { transform: scale(0.8) translateY(30px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+  .modal .icon { font-size: 56px; margin-bottom: 10px; }
+  .modal .title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+  .modal .title.win { color: #fff; }
+  .modal .title.lose { color: var(--fail); }
+  .modal .title.crack { color: var(--red-glow); }
+  .modal .level-change { font-size: 15px; color: var(--text2); margin-bottom: 6px; }
+  .modal .ovr-change {
+    font-size: 28px; font-weight: 900; margin-bottom: 8px;
+    background: linear-gradient(180deg, #f0b90b, #c8900a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .modal .ovr-change.down {
+    background: linear-gradient(180deg, #ff5252, #c62828);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .modal .detail-text { font-size: 12px; color: var(--text3); margin-bottom: 18px; line-height: 1.6; }
+  .modal .btn-close {
+    padding: 10px 36px;
+    border-radius: 8px;
+    border: none;
+    background: #2a3850;
+    color: #ccd;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .modal .btn-close:hover { background: #3a4860; color: #fff; }
+
+  /* Particles */
+  .particle-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 250;
+  }
+  .pt {
+    position: absolute;
+    font-size: 22px;
+    animation: ptFly 0.9s ease-out forwards;
+  }
+  @keyframes ptFly {
+    0% { opacity: 1; transform: translate(0,0) scale(1.2); }
+    100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(0); }
+  }
+
+  /* Footer hint */
+  .hint {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 12px;
+  }
+  .hint kbd {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-family: inherit;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1>FC Online 4 强化模拟器</h1>
+  </div>
+
+  <!-- Settings -->
+  <div class="settings-toggle" onclick="toggleSettings()">
+    <span class="arrow" id="settingsArrow">▶</span> 球员设置 <span style="color:var(--text3);">— 自定义球员信息</span>
+  </div>
+  <div class="settings-panel" id="settingsPanel">
+    <!-- 快速选择球员 -->
+    <div class="field full" style="margin-bottom:10px;">
+      <label>快速选择球员 <span style="color:var(--text3);font-weight:400;">— 25UCL 赛季</span></label>
+      <div style="display:flex;gap:8px;">
+        <select id="inpPlayerSelect" onchange="onPlayerSelect()" style="flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:inherit;outline:none;">
+          <option value="">— 自定义球员 —</option>
+        </select>
+      </div>
+    </div>
+    <div class="settings-grid">
+      <div class="field full">
+        <label>球员名称</label>
+        <input type="text" id="inpName" value="Cristiano Ronaldo" placeholder="输入球员名称">
+      </div>
+      <div class="field">
+        <label>赛季 / 卡种</label>
+        <select id="inpSeason">
+          <option value="default">基础卡 (普通)</option>
+          <option value="live">LIVE 实时</option>
+          <option value="hot">HOT 焦点</option>
+          <option value="tots">TOTS 赛季最佳</option>
+          <option value="toty">TOTY 年度最佳</option>
+          <option value="icon">ICON 传奇</option>
+          <option value="icon-tm">ICON TM 传奇时刻</option>
+          <option value="wc">WC 世界杯</option>
+          <option value="ucl">UCL 欧冠</option>
+          <option value="25ucl" selected>25UCL 25欧冠</option>
+          <option value="ng">NG 新星</option>
+          <option value="cap">CAP 队长</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>位置</label>
+        <input type="text" id="inpPos" value="ST" placeholder="如 ST, CF, CAM">
+      </div>
+      <div class="field">
+        <label>基础能力值 (OVR)</label>
+        <input type="number" id="inpOvr" value="123" min="40" max="150">
+      </div>
+      <div class="field">
+        <label>当前强化等级 (+0 ~ +13)</label>
+        <input type="number" id="inpLevel" value="1" min="0" max="13">
+      </div>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="applySettings()">应用设置</button>
+  </div>
+
+  <!-- Player Card -->
+  <div class="player-card-wrap">
+    <div class="player-card" id="playerCard">
+      <div class="player-avatar" id="playerAvatar">⚽</div>
+      <div class="player-info">
+        <span class="player-season season-tots" id="playerSeason">TOTS</span>
+        <div class="player-name" id="playerName">Cristiano Ronaldo</div>
+        <div class="player-meta" id="playerMeta">ST · CF</div>
+        <div class="card-extra" id="traitSlots"></div>
+        <div class="est-value" id="estValue">💰 预计价值: --</div>
+      </div>
+      <div style="text-align:right;position:relative;z-index:1;flex-shrink:0;">
+        <div class="player-ovr-row" style="justify-content:flex-end;">
+          <span class="player-ovr" id="playerOvr">89</span>
+        </div>
+        <div style="margin-top:4px;">
+          <span class="enhance-badge" id="enhanceBadge">+0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span class="progress-title">强化进度</span>
+      <span class="progress-rate" id="rateInfo">点击强化按钮开始</span>
+    </div>
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Quick Info -->
+  <div class="info-row">
+    <div class="info-chip">
+      <div class="val" id="infoNextLevel">+1</div>
+      <div class="lbl">目标等级</div>
+    </div>
+    <div class="info-chip">
+      <div class="val gold" id="infoRate">100%</div>
+      <div class="lbl">成功率</div>
+    </div>
+    <div class="info-chip">
+      <div class="val green" id="infoOvrGain">+0</div>
+      <div class="lbl">单级OVR提升</div>
+    </div>
+    <div class="info-chip">
+      <div class="val" id="infoTargetOvr">89</div>
+      <div class="lbl">成功后能力值</div>
+    </div>
+  </div>
+
+  <!-- Protection -->
+  <div class="protect-row">
+    <div class="protect-left">
+      <span style="font-weight:600;">强化等级保护</span>
+      <span class="protect-badge" id="protectBadge" style="display:none;">推荐开启</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex:1;justify-content:flex-end;">
+      <input type="range" id="protectSlider" min="0" max="100" value="0" oninput="onProtectSlider()" style="width:120px;accent-color:#f0b90b;cursor:pointer;">
+      <span style="font-size:13px;font-weight:700;color:#f0b90b;min-width:28px;text-align:right;" id="protectCount">0</span>
+    </div>
+  </div>
+
+  <!-- 强化概率加成 -->
+  <div class="material-section" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:12px;color:var(--text2);font-weight:600;">强化概率加成</span>
+      <span style="font-size:11px;color:var(--text3);">成功率加成: <b style="color:#2979ff;" id="materialBoost">+0%</b></span>
+    </div>
+    <!-- 5 Energy Slots -->
+    <div style="display:flex;gap:6px;margin-bottom:8px;" id="energySlots">
+      <div class="energy-slot" data-slot="1" onclick="clickSlot(1)"></div>
+      <div class="energy-slot" data-slot="2" onclick="clickSlot(2)"></div>
+      <div class="energy-slot" data-slot="3" onclick="clickSlot(3)"></div>
+      <div class="energy-slot" data-slot="4" onclick="clickSlot(4)"></div>
+      <div class="energy-slot" data-slot="5" onclick="clickSlot(5)"></div>
+    </div>
+    <!-- Material Input -->
+    <div style="display:flex;gap:6px;align-items:center;">
+      <span style="font-size:11px;color:var(--text3);flex-shrink:0;">添加材料</span>
+      <input type="number" id="inpMaterialOvr" value="123" min="40" max="150" style="width:58px;padding:5px 6px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:12px;text-align:center;font-family:inherit;outline:none;">
+      <button class="btn btn-secondary" onclick="addMaterial()" style="font-size:11px;padding:5px 10px;">添加</button>
+      <button class="btn btn-secondary" onclick="clearMaterials()" style="font-size:11px;padding:5px 10px;">清空</button>
+      <span style="font-size:10px;color:var(--text3);flex:1;text-align:right;" id="materialCount">已填 0/5</span>
+    </div>
+  </div>
+
+  <!-- Stop Level + Buttons -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text2);">
+    <span style="flex-shrink:0;">强化至</span>
+    <input type="number" id="inpStopLevel" value="13" min="1" max="13" style="width:50px;padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:13px;text-align:center;font-family:inherit;outline:none;">
+    <span style="flex-shrink:0;">级自动停止</span>
+    <span style="flex:1;"></span>
+    <span style="font-size:11px;color:var(--text3);">当前目标: +<b id="stopLevelDisplay" style="color:#f0b90b;">13</b></span>
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-main" id="btnEnhance" onclick="startEnhance()">强 化</button>
+    <button class="btn btn-secondary" id="btnAuto" onclick="toggleAuto()">自动</button>
+    <button class="btn btn-secondary" onclick="resetCard()">重置</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-box">
+      <div class="num" id="sAttempts">0</div>
+      <div class="tag">总次数</div>
+    </div>
+    <div class="stat-box clickable" id="statSuccessBox" data-tip="">
+      <div class="num s" id="sSuccess">0</div>
+      <div class="tag">成功</div>
+    </div>
+    <div class="stat-box">
+      <div class="num f" id="sFail">0</div>
+      <div class="tag">失败</div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-box">
+    <div class="history-title">强化记录</div>
+    <ul class="history-list" id="historyList">
+      <li class="hist-empty">等待首次强化...</li>
+    </ul>
+  </div>
+
+  <div class="hint">
+    按 <kbd>空格</kbd> 强化 &nbsp;·&nbsp; 按 <kbd>A</kbd> 切换自动强化
+  </div>
+</div>
+
+<!-- Result Overlay -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="icon" id="modalIcon"></div>
+    <div class="title" id="modalTitle"></div>
+    <div class="level-change" id="modalLevel"></div>
+    <div class="ovr-change" id="modalOvr"></div>
+    <div class="detail-text" id="modalDetail"></div>
+    <button class="btn-close" onclick="closeModal()">确 定</button>
+  </div>
+</div>
+
+<!-- Particles -->
+<div class="particle-layer" id="particleLayer"></div>
+
+<script>
+// ============================================================
+//  FC Online 4 (腾讯) 强化数据表 — 严格按用户提供的数据
+// ============================================================
+//  level: 强化等级
+//  bonus: 该等级累计 OVR 加成 (相对于 +1 卡)
+//  rate:  升级到下一级的成功率
+//  gain:  升级到下一级的单级 OVR 提升
+//
+//  说明：+1 为基准卡（总加成=0），+0 为未强化白卡
+
+const TABLE = [
+  // bonus = 该等级累计 OVR 加成（从 +0 算起）
+  // +0 和 +1 能力值相同；+1→+2 是第一次涨属性
+  { level: 0,  bonus: 0,  rate: 1.00, gain: 0  },  // 0→1: 100%, OVR不变
+  { level: 1,  bonus: 0,  rate: 1.00, gain: 1  },  // 1→2: 100%, +1, 总+1
+  { level: 2,  bonus: 1,  rate: 0.81, gain: 1  },  // 2→3: 81%,  +1, 总+2
+  { level: 3,  bonus: 2,  rate: 0.64, gain: 2  },  // 3→4: 64%,  +2, 总+4
+  { level: 4,  bonus: 4,  rate: 0.50, gain: 2  },  // 4→5: 50%,  +2, 总+6
+  { level: 5,  bonus: 6,  rate: 0.26, gain: 2  },  // 5→6: 26%,  +2, 总+8
+  { level: 6,  bonus: 8,  rate: 0.15, gain: 3  },  // 6→7: 15%,  +3, 总+11
+  { level: 7,  bonus: 11, rate: 0.07, gain: 4  },  // 7→8: 7%,   +4, 总+15
+  { level: 8,  bonus: 15, rate: 0.05, gain: 2  },  // 8→9: 5%,   +2, 总+17
+  { level: 9,  bonus: 17, rate: 0.04, gain: 2  },  // 9→10: 4%,  +2, 总+19
+  { level: 10, bonus: 19, rate: 0.03, gain: 2  },  // 10→11: 3%, +2, 总+21
+  { level: 11, bonus: 21, rate: 0.02, gain: 3  },  // 11→12: 2%, +3, 总+24
+  { level: 12, bonus: 24, rate: 0.01, gain: 3  },  // 12→13: 1%, +3, 总+27
+  { level: 13, bonus: 27, rate: null, gain: 0  },  // MAX
+];
+
+
+// ============================================================
+//  25UCL 球员数据库 (105名)
+// ============================================================
+const PLAYER_DB = [
+  {"position":"中锋","name":"哈里·凯恩","salary":31,"ovr":123,"enhance":1},
+  {"position":"左边锋","name":"克瓦拉茨赫利亚","salary":30,"ovr":123,"enhance":1},
+  {"position":"左边锋","name":"路易斯·迪亚斯","salary":29,"ovr":123,"enhance":1},
+  {"position":"中场","name":"赖斯","salary":28,"ovr":123,"enhance":1},
+  {"position":"中锋","name":"姆巴佩","salary":31,"ovr":122,"enhance":1},
+  {"position":"影锋","name":"J.阿尔瓦雷斯","salary":30,"ovr":122,"enhance":1},
+  {"position":"右边锋","name":"拉明·亚马尔","salary":29,"ovr":122,"enhance":1},
+  {"position":"中场","name":"维蒂尼亚","salary":29,"ovr":122,"enhance":1},
+  {"position":"右边锋","name":"奥利塞","salary":29,"ovr":122,"enhance":1},
+  {"position":"中后卫","name":"加布里埃尔","salary":29,"ovr":122,"enhance":1},
+  {"position":"中场","name":"若昂·内维斯","salary":27,"ovr":122,"enhance":1},
+  {"position":"守门员","name":"大卫·拉亚","salary":26,"ovr":122,"enhance":1},
+  {"position":"中锋","name":"哈兰德","salary":31,"ovr":120,"enhance":1},
+  {"position":"前腰","name":"D.索博斯洛伊","salary":29,"ovr":120,"enhance":1},
+  {"position":"右边锋","name":"萨卡","salary":28,"ovr":120,"enhance":1},
+  {"position":"前腰","name":"费尔明","salary":27,"ovr":120,"enhance":1},
+  {"position":"守门员","name":"库尔图瓦","salary":26,"ovr":120,"enhance":1},
+  {"position":"中锋","name":"奥斯梅恩","salary":30,"ovr":119,"enhance":1},
+  {"position":"前腰","name":"F.维尔茨","salary":29,"ovr":119,"enhance":1},
+  {"position":"左后卫","name":"努诺·门德斯","salary":28,"ovr":119,"enhance":1},
+  {"position":"后腰","name":"苏比门迪","salary":28,"ovr":119,"enhance":1},
+  {"position":"左边锋","name":"J.多库","salary":28,"ovr":119,"enhance":1},
+  {"position":"前腰","name":"L.卡尔","salary":28,"ovr":119,"enhance":1},
+  {"position":"中后卫","name":"W.帕乔","salary":27,"ovr":119,"enhance":1},
+  {"position":"中后卫","name":"W.萨利巴","salary":27,"ovr":119,"enhance":1},
+  {"position":"守门员","name":"U.卡科尔","salary":25,"ovr":119,"enhance":1},
+  {"position":"左边锋","name":"G.马丁内利","salary":30,"ovr":118,"enhance":1},
+  {"position":"左边锋","name":"拉什福德","salary":30,"ovr":118,"enhance":1},
+  {"position":"中后卫","name":"范戴克","salary":30,"ovr":118,"enhance":1},
+  {"position":"中场","name":"佩德里","salary":29,"ovr":118,"enhance":1},
+  {"position":"中后卫","name":"J.格瓦迪奥尔","salary":29,"ovr":118,"enhance":1},
+  {"position":"前腰","name":"德凯特拉雷","salary":29,"ovr":118,"enhance":1},
+  {"position":"左边锋","name":"A.戈登","salary":29,"ovr":118,"enhance":1},
+  {"position":"右边锋","name":"哈维·巴恩斯","salary":29,"ovr":118,"enhance":1},
+  {"position":"中锋","name":"劳塔罗·马丁内斯","salary":29,"ovr":118,"enhance":1},
+  {"position":"右后卫","name":"马科斯·略伦特","salary":29,"ovr":118,"enhance":1},
+  {"position":"左边锋","name":"格纳布里","salary":29,"ovr":118,"enhance":1},
+  {"position":"后腰","name":"M.凯塞多","salary":28,"ovr":118,"enhance":1},
+  {"position":"前腰","name":"特林康","salary":28,"ovr":118,"enhance":1},
+  {"position":"后腰","name":"楚阿梅尼","salary":28,"ovr":118,"enhance":1},
+  {"position":"左边锋","name":"维尼修斯","salary":28,"ovr":118,"enhance":1},
+  {"position":"左边锋","name":"J.海于格","salary":28,"ovr":118,"enhance":1},
+  {"position":"左边卫","name":"格里马尔多","salary":28,"ovr":118,"enhance":1},
+  {"position":"右后卫","name":"佩德罗·波罗","salary":27,"ovr":118,"enhance":1},
+  {"position":"影锋","name":"格列兹曼","salary":27,"ovr":118,"enhance":1},
+  {"position":"前腰","name":"居莱尔","salary":26,"ovr":118,"enhance":1},
+  {"position":"后腰","name":"基米希","salary":26,"ovr":118,"enhance":1},
+  {"position":"左边锋","name":"K.伊尔迪兹","salary":29,"ovr":117,"enhance":1},
+  {"position":"中场","name":"恩梅加","salary":29,"ovr":117,"enhance":1},
+  {"position":"后腰","name":"恰尔汗奥卢","salary":29,"ovr":117,"enhance":1},
+  {"position":"前腰","name":"J.贝林厄姆","salary":28,"ovr":117,"enhance":1},
+  {"position":"前腰","name":"福登","salary":28,"ovr":117,"enhance":1},
+  {"position":"中后卫","name":"A.巴斯托尼","salary":28,"ovr":117,"enhance":1},
+  {"position":"右边锋","name":"杜埃","salary":27,"ovr":117,"enhance":1},
+  {"position":"守门员","name":"M.卡尔内塞基","salary":26,"ovr":117,"enhance":1},
+  {"position":"守门员","name":"N.克海金","salary":25,"ovr":117,"enhance":1},
+  {"position":"左边锋","name":"特洛萨德","salary":29,"ovr":116,"enhance":1},
+  {"position":"右边锋","name":"谢尔基","salary":28,"ovr":116,"enhance":1},
+  {"position":"右前卫","name":"W.麦克凯尼","salary":28,"ovr":116,"enhance":1},
+  {"position":"中后卫","name":"C.罗梅罗","salary":28,"ovr":116,"enhance":1},
+  {"position":"右边锋","name":"L.萨内","salary":28,"ovr":116,"enhance":1},
+  {"position":"前腰","name":"H.瓦纳肯","salary":28,"ovr":116,"enhance":1},
+  {"position":"右边锋","name":"埃斯特旺","salary":28,"ovr":116,"enhance":1},
+  {"position":"中场","name":"法比安-鲁易斯","salary":27,"ovr":116,"enhance":1},
+  {"position":"守门员","name":"G.维卡里奥","salary":26,"ovr":116,"enhance":1},
+  {"position":"守门员","name":"波普","salary":26,"ovr":116,"enhance":1},
+  {"position":"后腰","name":"A.帕夫洛维奇","salary":25,"ovr":116,"enhance":1},
+  {"position":"守门员","name":"多纳鲁马","salary":25,"ovr":116,"enhance":1},
+  {"position":"中后卫","name":"范德芬","salary":28,"ovr":115,"enhance":1},
+  {"position":"右边锋","name":"N.马杜克","salary":28,"ovr":115,"enhance":1},
+  {"position":"影锋","name":"K.阿德耶米","salary":28,"ovr":115,"enhance":1},
+  {"position":"右后卫","name":"J.廷贝尔","salary":28,"ovr":115,"enhance":1},
+  {"position":"左边锋","name":"加克波","salary":28,"ovr":115,"enhance":1},
+  {"position":"中锋","name":"哲凯赖什","salary":28,"ovr":115,"enhance":1},
+  {"position":"中锋","name":"吉拉西","salary":28,"ovr":115,"enhance":1},
+  {"position":"左边锋","name":"B.巴科拉","salary":27,"ovr":115,"enhance":1},
+  {"position":"右边卫","name":"扬·科托","salary":27,"ovr":115,"enhance":1},
+  {"position":"中场","name":"布鲁诺·吉马良斯","salary":27,"ovr":115,"enhance":1},
+  {"position":"中后卫","name":"Y.比塞克","salary":27,"ovr":115,"enhance":1},
+  {"position":"中场","name":"巴尔维德","salary":27,"ovr":115,"enhance":1},
+  {"position":"右边卫","name":"D.邓弗里斯","salary":27,"ovr":115,"enhance":1},
+  {"position":"左边卫","name":"F.迪马尔科","salary":27,"ovr":115,"enhance":1},
+  {"position":"前腰","name":"厄德高","salary":27,"ovr":115,"enhance":1},
+  {"position":"左后卫","name":"罗伯逊","salary":27,"ovr":115,"enhance":1},
+  {"position":"中后卫","name":"马尔基尼奥斯","salary":27,"ovr":115,"enhance":1},
+  {"position":"中锋","name":"H.埃基蒂克","salary":26,"ovr":115,"enhance":1},
+  {"position":"前腰","name":"埃泽","salary":26,"ovr":115,"enhance":1},
+  {"position":"守门员","name":"P.科恩","salary":25,"ovr":115,"enhance":1},
+  {"position":"守门员","name":"索默","salary":25,"ovr":115,"enhance":1},
+  {"position":"守门员","name":"鲁伊·席尔瓦","salary":24,"ovr":115,"enhance":1},
+  {"position":"前腰","name":"布兰特","salary":28,"ovr":114,"enhance":1},
+  {"position":"右后卫","name":"特里皮尔","salary":28,"ovr":114,"enhance":1},
+  {"position":"中锋","name":"马库斯·图拉姆","salary":27,"ovr":114,"enhance":1},
+  {"position":"右后卫","name":"莱默尔","salary":27,"ovr":114,"enhance":1},
+  {"position":"中场","name":"迈克尔梅里诺","salary":27,"ovr":114,"enhance":1},
+  {"position":"中后卫","name":"丹·伯恩","salary":27,"ovr":114,"enhance":1},
+  {"position":"影锋","name":"A.卢克曼","salary":26,"ovr":114,"enhance":1},
+  {"position":"后腰","name":"P.伯格","salary":26,"ovr":114,"enhance":1},
+  {"position":"守门员","name":"阿利松","salary":25,"ovr":114,"enhance":1},
+  {"position":"左后卫","name":"杰拉德·马丁","salary":25,"ovr":114,"enhance":1}
+];
+
+function populatePlayerSelect() {
+  const sel = document.getElementById('inpPlayerSelect');
+  // Keep the first "custom" option
+  sel.innerHTML = '<option value="">— 自定义球员 —</option>';
+  // Group by position
+  const positions = [...new Set(PLAYER_DB.map(p => p.position))];
+  positions.sort();
+  positions.forEach(pos => {
+    const group = document.createElement('optgroup');
+    group.label = pos;
+    const players = PLAYER_DB.filter(p => p.position === pos);
+    players.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.name;
+      opt.textContent = p.name + ' · OVR ' + p.ovr + ' · 周薪' + p.salary + '万';
+      opt.dataset.position = p.position;
+      opt.dataset.ovr = p.ovr;
+      opt.dataset.salary = p.salary;
+      opt.dataset.enhance = p.enhance;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
+  });
+}
+
+function onPlayerSelect() {
+  const sel = document.getElementById('inpPlayerSelect');
+  const name = sel.value;
+  if (!name) return; // "自定义" option
+  const opt = sel.selectedOptions[0];
+  document.getElementById('inpName').value = name;
+  document.getElementById('inpPos').value = opt.dataset.position;
+  document.getElementById('inpOvr').value = opt.dataset.ovr;
+  document.getElementById('inpLevel').value = opt.dataset.enhance;
+  document.getElementById('inpSeason').value = '25ucl';
+  // Apply immediately
+  applySettings();
+}
+
+// ============================================================
+//  State
+// ============================================================
+let baseOvr = 123;
+let currentLevel = 1;
+let playerName = '哈里·凯恩';
+let playerPos = '中锋';
+let playerSeason = '25ucl';
+let totalAttempts = 0;
+let totalSuccess = 0;
+let protectCount = 0;
+let autoMode = false;
+let stopLevel = 13;
+let autoTimer = null;
+let isEnhancing = false;
+let history = [];
+
+// Settings panel
+let settingsOpen = false;
+let materialCards = []; // {ovr: number}
+
+// ============================================================
+//  Material Card Energy Bar
+// ============================================================
+function addMaterial() {
+  if (materialCards.length >= 5) return;
+  const inp = document.getElementById('inpMaterialOvr');
+  const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
+  inp.value = ovr;
+  materialCards.push({ ovr });
+  updateEnergyBar();
+}
+
+function clearMaterials() {
+  materialCards = [];
+  updateEnergyBar();
+}
+
+function clickSlot(n) {
+  // Manual fill: clicking slot N means fill slots 1..N
+  const currentFilled = Math.round(getTotalFill());
+  if (currentFilled === n) {
+    // Toggle off
+    materialCards = [];
+  } else {
+    // Fill to N slots with current-OVR materials
+    materialCards = [];
+    for (let i = 0; i < n; i++) {
+      materialCards.push({ ovr: curOvr() });
+    }
+  }
+  updateEnergyBar();
+}
+
+function calcFillRatio(matOvr) {
+  // 以球员当前实际OVR为基准（非基础OVR）
+  const currentOvr = curOvr();
+  const diff = matOvr - currentOvr;
+  return Math.max(0.1, 1.0 + diff * 0.1);
+}
+
+function getTotalFill() {
+  let total = 0;
+  materialCards.forEach(m => { total += calcFillRatio(m.ovr); });
+  return Math.min(total, 5);
+}
+
+function getMaterialBoost() {
+  return Math.round(getTotalFill()) * 1; // 每格 +1% 成功率
+}
+
+function updateEnergyBar() {
+  const totalFill = getTotalFill();
+  const fullSlots = Math.floor(totalFill);
+  const partialFill = totalFill - fullSlots;
+
+  for (let i = 0; i < 5; i++) {
+    const slot = document.querySelector(`.energy-slot[data-slot="${i+1}"]`);
+    if (!slot) continue;
+    // Clear old fill
+    const oldFill = slot.querySelector('.fill');
+    if (oldFill) oldFill.remove();
+
+    if (i < fullSlots) {
+      // Fully filled
+      slot.classList.add('filled');
+      const fill = document.createElement('div');
+      fill.className = 'fill';
+      fill.style.width = '100%';
+      slot.appendChild(fill);
+    } else if (i === fullSlots && partialFill > 0) {
+      // Partially filled
+      slot.classList.add('filled');
+      const fill = document.createElement('div');
+      fill.className = 'fill';
+      fill.style.width = (partialFill * 100) + '%';
+      slot.appendChild(fill);
+    } else {
+      // Empty
+      slot.classList.remove('filled');
+    }
+  }
+
+  document.getElementById('materialCount').textContent = `已填 ${materialCards.length}/5`;
+  const boost = getMaterialBoost();
+  document.getElementById('materialBoost').textContent = '+' + boost + '%';
+}
+
+function getFinalRate(baseRate) {
+  const boost = getMaterialBoost() / 100; // convert to decimal
+  return Math.min(1, baseRate + boost);
+}
+
+
+// ============================================================
+//  Helpers
+// ============================================================
+function data(lv) { return TABLE.find(d => d.level === lv) || TABLE[0]; }
+function curOvr() { return baseOvr + data(currentLevel).bonus; }
+function canEnhance() { return currentLevel < 13; }
+
+// ============================================================
+//  UI Update
+// ============================================================
+function refreshAll() {
+  const d = data(currentLevel);
+  const ovr = curOvr();
+  const nextLv = currentLevel + 1;
+  const canUp = canEnhance();
+  const nextD = canUp ? data(nextLv) : null;
+
+  // Player card
+  document.getElementById('playerOvr').textContent = ovr;
+  document.getElementById('enhanceBadge').textContent = '+' + currentLevel;
+  document.getElementById('playerName').textContent = playerName;
+  document.getElementById('playerMeta').textContent = playerPos;
+
+  // Season badge
+  const sEl = document.getElementById('playerSeason');
+  const seasonNames = {
+    default:'基础卡', live:'LIVE', hot:'HOT', tots:'TOTS', toty:'TOTY',
+    icon:'ICON', 'icon-tm':'ICON TM', wc:'WC', ucl:'UCL', ng:'NG', cap:'CAP'
+  };
+  sEl.textContent = seasonNames[playerSeason] || playerSeason.toUpperCase();
+  sEl.className = 'player-season';
+  if (playerSeason === 'tots') sEl.classList.add('season-tots');
+  else if (playerSeason === 'toty') sEl.classList.add('season-toty');
+  else if (playerSeason === 'icon' || playerSeason === 'icon-tm') sEl.classList.add('season-icon');
+  else if (playerSeason === 'hot') sEl.classList.add('season-hot');
+  else if (playerSeason === 'live') sEl.classList.add('season-live');
+  else if (playerSeason === '25ucl') sEl.classList.add('season-25ucl');
+  else sEl.classList.add('season-default');
+
+  // Avatar
+  const avatar = document.getElementById('playerAvatar');
+  avatar.classList.remove('elite','legend','ultimate');
+  if (currentLevel >= 12) avatar.classList.add('ultimate');
+  else if (currentLevel >= 8) avatar.classList.add('legend');
+  else if (currentLevel >= 5) avatar.classList.add('elite');
+
+  // Trait slots (特性槽)
+  const traitCount = currentLevel >= 12 ? 7 : currentLevel >= 9 ? 6 : currentLevel >= 6 ? 5 : currentLevel >= 3 ? 4 : 3;
+  let traitHtml = '';
+  for (let i = 0; i < 7; i++) {
+    traitHtml += `<div class="trait-slot${i < traitCount ? ' active' : ''}">${i < traitCount ? '◆' : ''}</div>`;
+  }
+  document.getElementById('traitSlots').innerHTML = traitHtml;
+
+  // Estimated value
+  const baseVal = baseOvr * baseOvr * 80;
+  const lvMult = [1, 1.2, 1.5, 2, 3, 5, 8, 14, 22, 35, 55, 85, 130, 200];
+  const val = Math.floor(baseVal * lvMult[currentLevel] / 10000);
+  document.getElementById('estValue').textContent = '💰 预计价值: ' + (val >= 1 ? val + '万 BP' : '--');
+
+  // Progress bar
+  renderProgress();
+
+  // Rate info
+  if (!canUp) {
+    document.getElementById('rateInfo').innerHTML = '<strong style="color:#f0b90b;">已满级 MAX +13</strong>';
+    document.getElementById('btnEnhance').disabled = true;
+    document.getElementById('btnEnhance').textContent = '已满级';
+  } else {
+    const effectiveRate = getFinalRate(nextD.rate);
+    const r = (effectiveRate * 100);
+    const rStr = r >= 1 ? r.toFixed(0) + '%' : r.toFixed(1) + '%';
+    const boost = getMaterialBoost();
+    const boostStr = boost > 0 ? ` <span style="color:#2979ff;font-size:11px;">(含材料+${boost}%)</span>` : '';
+    document.getElementById('rateInfo').innerHTML = `+${currentLevel} → +${nextLv} 成功率 <strong>${rStr}</strong>${boostStr} <span class="rate-help" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span>`;
+    document.getElementById('btnEnhance').disabled = false;
+    document.getElementById('btnEnhance').textContent = '强 化';
+  }
+
+  // Info chips
+  document.getElementById('infoNextLevel').textContent = canUp ? '+' + nextLv : 'MAX';
+  document.getElementById('infoRate').textContent = canUp ? ((getFinalRate(nextD.rate)*100) >= 1 ? (getFinalRate(nextD.rate)*100).toFixed(0)+'%' : (getFinalRate(nextD.rate)*100).toFixed(1)+'%') : '-';
+  document.getElementById('infoOvrGain').textContent = canUp ? ('+' + nextD.gain) : '-';
+  document.getElementById('infoTargetOvr').textContent = canUp ? (baseOvr + nextD.bonus) : (baseOvr + d.bonus);
+
+  // Protection badge
+  if (currentLevel >= 5 && protectCount === 0) {
+    document.getElementById('protectBadge').style.display = 'inline';
+  } else {
+    document.getElementById('protectBadge').style.display = 'none';
+  }
+
+  // Stats
+  document.getElementById('sAttempts').textContent = totalAttempts;
+  document.getElementById('sSuccess').textContent = totalSuccess;
+  // Build all-success tip
+  const successes = history.filter(h => h.result === 'success');
+  let allSuccessTip = '';
+  if (successes.length === 0) {
+    allSuccessTip = '暂无成功记录';
+  } else {
+    allSuccessTip = successes.map(h => {
+      const parts = h.desc.split(' | ');
+      return parts[0] + '\n' + parts[parts.length - 1];
+    }).join('\n———\n');
+  }
+  document.getElementById('statSuccessBox').setAttribute('data-tip', allSuccessTip);
+  document.getElementById('sFail').textContent = totalAttempts - totalSuccess;
+
+  document.getElementById('stopLevelDisplay').textContent = '+' + ((stopLevel > 13) ? 13 : stopLevel);
+
+  // Button state
+  if (!canUp) {
+    document.getElementById('btnEnhance').disabled = true;
+    if (autoMode) stopAuto();
+  }
+
+  renderHistory();
+}
+
+function renderProgress() {
+  let html = '';
+  for (let i = 0; i <= 13; i++) {
+    if (i > 0) html += '<span class="progress-arrow">›</span>';
+    let cls = 'progress-step';
+    if (i < currentLevel) cls += ' reached';
+    if (i === currentLevel) cls += ' current';
+    html += `<div class="${cls}" title="+${i}: OVR ${baseOvr + data(i).bonus}">+${i}</div>`;
+  }
+  document.getElementById('progressBar').innerHTML = html;
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (history.length === 0) {
+    list.innerHTML = '<li class="hist-empty">等待首次强化...</li>';
+    return;
+  }
+  list.innerHTML = history.slice(0, 50).map(h => {
+    let tagCls, tagText;
+    if (h.result === 'success') { tagCls = 'win'; tagText = '成功'; }
+    else { tagCls = 'lose'; tagText = '失败'; }
+    return `<li class="history-item">
+      <span class="hist-num">#${h.num}</span>
+      <span class="hist-tag ${tagCls}">${tagText}</span>
+      <span class="hist-detail">${h.desc}</span>
+    </li>`;
+  }).join('');
+}
+
+// ============================================================
+//  Actions
+// ============================================================
+function onProtectSlider() {
+  const slider = document.getElementById('protectSlider');
+  protectCount = parseInt(slider.value) || 0;
+  document.getElementById('protectCount').textContent = protectCount;
+}
+function hasProtection() { return protectCount > 0; }
+
+function toggleAuto() {
+  if (autoMode) { stopAuto(); } else { startAuto(); }
+}
+
+function startAuto() {
+  if (!canEnhance()) return;
+  autoMode = true;
+  const btn = document.getElementById('btnAuto');
+  btn.textContent = '停止';
+  btn.classList.add('active');
+  doAutoStep();
+}
+
+function stopAuto() {
+  autoMode = false;
+  const btn = document.getElementById('btnAuto');
+  btn.textContent = '自动';
+  btn.classList.remove('active');
+  if (autoTimer) clearTimeout(autoTimer);
+}
+
+function doAutoStep() {
+  if (!autoMode || !canEnhance()) { stopAuto(); return; }
+  if (currentLevel >= stopLevel) { stopAuto(); return; }
+  if (!isEnhancing) startEnhance();
+  autoTimer = setTimeout(() => doAutoStep(), 1800);
+}
+
+function resetCard() {
+  if (isEnhancing) return;
+  if (autoMode) stopAuto();
+  currentLevel = 0;
+  totalAttempts = 0;
+  totalSuccess = 0;
+  history = [];
+  stopLevel = 13;
+  document.getElementById('inpStopLevel').value = 13;
+  protectCount = 0;
+  document.getElementById('protectSlider').value = 0;
+  document.getElementById('protectCount').textContent = '0';
+  clearMaterials();
+  document.getElementById('inpMaterialOvr').value = baseOvr;
+  refreshAll();
+}
+
+function startEnhance() {
+  if (isEnhancing || !canEnhance()) return;
+  isEnhancing = true;
+
+  const btn = document.getElementById('btnEnhance');
+  const card = document.getElementById('playerCard');
+  btn.classList.add('charging');
+  btn.textContent = '强化中...';
+  btn.disabled = true;
+  card.classList.add('enhance-flash');
+
+  setTimeout(() => {
+    executeEnhance();
+    isEnhancing = false;
+    btn.classList.remove('charging');
+    btn.disabled = false;
+    btn.textContent = '强 化';
+    card.classList.remove('enhance-flash');
+  }, 1300);
+}
+
+function executeEnhance() {
+  const nextLv = currentLevel + 1;
+  const nextD = data(nextLv);
+  const rate = getFinalRate(nextD.rate);
+  const roll = Math.random();
+  const success = roll < rate;
+
+  totalAttempts++;
+
+  if (success) {
+    // === SUCCESS ===
+    const oldOvr = curOvr();
+    currentLevel = nextLv;
+    totalSuccess++;
+    const newOvr = curOvr();
+
+    const card = document.getElementById('playerCard');
+    card.classList.add('success-glow');
+    setTimeout(() => card.classList.remove('success-glow'), 600);
+
+    spawnParticles('success');
+    addHistory('success', `+${nextLv - 1} → +${nextLv}  |  OVR ${oldOvr} → ${newOvr}  |  第${totalAttempts}次成功`);
+    showModal('success', nextLv, oldOvr, newOvr);
+
+    if (currentLevel >= stopLevel && autoMode) stopAuto();
+  } else {
+    // === FAIL ===
+    const oldOvr = curOvr();
+    const oldLevel = currentLevel;
+    const card = document.getElementById('playerCard');
+
+    // 失败规则：+1~+4 不掉级，+5及以上掉1级
+    card.classList.add('fail-shake');
+    setTimeout(() => card.classList.remove('fail-shake'), 450);
+    spawnParticles('fail');
+
+    if (currentLevel >= 5 && !hasProtection()) {
+      // 掉1级
+      const dropTo = currentLevel - 1;
+      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  降至 +${dropTo}`);
+      showModal('fail', oldLevel, oldOvr, baseOvr + data(dropTo).bonus, nextLv, dropTo);
+      currentLevel = dropTo;
+    } else if (hasProtection() && currentLevel >= 5) {
+      // 有保护，不掉级
+      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  强化等级保护生效，保持 +${oldLevel}`);
+      showModal('protect', oldLevel, oldOvr, oldOvr, nextLv);
+    } else {
+      // +1~+4 不掉级
+      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  不掉级，保持 +${oldLevel}`);
+      showModal('failSafe', oldLevel, oldOvr, oldOvr, nextLv);
+    }
+  }
+
+  refreshAll();
+}
+
+function addHistory(result, desc) {
+  history.unshift({ result, desc, num: totalAttempts });
+  if (history.length > 100) history.length = 100;
+}
+
+// ============================================================
+//  Modal
+// ============================================================
+function showModal(type, level, oldOvr, newOvr, targetLv, dropTo) {
+  const overlay = document.getElementById('overlay');
+  const icon = document.getElementById('modalIcon');
+  const title = document.getElementById('modalTitle');
+  const lvl = document.getElementById('modalLevel');
+  const ovr = document.getElementById('modalOvr');
+  const detail = document.getElementById('modalDetail');
+
+  overlay.classList.add('show');
+
+  switch (type) {
+    case 'success':
+      icon.textContent = '✨';
+      title.textContent = '强化成功！';
+      title.className = 'title win';
+      lvl.textContent = `球员提升至 +${level}`;
+      ovr.textContent = `能力值 ${newOvr}`;
+      ovr.className = 'ovr-change';
+      detail.textContent = `OVR ${oldOvr} → ${newOvr}  (+${newOvr - oldOvr})  |  材料加成: +${getMaterialBoost()}%`;
+      break;
+
+    case 'fail':
+      icon.textContent = '💔';
+      title.textContent = '强化失败';
+      title.className = 'title lose';
+      lvl.textContent = `+${level} → +${targetLv} 失败`;
+      ovr.textContent = `降至 +${dropTo}  能力值 ${newOvr}`;
+      ovr.className = 'ovr-change down';
+      detail.textContent = `OVR ${oldOvr} → ${newOvr}  (${newOvr - oldOvr})  |  强化等级下降 1 级`;
+      break;
+
+    case 'failSafe':
+      icon.textContent = '😞';
+      title.textContent = '强化失败';
+      title.className = 'title lose';
+      lvl.textContent = `+${level} → +${targetLv} 失败`;
+      ovr.textContent = `保持 +${level}  能力值 ${newOvr}`;
+      ovr.className = 'ovr-change';
+      detail.textContent = '+1~+4 阶段失败不掉级，请继续尝试';
+      break;
+
+    case 'protect':
+      icon.textContent = '🛡️';
+      title.textContent = '强化失败 (强化等级保护)';
+      title.className = 'title win';
+      lvl.textContent = `+${level} → +${targetLv} 失败`;
+      ovr.textContent = `保持 +${level}  能力值 ${newOvr}`;
+      ovr.className = 'ovr-change';
+      detail.textContent = '强化等级保护生效 | 等级不变';
+      break;
+
+  }
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ============================================================
+//  Particles
+// ============================================================
+function spawnParticles(type) {
+  const layer = document.getElementById('particleLayer');
+  const card = document.getElementById('playerCard');
+  const rect = card.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const count = type === 'success' ? 28 : 12;
+  const icons = type === 'success'
+    ? ['⭐','✨','🔥','💪','⚡','🏆','💎']
+    : ['❌','😢','💨'];
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'pt';
+    el.textContent = icons[Math.floor(Math.random() * icons.length)];
+    el.style.left = cx + 'px';
+    el.style.top = cy + 'px';
+    const a = Math.random() * Math.PI * 2;
+    const d = 50 + Math.random() * 140;
+    el.style.setProperty('--dx', Math.cos(a) * d + 'px');
+    el.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    el.style.animationDuration = (0.5 + Math.random() * 0.8) + 's';
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+  }
+}
+
+// ============================================================
+//  Settings
+// ============================================================
+
+// Sync the player select dropdown with current player
+function syncPlayerSelect() {
+  const sel = document.getElementById('inpPlayerSelect');
+  const match = PLAYER_DB.find(p => p.name === playerName);
+  if (match) {
+    sel.value = match.name;
+  } else {
+    sel.value = '';
+  }
+}
+
+function toggleSettings() {
+  settingsOpen = !settingsOpen;
+  document.getElementById('settingsPanel').classList.toggle('show', settingsOpen);
+  document.getElementById('settingsArrow').classList.toggle('open', settingsOpen);
+}
+
+function applySettings() {
+  const name = document.getElementById('inpName').value.trim() || 'Unknown Player';
+  const season = document.getElementById('inpSeason').value;
+  const pos = document.getElementById('inpPos').value.trim() || 'ST';
+  const ovr = parseInt(document.getElementById('inpOvr').value) || 89;
+  const lv = parseInt(document.getElementById('inpLevel').value) || 0;
+
+  playerName = name;
+  playerSeason = season;
+  playerPos = pos;
+  baseOvr = Math.max(40, Math.min(150, ovr));
+  currentLevel = Math.max(0, Math.min(13, lv));
+
+  // Reset stats when changing player
+  totalAttempts = 0;
+  totalSuccess = 0;
+  history = [];
+  if (autoMode) stopAuto();
+
+  // Update form fields
+  document.getElementById('inpName').value = playerName;
+  document.getElementById('inpSeason').value = playerSeason;
+  document.getElementById('inpPos').value = playerPos;
+  document.getElementById('inpOvr').value = baseOvr;
+  document.getElementById('inpLevel').value = currentLevel;
+  document.getElementById('inpStopLevel').value = stopLevel;
+  document.getElementById('inpMaterialOvr').value = baseOvr;
+  clearMaterials();
+  // Sync player select dropdown
+  syncPlayerSelect();
+
+  refreshAll();
+}
+
+// ============================================================
+//  Stop Level Input
+// ============================================================
+document.getElementById('inpStopLevel').addEventListener('input', function() {
+  stopLevel = Math.max(1, Math.min(13, parseInt(this.value) || 13));
+  this.value = stopLevel;
+  document.getElementById('stopLevelDisplay').textContent = '+' + stopLevel;
+});
+
+//  Keyboard
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!isEnhancing && canEnhance()) startEnhance();
+  }
+  if (e.code === 'KeyA') {
+    e.preventDefault();
+    toggleAuto();
+  }
+});
+
+populatePlayerSelect();
+// ============================================================
+//  Init
+// ============================================================
+refreshAll();
+</script>
+</body>
+</html>
