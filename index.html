@@ -1302,11 +1302,25 @@ function refreshAll() {
   document.getElementById('infoOvrGain').textContent = canUp ? ('+' + nextD.gain) : '-';
   document.getElementById('infoTargetOvr').textContent = canUp ? (baseOvr + nextD.bonus) : (baseOvr + d.bonus);
 
-  // Protection badge
-  if (currentLevel >= 5 && protectCount === 0) {
-    document.getElementById('protectBadge').style.display = 'inline';
+  // Protection slider: only available at +8 and above
+  const slider = document.getElementById('protectSlider');
+  const protectBadge = document.getElementById('protectBadge');
+  if (currentLevel < 8) {
+    slider.disabled = true;
+    slider.value = 0;
+    protectCount = 0;
+    document.getElementById('protectCount').textContent = '0';
+    protectBadge.style.display = 'none';
+    slider.parentElement.style.opacity = '0.35';
   } else {
-    document.getElementById('protectBadge').style.display = 'none';
+    slider.disabled = false;
+    slider.parentElement.style.opacity = '1';
+    if (protectCount === 0) {
+      protectBadge.style.display = 'inline';
+      protectBadge.textContent = '推荐开启';
+    } else {
+      protectBadge.style.display = 'none';
+    }
   }
 
   // Stats
@@ -1375,7 +1389,7 @@ function onProtectSlider() {
   protectCount = parseInt(slider.value) || 0;
   document.getElementById('protectCount').textContent = protectCount;
 }
-function hasProtection() { return protectCount > 0; }
+function hasProtection() { return currentLevel >= 8 && protectCount > 0; }
 
 function toggleAuto() {
   if (autoMode) { stopAuto(); } else { startAuto(); }
@@ -1419,6 +1433,7 @@ function resetCard() {
   document.getElementById('protectCount').textContent = '0';
   clearMaterials();
   document.getElementById('inpMaterialOvr').value = baseOvr;
+  saveState();
   refreshAll();
 }
 
@@ -1474,28 +1489,37 @@ function executeEnhance() {
     const oldLevel = currentLevel;
     const card = document.getElementById('playerCard');
 
-    // 失败规则：+1~+4 不掉级，+5及以上掉1级
     card.classList.add('fail-shake');
     setTimeout(() => card.classList.remove('fail-shake'), 450);
     spawnParticles('fail');
 
-    if (currentLevel >= 5 && !hasProtection()) {
-      // 掉1级
-      const dropTo = currentLevel - 1;
-      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  降至 +${dropTo}`);
-      showModal('fail', oldLevel, oldOvr, baseOvr + data(dropTo).bonus, nextLv, dropTo);
+    let dropTo;
+    if (!hasProtection()) {
+      if (currentLevel === 2) {
+        // +2→+3 失败: 掉至 +1
+        dropTo = 1;
+      } else if (currentLevel === 3) {
+        // +3→+4 失败: 随机掉至 +1 或 +2
+        dropTo = Math.random() < 0.5 ? 1 : 2;
+      } else if (currentLevel >= 4 && currentLevel <= 7) {
+        // +4→+5 ~ +7→+8 失败: 统一掉至 +1
+        dropTo = 1;
+      } else {
+        // +8 及以上失败: 随机掉落至 +1~+6
+        dropTo = Math.floor(Math.random() * 6) + 1;
+      }
+      const dropOvr = baseOvr + data(dropTo).bonus;
+      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  降至 +${dropTo}  (OVR ${dropOvr})`);
+      showModal('fail', oldLevel, oldOvr, dropOvr, nextLv, dropTo);
       currentLevel = dropTo;
-    } else if (hasProtection() && currentLevel >= 5) {
-      // 有保护，不掉级
+    } else {
+      // 强化等级保护: 不掉级
       addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  强化等级保护生效，保持 +${oldLevel}`);
       showModal('protect', oldLevel, oldOvr, oldOvr, nextLv);
-    } else {
-      // +1~+4 不掉级
-      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  不掉级，保持 +${oldLevel}`);
-      showModal('failSafe', oldLevel, oldOvr, oldOvr, nextLv);
     }
   }
 
+  saveState();
   refreshAll();
 }
 
@@ -1535,17 +1559,7 @@ function showModal(type, level, oldOvr, newOvr, targetLv, dropTo) {
       lvl.textContent = `+${level} → +${targetLv} 失败`;
       ovr.textContent = `降至 +${dropTo}  能力值 ${newOvr}`;
       ovr.className = 'ovr-change down';
-      detail.textContent = `OVR ${oldOvr} → ${newOvr}  (${newOvr - oldOvr})  |  强化等级下降 1 级`;
-      break;
-
-    case 'failSafe':
-      icon.textContent = '😞';
-      title.textContent = '强化失败';
-      title.className = 'title lose';
-      lvl.textContent = `+${level} → +${targetLv} 失败`;
-      ovr.textContent = `保持 +${level}  能力值 ${newOvr}`;
-      ovr.className = 'ovr-change';
-      detail.textContent = '+1~+4 阶段失败不掉级，请继续尝试';
+      detail.textContent = `OVR ${oldOvr} → ${newOvr}  (${newOvr - oldOvr})  |  等级下降 ${level - dropTo} 级`;
       break;
 
     case 'protect':
@@ -1648,6 +1662,9 @@ function applySettings() {
   // Sync player select dropdown
   syncPlayerSelect();
 
+  // Auto-collapse settings panel
+  if (settingsOpen) toggleSettings();
+
   refreshAll();
 }
 
@@ -1676,8 +1693,78 @@ document.addEventListener('keydown', e => {
 
 populatePlayerSelect();
 // ============================================================
+//  State Persistence (mobile keep-alive)
+// ============================================================
+function saveState() {
+  const state = {
+    playerName, playerSeason, playerPos, baseOvr, currentLevel,
+    protectCount, stopLevel, totalAttempts, totalSuccess, history,
+    matSlots, autoMode
+  };
+  try { localStorage.setItem('fc-enhance-state', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('fc-enhance-state');
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    playerName = s.playerName || 'Cristiano Ronaldo';
+    playerSeason = s.playerSeason || 'tots';
+    playerPos = s.playerPos || 'ST · CF';
+    baseOvr = s.baseOvr || 89;
+    currentLevel = s.currentLevel || 0;
+    protectCount = s.protectCount || 0;
+    stopLevel = s.stopLevel || 13;
+    totalAttempts = s.totalAttempts || 0;
+    totalSuccess = s.totalSuccess || 0;
+    history = s.history || [];
+    matSlots = s.matSlots || [0,0,0,0,0];
+    autoMode = false;
+    // Restore UI inputs
+    document.getElementById('protectSlider').value = protectCount;
+    document.getElementById('protectCount').textContent = protectCount;
+    document.getElementById('inpStopLevel').value = stopLevel;
+    document.getElementById('stopLevelDisplay').textContent = '+' + stopLevel;
+    return true;
+  } catch(e) { return false; }
+}
+
+// Save state on page hide / visibility change
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) saveState();
+});
+window.addEventListener('beforeunload', () => saveState());
+window.addEventListener('pagehide', () => saveState());
+
+// WakeLock for mobile keep-alive
+let wakeLock = null;
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => {
+        // WakeLock released, try re-acquire on visibility
+      });
+    }
+  } catch(e) { /* not supported or denied */ }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') requestWakeLock();
+});
+requestWakeLock();
+
+// ============================================================
 //  Init
 // ============================================================
+const restored = loadState();
+// Update form fields to match loaded state
+document.getElementById('inpName').value = playerName;
+document.getElementById('inpSeason').value = playerSeason;
+document.getElementById('inpPos').value = playerPos;
+document.getElementById('inpOvr').value = baseOvr;
+document.getElementById('inpLevel').value = currentLevel;
+syncPlayerSelect();
 refreshAll();
 </script>
 </body>
