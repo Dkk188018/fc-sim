@@ -302,9 +302,11 @@
     display: flex;
     align-items: center;
     gap: 2px;
+    overflow: hidden;
   }
   .progress-step {
     width: 26px; height: 26px;
+    min-width: 16px;
     border-radius: 5px;
     background: #141c28;
     border: 1px solid #222d3d;
@@ -315,7 +317,21 @@
     font-weight: 700;
     color: #3a4860;
     transition: all 0.35s;
-    flex-shrink: 0;
+    flex-shrink: 1;
+  }
+  @media (max-width: 480px) {
+    .progress-bar { gap: 0; }
+    .progress-step {
+      width: 18px; height: 18px;
+      min-width: 14px;
+      font-size: 7px;
+      border-radius: 3px;
+    }
+    .progress-arrow {
+      font-size: 7px;
+      flex-shrink: 1;
+      margin: 0;
+    }
   }
   .progress-step.reached {
     background: #182a20;
