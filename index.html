@@ -1354,24 +1354,30 @@ function refreshAll() {
     }
   }
 
-  // Stats
-  document.getElementById('sAttempts').textContent = totalAttempts;
-  document.getElementById('sSuccess').textContent = totalSuccess;
+  // Stats (with safety null checks)
+  const sAttempts = document.getElementById('sAttempts');
+  const sSuccess = document.getElementById('sSuccess');
+  const sFail = document.getElementById('sFail');
+  const statSuccessBox = document.getElementById('statSuccessBox');
+  const stopLevelDisplay = document.getElementById('stopLevelDisplay');
+  if (sAttempts) sAttempts.textContent = totalAttempts;
+  if (sSuccess) sSuccess.textContent = totalSuccess;
+  if (sFail) sFail.textContent = totalAttempts - totalSuccess;
+  if (stopLevelDisplay) stopLevelDisplay.textContent = '+' + ((stopLevel > 13) ? 13 : stopLevel);
   // Build all-success tip
-  const successes = history.filter(h => h.result === 'success');
-  let allSuccessTip = '';
-  if (successes.length === 0) {
-    allSuccessTip = '暂无成功记录';
-  } else {
-    allSuccessTip = successes.map(h => {
-      const parts = h.desc.split(' | ');
-      return parts[0] + '\n' + parts[parts.length - 1];
-    }).join('\n———\n');
+  if (statSuccessBox) {
+    const successes = history.filter(h => h.result === 'success');
+    let allSuccessTip = '';
+    if (successes.length === 0) {
+      allSuccessTip = '暂无成功记录';
+    } else {
+      allSuccessTip = successes.map(h => {
+        const parts = h.desc.split(' | ');
+        return parts[0] + '\n' + parts[parts.length - 1];
+      }).join('\n———\n');
+    }
+    statSuccessBox.setAttribute('data-tip', allSuccessTip);
   }
-  document.getElementById('statSuccessBox').setAttribute('data-tip', allSuccessTip);
-  document.getElementById('sFail').textContent = totalAttempts - totalSuccess;
-
-  document.getElementById('stopLevelDisplay').textContent = '+' + ((stopLevel > 13) ? 13 : stopLevel);
 
   // Button state
   if (!canUp) {
@@ -1383,6 +1389,8 @@ function refreshAll() {
 }
 
 function renderProgress() {
+  const bar = document.getElementById('progressBar');
+  if (!bar) return;
   let html = '';
   for (let i = 0; i <= 13; i++) {
     if (i > 0) html += '<span class="progress-arrow">›</span>';
@@ -1391,11 +1399,12 @@ function renderProgress() {
     if (i === currentLevel) cls += ' current';
     html += `<div class="${cls}" title="+${i}: OVR ${baseOvr + data(i).bonus}">+${i}</div>`;
   }
-  document.getElementById('progressBar').innerHTML = html;
+  bar.innerHTML = html;
 }
 
 function renderHistory() {
   const list = document.getElementById('historyList');
+  if (!list) return;
   if (history.length === 0) {
     list.innerHTML = '<li class="hist-empty">等待首次强化...</li>';
     return;
