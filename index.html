@@ -409,7 +409,8 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-modal {
   background: #1a1f2e; border: 1px solid #3a4560;
   border-radius: 12px; padding: 16px 18px; text-align: center;
-  width: auto; max-width: 220px;
+  width: auto; max-width: 220px !important;
+  word-break: break-all; overflow-wrap: break-word;
   animation: modalPop 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
   will-change: transform,opacity;
 }
@@ -480,7 +481,7 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 <div class="app">
   <!-- Header -->
   <div class="header">
-    <h1>FC Online 4 强化模拟器</h1>
+    <h1>FC Online 4 强化模拟器 <span style="font-size:9px;color:#ff6d00;vertical-align:super;">v5.22</span></h1>
   </div>
 
   <!-- Settings Trigger -->
@@ -1019,9 +1020,9 @@ function refreshAll() {
   avatar.classList.remove('elite','legend','ultimate','has-img');
   const imgUrl = (typeof PLAYER_IMAGES !== 'undefined' && PLAYER_IMAGES[playerName]) ? PLAYER_IMAGES[playerName] : null;
   if (imgUrl) {
+    avatar.textContent = '';
     avatar.innerHTML = `<img src="${imgUrl}" alt="${playerName}" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">`;
     avatar.classList.add('has-img');
-    avatar.textContent = '';
   } else {
     avatar.innerHTML = '';
     avatar.textContent = '⚽';
