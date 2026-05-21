@@ -322,12 +322,39 @@
     color: #889;
     font-size: 10px;
     font-weight: 700;
-    cursor: help;
+    cursor: pointer;
     vertical-align: middle;
-    margin-left: 2px;
+    margin-left: 3px;
     touch-action: manipulation;
+    user-select: none;
+    position: relative;
   }
-  .rate-help:hover { background: #f0b90b; color: #000; }
+  .rate-help:hover, .rate-help.active { background: #f0b90b; color: #000; }
+  .rate-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 130%;
+    right: 0;
+    background: #0a0a0a;
+    color: #ddd;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.6;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #3a4860;
+    white-space: pre-line;
+    min-width: 280px;
+    max-width: 320px;
+    z-index: 100;
+    pointer-events: auto;
+    cursor: default;
+  }
+  .rate-tooltip.show { display: block; animation: fadeIn 0.15s ease-out; }
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
 
   .progress-bar {
     display: flex;
@@ -847,7 +874,7 @@
   <div class="material-section" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <span style="font-size:12px;color:var(--text2);font-weight:600;">强化概率加成</span>
-      <span style="font-size:11px;color:var(--text3);">成功率加成: <b style="color:#2979ff;" id="materialBoost">+0%</b></span>
+      <span style="font-size:11px;color:var(--text3);">成功率加成: <b style="color:#2979ff;" id="materialBoost">+0%</b> <span class="rate-help" id="rateHelpIcon" onclick="toggleRateHelp(event)" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span></span>
     </div>
     <!-- 5 Energy Slots -->
     <div style="display:flex;gap:6px;margin-bottom:8px;" id="energySlots">
@@ -1291,7 +1318,7 @@ function refreshAll() {
     const rStr = r >= 1 ? r.toFixed(0) + '%' : r.toFixed(1) + '%';
     const boost = getMaterialBoost();
     const boostStr = boost > 0 ? ` <span style="color:#2979ff;font-size:11px;">(含材料+${boost}%)</span>` : '';
-    document.getElementById('rateInfo').innerHTML = `+${currentLevel} → +${nextLv} 成功率 <strong>${rStr}</strong>${boostStr} <span class="rate-help" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span>`;
+    document.getElementById('rateInfo').innerHTML = `+${currentLevel} → +${nextLv} 成功率 <strong>${rStr}</strong>${boostStr}`;
     document.getElementById('btnEnhance').disabled = false;
     document.getElementById('btnEnhance').textContent = '强 化';
   }
@@ -1597,6 +1624,53 @@ function showModal(type, level, oldOvr, newOvr, targetLv, dropTo) {
 
 function closeModal() {
   document.getElementById('overlay').classList.remove('show');
+}
+
+// ============================================================
+//  Rate help tooltip
+// ============================================================
+let rateTooltipEl = null;
+
+function ensureTooltip() {
+  if (!rateTooltipEl) {
+    rateTooltipEl = document.createElement('div');
+    rateTooltipEl.className = 'rate-tooltip';
+    document.body.appendChild(rateTooltipEl);
+  }
+  return rateTooltipEl;
+}
+
+function toggleRateHelp(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const icon = document.getElementById('rateHelpIcon');
+  const tip = ensureTooltip();
+  const isShowing = tip.classList.contains('show');
+
+  // Close all rate tooltips first
+  tip.classList.remove('show');
+
+  if (!isShowing) {
+    tip.textContent = icon.getAttribute('title');
+    const rect = icon.getBoundingClientRect();
+    tip.style.position = 'fixed';
+    tip.style.bottom = 'auto';
+    tip.style.right = 'auto';
+    tip.style.top = (rect.top - 10) + 'px';
+    tip.style.left = Math.max(10, rect.right - 300) + 'px';
+    tip.classList.add('show');
+    setTimeout(() => {
+      const closeHandler = function(ev) {
+        if (!tip.contains(ev.target) && ev.target !== icon) {
+          tip.classList.remove('show');
+          document.removeEventListener('click', closeHandler);
+          document.removeEventListener('touchstart', closeHandler);
+        }
+      };
+      document.addEventListener('click', closeHandler);
+      document.addEventListener('touchstart', closeHandler);
+    }, 10);
+  }
 }
 
 // ============================================================
