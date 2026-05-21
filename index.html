@@ -1305,21 +1305,25 @@ function refreshAll() {
   // Protection slider: only available at +8 and above
   const slider = document.getElementById('protectSlider');
   const protectBadge = document.getElementById('protectBadge');
-  if (currentLevel < 8) {
-    slider.disabled = true;
-    slider.value = 0;
-    protectCount = 0;
-    document.getElementById('protectCount').textContent = '0';
-    protectBadge.style.display = 'none';
-    slider.parentElement.style.opacity = '0.35';
-  } else {
-    slider.disabled = false;
-    slider.parentElement.style.opacity = '1';
-    if (protectCount === 0) {
-      protectBadge.style.display = 'inline';
-      protectBadge.textContent = '推荐开启';
+  if (slider) {
+    if (currentLevel < 8) {
+      slider.disabled = true;
+      slider.value = 0;
+      protectCount = 0;
+      document.getElementById('protectCount').textContent = '0';
+      if (protectBadge) protectBadge.style.display = 'none';
+      if (slider.parentElement) slider.parentElement.style.opacity = '0.35';
     } else {
-      protectBadge.style.display = 'none';
+      slider.disabled = false;
+      if (slider.parentElement) slider.parentElement.style.opacity = '1';
+      if (protectBadge) {
+        if (protectCount === 0) {
+          protectBadge.style.display = 'inline';
+          protectBadge.textContent = '推荐开启';
+        } else {
+          protectBadge.style.display = 'none';
+        }
+      }
     }
   }
 
@@ -1448,8 +1452,24 @@ function startEnhance() {
   btn.disabled = true;
   card.classList.add('enhance-flash');
 
+  // Safety fallback: force-reset button after 3s no matter what
+  const safetyTimer = setTimeout(() => {
+    if (isEnhancing) {
+      isEnhancing = false;
+      btn.classList.remove('charging');
+      btn.disabled = false;
+      btn.textContent = '强 化';
+      card.classList.remove('enhance-flash');
+    }
+  }, 3000);
+
   setTimeout(() => {
-    executeEnhance();
+    try {
+      executeEnhance();
+    } catch(e) {
+      console.error('Enhance error:', e);
+    }
+    clearTimeout(safetyTimer);
     isEnhancing = false;
     btn.classList.remove('charging');
     btn.disabled = false;
