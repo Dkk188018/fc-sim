@@ -485,17 +485,30 @@
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
+  .energy-slot::before {
+    content: attr(data-slot);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #1a1a2e;
+    z-index: 2;
+    pointer-events: none;
+  }
   .energy-slot:hover { border-color: #4a6090; }
   .energy-slot .fill {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, #2979ff 0%, #1a50cc 100%);
+    background: linear-gradient(180deg, #5bb8ff 0%, #3a9aee 100%);
     transition: width 0.3s ease;
     border-radius: 4px;
   }
   .energy-slot.filled {
-    border-color: #2979ff;
-    box-shadow: 0 0 8px rgba(41,121,255,0.3);
+    border-color: #5bb8ff;
+    box-shadow: 0 0 8px rgba(91,184,255,0.35);
   }
   .protect-badge {
     font-size: 11px;
@@ -801,7 +814,7 @@
       </div>
       <div class="field">
         <label>当前强化等级 (+0 ~ +13)</label>
-        <input type="number" id="inpLevel" value="1" min="0" max="13">
+        <input type="number" id="inpLevel" value="1" min="1" max="13">
       </div>
     </div>
     <button class="btn btn-secondary" style="margin-top:12px;width:100%;" onclick="applySettings()">应用设置</button>
@@ -916,7 +929,7 @@
       <div class="num" id="sAttempts">0</div>
       <div class="tag">总次数</div>
     </div>
-    <div class="stat-box clickable" id="statSuccessBox" data-tip="">
+    <div class="stat-box clickable" id="statSuccessBox" data-tip="" onclick="toggleSuccessTip(event)">
       <div class="num s" id="sSuccess">0</div>
       <div class="tag">成功</div>
     </div>
@@ -1126,8 +1139,7 @@ function onPlayerSelect() {
   document.getElementById('inpOvr').value = opt.dataset.ovr;
   document.getElementById('inpLevel').value = opt.dataset.enhance;
   document.getElementById('inpSeason').value = '25ucl';
-  // Apply immediately
-  applySettings();
+  // Don't auto-apply — user must click 应用设置
 }
 
 // ============================================================
@@ -1681,6 +1693,51 @@ function toggleRateHelp(e) {
 }
 
 // ============================================================
+//  Success stat tooltip (mobile click)
+// ============================================================
+let successTipEl = null;
+
+function toggleSuccessTip(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const box = document.getElementById('statSuccessBox');
+  const tipText = box.getAttribute('data-tip');
+  if (!tipText || tipText === '暂无成功记录') return;
+
+  if (!successTipEl) {
+    successTipEl = document.createElement('div');
+    successTipEl.className = 'rate-tooltip';
+    document.body.appendChild(successTipEl);
+  }
+
+  const isShowing = successTipEl.classList.contains('show');
+  successTipEl.classList.remove('show');
+
+  if (!isShowing) {
+    successTipEl.textContent = tipText;
+    const rect = box.getBoundingClientRect();
+    successTipEl.style.position = 'fixed';
+    successTipEl.style.bottom = 'auto';
+    successTipEl.style.right = 'auto';
+    successTipEl.style.top = Math.max(10, rect.top - 10) + 'px';
+    successTipEl.style.left = Math.max(10, rect.left - 10) + 'px';
+    successTipEl.style.maxWidth = Math.min(320, window.innerWidth - 20) + 'px';
+    successTipEl.classList.add('show');
+    setTimeout(() => {
+      const closeHandler = function(ev) {
+        if (!successTipEl.contains(ev.target) && ev.target !== box) {
+          successTipEl.classList.remove('show');
+          document.removeEventListener('click', closeHandler);
+          document.removeEventListener('touchstart', closeHandler);
+        }
+      };
+      document.addEventListener('click', closeHandler);
+      document.addEventListener('touchstart', closeHandler);
+    }, 10);
+  }
+}
+
+// ============================================================
 //  Particles
 // ============================================================
 function spawnParticles(type) {
@@ -1743,7 +1800,7 @@ function applySettings() {
   playerSeason = season;
   playerPos = pos;
   baseOvr = Math.max(40, Math.min(150, ovr));
-  currentLevel = Math.max(0, Math.min(13, lv));
+  currentLevel = Math.max(1, Math.min(13, lv));
 
   // Reset stats when changing player
   totalAttempts = 0;
