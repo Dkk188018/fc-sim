@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>FC Online 4 - 球员强化模拟器</title>
 <style>
   :root {
@@ -27,17 +27,41 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  /* Global touch & interaction optimization */
+  button, input, select, textarea, [onclick], [tabindex] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  a, button, [role="button"], input[type="range"] {
+    touch-action: manipulation;
+  }
+
+  html {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Microsoft YaHei', 'PingFang SC', 'Segoe UI', sans-serif;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     justify-content: center;
     padding: 20px 0 40px;
     background-image:
       radial-gradient(ellipse at 50% 0%, rgba(41,121,255,0.06) 0%, transparent 60%),
       radial-gradient(ellipse at 50% 100%, rgba(156,39,176,0.04) 0%, transparent 60%);
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .app { width: 560px; max-width: 100vw; padding: 0 16px; }
@@ -75,7 +99,9 @@
     cursor: pointer;
     margin-bottom: 8px;
     user-select: none;
-    padding: 4px 0;
+    padding: 8px 0;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .settings-toggle:hover { color: var(--text); }
   .settings-toggle .arrow {
@@ -95,7 +121,7 @@
   }
   .settings-panel.show { display: block; }
   @keyframes slideDown {
-    0% { opacity: 0; transform: translateY(-8px); }
+    0% { opacity: 0; transform: translateY(-6px); }
     100% { opacity: 1; transform: translateY(0); }
   }
   .settings-grid {
@@ -120,10 +146,12 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--text);
-    font-size: 14px;
+    font-size: 16px;
     font-family: inherit;
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color 0.15s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .field input:focus, .field select:focus {
     border-color: var(--accent);
@@ -142,7 +170,8 @@
     gap: 16px;
     position: relative;
     overflow: hidden;
-    transition: all 0.4s;
+    transition: all 0.25s;
+    will-change: transform;
   }
   .player-card::after {
     content: '';
@@ -151,7 +180,7 @@
     background: linear-gradient(135deg, rgba(240,185,11,0.03) 0%, transparent 40%, rgba(41,121,255,0.03) 100%);
     pointer-events: none;
   }
-  .player-card.enhance-flash { animation: cardFlash 0.15s ease-in-out 4; }
+  .player-card.enhance-flash { animation: cardFlash 0.1s ease-in-out 3; }
   @keyframes cardFlash {
     0%,100% { border-color: #2a3850; box-shadow: none; }
     50% { border-color: #f0b90b; box-shadow: 0 0 20px rgba(240,185,11,0.25); }
@@ -161,7 +190,7 @@
     box-shadow: 0 0 24px rgba(0,200,83,0.3) !important;
     transition: all 0.5s;
   }
-  .player-card.fail-shake { animation: shake 0.4s ease-out; }
+  .player-card.fail-shake { animation: shake 0.3s ease-out; will-change: transform; }
   @keyframes shake {
     0%,100% { transform: translateX(0); }
     15% { transform: translateX(-8px); }
@@ -181,11 +210,12 @@
     flex-shrink: 0;
     position: relative;
     z-index: 1;
-    transition: all 0.4s;
+    transition: all 0.25s;
+    will-change: transform, box-shadow;
   }
   .player-avatar.elite { border-color: #f0b90b; box-shadow: 0 0 12px rgba(240,185,11,0.3); }
   .player-avatar.legend { border-color: #9c27b0; box-shadow: 0 0 12px rgba(156,39,176,0.4); }
-  .player-avatar.ultimate { border-color: #ff6d00; box-shadow: 0 0 14px rgba(255,109,0,0.4); animation: ultimateGlow 2s ease-in-out infinite; }
+  .player-avatar.ultimate { border-color: #ff6d00; box-shadow: 0 0 14px rgba(255,109,0,0.4); animation: ultimateGlow 1.5s ease-in-out infinite; }
   @keyframes ultimateGlow {
     0%,100% { box-shadow: 0 0 14px rgba(255,109,0,0.4); }
     50% { box-shadow: 0 0 24px rgba(255,109,0,0.7), 0 0 40px rgba(255,152,0,0.3); }
@@ -219,7 +249,7 @@
     line-height: 1;
     transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
   }
-  .player-ovr.bump { animation: ovrBump 0.5s ease-out; }
+  .player-ovr.bump { animation: ovrBump 0.35s ease-out; will-change: transform; }
   @keyframes ovrBump {
     0% { transform: scale(1.4); filter: brightness(2); }
     100% { transform: scale(1); filter: brightness(1); }
@@ -295,6 +325,7 @@
     cursor: help;
     vertical-align: middle;
     margin-left: 2px;
+    touch-action: manipulation;
   }
   .rate-help:hover { background: #f0b90b; color: #000; }
 
@@ -343,7 +374,8 @@
     border-color: #f0b90b;
     color: #fff;
     box-shadow: 0 0 10px rgba(240,185,11,0.35);
-    animation: stepPulse 1s ease-in-out infinite;
+    animation: stepPulse 0.6s ease-in-out infinite;
+    will-change: box-shadow;
     transform: scale(1.1);
     z-index: 1;
   }
@@ -398,8 +430,10 @@
     background: #2a3850;
     border-radius: 12px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.2s;
     flex-shrink: 0;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .toggle-switch.on { background: #f0b90b; }
   .toggle-switch::after {
@@ -418,9 +452,11 @@
     background: #1a2230;
     border: 2px solid #2a3850;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     position: relative;
     overflow: hidden;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .energy-slot:hover { border-color: #4a6090; }
   .energy-slot .fill {
@@ -456,10 +492,12 @@
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
     font-family: inherit;
     letter-spacing: 0.5px;
     user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .btn:disabled {
     opacity: 0.4;
@@ -530,6 +568,10 @@
     padding: 12px;
     max-height: 200px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    will-change: scroll-position;
   }
   .history-box::-webkit-scrollbar { width: 4px; }
   .history-box::-webkit-scrollbar-thumb { background: #2a3850; border-radius: 2px; }
@@ -559,7 +601,7 @@
     cursor: default;
   }
   /* 成功次数统计hover弹窗 */
-  .stat-box.clickable { cursor: pointer; position: relative; }
+  .stat-box.clickable { cursor: pointer; position: relative; touch-action: manipulation; }
   .stat-box.clickable:hover::after {
     content: attr(data-tip);
     position: absolute;
@@ -605,7 +647,8 @@
     text-align: center;
     min-width: 300px;
     max-width: 380px;
-    animation: modalPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform, opacity;
   }
   @keyframes modalPop {
     0% { transform: scale(0.8) translateY(30px); opacity: 0; }
@@ -652,7 +695,8 @@
   .pt {
     position: absolute;
     font-size: 22px;
-    animation: ptFly 0.9s ease-out forwards;
+    animation: ptFly 0.6s ease-out forwards;
+    will-change: transform, opacity;
   }
   @keyframes ptFly {
     0% { opacity: 1; transform: translate(0,0) scale(1.2); }
@@ -794,7 +838,7 @@
       <span class="protect-badge" id="protectBadge" style="display:none;">推荐开启</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex:1;justify-content:flex-end;">
-      <input type="range" id="protectSlider" min="0" max="100" value="0" oninput="onProtectSlider()" style="width:120px;accent-color:#f0b90b;cursor:pointer;">
+      <input type="range" id="protectSlider" min="0" max="100" value="0" oninput="onProtectSlider()" style="width:120px;accent-color:#f0b90b;cursor:pointer;touch-action:manipulation;">
       <span style="font-size:13px;font-weight:700;color:#f0b90b;min-width:28px;text-align:right;" id="protectCount">0</span>
     </div>
   </div>
@@ -1530,7 +1574,8 @@ function spawnParticles(type) {
   const rect = card.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
-  const count = type === 'success' ? 28 : 12;
+  const isMobile = window.innerWidth < 480;
+  const count = type === 'success' ? (isMobile ? 14 : 28) : (isMobile ? 6 : 12);
   const icons = type === 'success'
     ? ['⭐','✨','🔥','💪','⚡','🏆','💎']
     : ['❌','😢','💨'];
@@ -1545,9 +1590,9 @@ function spawnParticles(type) {
     const d = 50 + Math.random() * 140;
     el.style.setProperty('--dx', Math.cos(a) * d + 'px');
     el.style.setProperty('--dy', Math.sin(a) * d + 'px');
-    el.style.animationDuration = (0.5 + Math.random() * 0.8) + 's';
+    el.style.animationDuration = (0.3 + Math.random() * 0.5) + 's';
     layer.appendChild(el);
-    setTimeout(() => el.remove(), 1200);
+    setTimeout(() => el.remove(), 800);
   }
 }
 
