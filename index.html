@@ -1473,7 +1473,6 @@ function resetCard() {
   document.getElementById('protectCount').textContent = '0';
   clearMaterials();
   document.getElementById('inpMaterialOvr').value = baseOvr;
-  saveState();
   refreshAll();
 }
 
@@ -1575,7 +1574,6 @@ function executeEnhance() {
     }
   }
 
-  saveState();
   refreshAll();
 }
 
@@ -1796,78 +1794,8 @@ document.addEventListener('keydown', e => {
 
 populatePlayerSelect();
 // ============================================================
-//  State Persistence (mobile keep-alive)
-// ============================================================
-function saveState() {
-  const state = {
-    playerName, playerSeason, playerPos, baseOvr, currentLevel,
-    protectCount, stopLevel, totalAttempts, totalSuccess, history,
-    matSlots, autoMode
-  };
-  try { localStorage.setItem('fc-enhance-state', JSON.stringify(state)); } catch(e) {}
-}
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem('fc-enhance-state');
-    if (!raw) return false;
-    const s = JSON.parse(raw);
-    playerName = s.playerName || 'Cristiano Ronaldo';
-    playerSeason = s.playerSeason || 'tots';
-    playerPos = s.playerPos || 'ST · CF';
-    baseOvr = s.baseOvr || 89;
-    currentLevel = s.currentLevel || 0;
-    protectCount = s.protectCount || 0;
-    stopLevel = s.stopLevel || 13;
-    totalAttempts = s.totalAttempts || 0;
-    totalSuccess = s.totalSuccess || 0;
-    history = s.history || [];
-    matSlots = s.matSlots || [0,0,0,0,0];
-    autoMode = false;
-    // Restore UI inputs
-    document.getElementById('protectSlider').value = protectCount;
-    document.getElementById('protectCount').textContent = protectCount;
-    document.getElementById('inpStopLevel').value = stopLevel;
-    document.getElementById('stopLevelDisplay').textContent = '+' + stopLevel;
-    return true;
-  } catch(e) { return false; }
-}
-
-// Save state on page hide / visibility change
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) saveState();
-});
-window.addEventListener('beforeunload', () => saveState());
-window.addEventListener('pagehide', () => saveState());
-
-// WakeLock for mobile keep-alive
-let wakeLock = null;
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      wakeLock.addEventListener('release', () => {
-        // WakeLock released, try re-acquire on visibility
-      });
-    }
-  } catch(e) { /* not supported or denied */ }
-}
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') requestWakeLock();
-});
-requestWakeLock();
-
-// ============================================================
 //  Init
 // ============================================================
-const restored = loadState();
-// Update form fields to match loaded state
-document.getElementById('inpName').value = playerName;
-document.getElementById('inpSeason').value = playerSeason;
-document.getElementById('inpPos').value = playerPos;
-document.getElementById('inpOvr').value = baseOvr;
-document.getElementById('inpLevel').value = currentLevel;
-syncPlayerSelect();
 refreshAll();
 </script>
 </body>
