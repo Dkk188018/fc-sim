@@ -427,41 +427,237 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   90% { transform: translateX(3px); }
 }
 
-/* ===== Modal (Result) ===== */
+/* ===== Burst Overlay (强化过程动画) ===== */
+.burst-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 9998; display: none; justify-content: center; align-items: center;
+  flex-direction: column; overflow: hidden;
+}
+.burst-overlay.show { display: flex; }
+.burst-overlay .burst-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 60%, #0a2a3a 0%, #060c16 60%, #000 100%);
+}
+.burst-overlay .burst-bg::after {
+  content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(30,120,70,0.3) 0%, transparent 70%);
+}
+.burst-spotlight {
+  position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+  width: 350px; height: 75%; z-index: 3; opacity: 0;
+  background: linear-gradient(180deg, rgba(180,220,255,0.6) 0%, rgba(100,200,255,0.25) 25%, rgba(100,200,255,0.08) 50%, transparent 80%);
+  clip-path: polygon(35% 0%, 65% 0%, 90% 100%, 10% 100%); filter: blur(25px);
+  transition: opacity 0.6s;
+}
+.burst-spotlight.on { opacity: 1; }
+.burst-spot-glow {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; height: 55%; z-index: 2; opacity: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(150,210,255,0.18) 0%, rgba(100,180,255,0.06) 40%, transparent 70%);
+  filter: blur(10px); transition: opacity 0.6s;
+}
+.burst-spot-glow.on { opacity: 1; }
+.burst-beam {
+  position: absolute; left: 50%; top: -5%; height: 110%;
+  background: linear-gradient(180deg, rgba(100,200,255,0.6) 0%, rgba(100,200,255,0.3) 40%, transparent 100%);
+  z-index: 3; opacity: 0; transition: opacity 0.3s;
+}
+.burst-beam.on { opacity: 1; }
+.burst-beam.b1 { width: 3px; margin-left: 0; }
+.burst-beam.b2 { width: 2px; margin-left: -40px; }
+.burst-beam.b3 { width: 1px; margin-left: 50px; }
+.burst-beam.b4 { width: 3px; margin-left: -80px; }
+.burst-beam.b5 { width: 1px; margin-left: 70px; }
+
+.burst-card-wrap { position: relative; z-index: 5; }
+.burst-card {
+  width: 160px; position: relative; z-index: 5; overflow: visible;
+  transition: filter 0.1s;
+}
+.burst-card.shaking { animation: burst-shake 0.4s ease-in-out infinite; }
+.burst-card.shaking-intense { animation: burst-shake 0.15s linear infinite; }
+.burst-card.purple-shadow::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0.6;
+  filter: brightness(0) drop-shadow(0 0 20px rgba(200,50,255,0.8));
+  mix-blend-mode: screen;
+}
+
+@keyframes burst-shake {
+  0%,100% { transform: translateX(0); }
+  10% { transform: translateX(-2px); }
+  20% { transform: translateX(2px); }
+  30% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  50% { transform: translateX(-6px); }
+  60% { transform: translateX(7px); }
+  70% { transform: translateX(-9px); }
+  80% { transform: translateX(11px); }
+  90% { transform: translateX(-14px); }
+}
+
+/* Rain particles */
+.rain-particle {
+  position: absolute; width: 1px;
+  background: linear-gradient(180deg, rgba(150,200,255,0.8), transparent);
+  z-index: 3; pointer-events: none;
+  animation: rainFall linear forwards;
+}
+@keyframes rainFall {
+  0% { transform: translateY(-20px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(105vh); opacity: 0; }
+}
+/* White burst particles */
+.burst-particle {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 100;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.4));
+  box-shadow: 0 0 15px rgba(255,255,255,0.9); filter: blur(3px);
+  animation: burstParticleFly ease-out forwards;
+}
+@keyframes burstParticleFly {
+  0% { opacity: 1; transform: translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--bx),var(--by)) scale(0); }
+}
+
+/* Smoke particles for fail */
+.smoke-particle {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 10;
+  background: radial-gradient(circle, rgba(80,80,80,0.6) 0%, rgba(40,40,40,0.3) 40%, transparent 70%);
+  filter: blur(4px); animation: smokeRise ease-out forwards;
+}
+@keyframes smokeRise {
+  0% { opacity: 0.7; transform: translate(0,0) scale(0.5); }
+  100% { opacity: 0; transform: translate(var(--sx),var(--sy)) scale(2); }
+}
+
+/* Shatter effect */
+.shatter-effect {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(1.5);
+  width: 256px; height: 256px;
+  background-image: url("images/shatter_sprite.webp");
+  background-size: 2048px auto; background-repeat: no-repeat;
+  pointer-events: none; z-index: 100; display: none;
+}
+.shatter-effect.animate {
+  display: block;
+  animation: shatter-play 0.8s step-end forwards, shatter-scale 0.8s ease-out forwards;
+  filter: brightness(2) contrast(1.2) drop-shadow(0 0 25px #fff);
+  mix-blend-mode: screen;
+}
+@keyframes shatter-scale {
+  0% { transform: translate(-50%, -50%) scale(2.2); }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+@keyframes shatter-play {
+  0% { background-position: 0px 0px; }
+  5.5% { background-position: -256px 0px; }
+  11.1% { background-position: -512px 0px; }
+  16.6% { background-position: -768px 0px; }
+  22.2% { background-position: -1024px 0px; }
+  27.7% { background-position: -1280px 0px; }
+  33.3% { background-position: -1536px 0px; }
+  38.8% { background-position: -1792px 0px; }
+  44.4% { background-position: 0px -256px; }
+  50% { background-position: -256px -256px; }
+  55.5% { background-position: -512px -256px; }
+  61.1% { background-position: -768px -256px; }
+  66.6% { background-position: -1024px -256px; }
+  72.2% { background-position: -1280px -256px; }
+  77.7% { background-position: -1536px -256px; }
+  83.3% { background-position: -1792px -256px; }
+  88.8% { background-position: 0px -512px; }
+  94.4% { background-position: -256px -512px; }
+  100% { background-position: -512px -512px; }
+}
+
+/* Skip button */
+.burst-skip {
+  position: absolute; bottom: 30px; right: 20px; color: rgba(255,255,255,0.5);
+  font-weight: 700; font-size: 0.9em; cursor: pointer; z-index: 20;
+  letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== Result Overlay ===== */
 .result-overlay {
-  display: none; position: fixed; inset: 0; z-index: 400;
-  background: rgba(0,0,0,0.7);
-  justify-content: center; align-items: center;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 9999; display: none; justify-content: center; align-items: center;
+  flex-direction: column;
+  background: radial-gradient(ellipse at 50% 60%, #0a2a3a 0%, #060c16 60%, #000 100%);
+  overflow-y: auto; overflow-x: hidden;
 }
 .result-overlay.show { display: flex; }
-.result-modal {
-  background: #1a1f2e;
-  border-radius: 8px; padding: 10px 12px; text-align: center;
-  width: 170px; box-sizing: border-box;
-  word-break: break-all; overflow-wrap: break-word;
-  animation: modalPop 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
-  will-change: transform,opacity;
+.result-card-wrap { position: relative; margin-bottom: 20px; }
+.result-card {
+  width: 180px; position: relative; z-index: 2;
+  animation: resultCardIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275);
 }
-@keyframes modalPop {
-  0% { transform: scale(0.8) translateY(30px); opacity: 0; }
+@keyframes resultCardIn {
+  0% { transform: scale(0.7) translateY(60px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
-.result-modal .icon { font-size: 28px; margin-bottom: 4px; }
-.result-modal .title { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
-.result-modal .title.win { color: var(--gold); }
-.result-modal .title.lose { color: var(--fail); }
-.result-modal .lv { font-size: 12px; color: var(--text2); margin-bottom: 2px; }
-.result-modal .ovr-change { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 2px; }
-.result-modal .ovr-change.down { color: var(--fail); }
-.result-modal .detail { font-size: 10px; color: var(--text3); margin-bottom: 8px; }
-.result-modal .btn-close {
-  background: rgba(255,255,255,0.1); color: var(--text2);
-  border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
-  padding: 6px 20px; font-size: 12px; font-weight: 600;
-  cursor: pointer; font-family: inherit;
-  touch-action: manipulation;
+.result-overlay.success .result-card {
+  animation: resultCardIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275), card-float 3s ease-in-out 0.8s infinite;
 }
-.result-modal .btn-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
+.result-overlay.success .result-card::before {
+  content: ""; position: absolute; top: 50%; left: 50%; width: 140%; height: 140%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 20%, rgba(0,255,234,0.15) 45%, transparent 70%);
+  border-radius: 50%; z-index: -1;
+  animation: glow-pulse 2s infinite alternate;
+}
+.result-overlay.fail .result-card { filter: grayscale(0.85) brightness(0.45); }
+@keyframes glow-pulse {
+  0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+@keyframes card-float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.result-text-wrap {
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 1.2s cubic-bezier(0.22,0.61,0.36,1), opacity 0.6s ease;
+  width: 85%; max-width: 320px; text-align: center;
+}
+.result-text-wrap.expand { max-height: 600px; opacity: 1; overflow: visible; }
+.result-title { font-size: 1.6em; font-weight: 700; margin: 10px 0 16px; }
+.result-overlay.success .result-title { color: #e8d5a3; text-shadow: 0 0 20px rgba(232,213,163,0.5); }
+.result-overlay.fail .result-title { color: #e74c3c; text-shadow: 0 0 20px rgba(231,76,60,0.4); }
+.result-subtitle { font-size: 1em; color: #aaa; margin-bottom: 16px; }
+.result-stats {
+  background: rgba(18,18,24,0.9); border-radius: 12px; padding: 16px; width: 100%;
+  margin: 10px 0; border: 1px solid rgba(255,255,255,0.08);
+  opacity: 0; transform: translateY(15px);
+  transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+  box-sizing: border-box;
+}
+.result-stats.fade-in { opacity: 1; transform: translateY(0); }
+.result-stats .rs-row { display: flex; justify-content: space-between; font-size: 0.9em; color: #ccc; margin-bottom: 6px; }
+.result-stats .rs-row:last-child { margin-bottom: 0; }
+.result-stats .rs-label { color: #888; }
+.result-stats .rs-value { color: #fff; font-weight: 700; }
+.result-retry-btn, .result-next-btn {
+  background: rgba(255,255,255,0.06); color: #ccc; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 10px 24px; font-size: 0.95em; font-weight: 600;
+  cursor: pointer; font-family: inherit; margin: 6px 4px;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.result-next-btn { background: rgba(240,185,11,0.15); color: #f0b90b; border-color: rgba(240,185,11,0.3); }
+.result-retry-btn:active, .result-next-btn:active { transform: scale(0.96); }
+
+@media (max-width: 480px) {
+  .burst-card { width: 130px; }
+  .result-card { width: 150px; }
+  .shatter-effect.animate { animation: shatter-play 0.8s step-end forwards, shatter-scale-mobile 0.8s ease-out forwards; }
+  @keyframes shatter-scale-mobile {
+    0% { transform: translate(-50%, -50%) scale(1.8); }
+    100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+}
 
 /* ===== Particles ===== */
 .particle-layer { position: fixed; inset: 0; pointer-events: none; z-index: 250; }
@@ -693,15 +889,41 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   </div>
 </div>
 
-<!-- Result Modal -->
-<div class="result-overlay" id="overlay" onclick="closeModal()">
-  <div class="result-modal" style="width:170px;padding:10px 12px;" onclick="event.stopPropagation()">
-    <div class="icon" id="modalIcon"></div>
-    <div class="title" id="modalTitle"></div>
-    <div class="lv" id="modalLevel"></div>
-    <div class="ovr-change" id="modalOvr"></div>
-    <div class="detail" id="modalDetail"></div>
-    <button class="btn-close" onclick="closeModal()">确 定</button>
+
+<!-- Burst Overlay (强化过程动画) -->
+<div class="burst-overlay" id="burstOverlay">
+  <div class="burst-bg"></div>
+  <div class="burst-spotlight"></div>
+  <div class="burst-spot-glow"></div>
+  <div class="burst-beam b1"></div>
+  <div class="burst-beam b2"></div>
+  <div class="burst-beam b3"></div>
+  <div class="burst-beam b4"></div>
+  <div class="burst-beam b5"></div>
+  <div class="burst-card-wrap">
+    <div class="burst-card" id="burstCard">
+      <img id="burstCardImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+    <div class="shatter-effect" id="shatterEffect"></div>
+  </div>
+  <div class="burst-rain" id="burstRain"></div>
+  <div class="burst-particles" id="burstParticles"></div>
+  <div class="burst-skip" id="burstSkip" onclick="skipBurst()">跳过 ▸</div>
+</div>
+
+<!-- Result Overlay (结果展示) -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card-wrap">
+    <div class="result-card" id="resultCard">
+      <img id="resultCardImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+  </div>
+  <div class="result-text-wrap" id="resultTextWrap">
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-subtitle" id="resultSubtitle"></div>
+    <div class="result-stats" id="resultStats"></div>
+    <button class="result-retry-btn" onclick="closeResult(false)">重新强化</button>
+    <button class="result-next-btn" id="resultConfirmBtn" onclick="closeResult(true)">确 定</button>
   </div>
 </div>
 
@@ -1339,36 +1561,10 @@ function startEnhance() {
   isEnhancing = true;
 
   const btn = document.getElementById('btnEnhance');
-  const card = document.getElementById('playerCard');
-  btn.classList.add('charging');
   btn.textContent = '强化中...';
   btn.disabled = true;
-  card.classList.add('enhance-flash');
 
-  // Safety fallback: force-reset button after 3s no matter what
-  const safetyTimer = setTimeout(() => {
-    if (isEnhancing) {
-      isEnhancing = false;
-      btn.classList.remove('charging');
-      btn.disabled = false;
-      btn.textContent = '强 化';
-      card.classList.remove('enhance-flash');
-    }
-  }, 3000);
-
-  setTimeout(() => {
-    try {
-      executeEnhance();
-    } catch(e) {
-      console.error('Enhance error:', e);
-    }
-    clearTimeout(safetyTimer);
-    isEnhancing = false;
-    btn.classList.remove('charging');
-    btn.disabled = false;
-    btn.textContent = '强 化';
-    card.classList.remove('enhance-flash');
-  }, 1300);
+  showBurstOverlay();
 }
 
 function executeEnhance() {
@@ -1381,58 +1577,42 @@ function executeEnhance() {
   totalAttempts++;
 
   if (success) {
-    // === SUCCESS ===
     const oldOvr = curOvr();
     currentLevel = nextLv;
     totalSuccess++;
     const newOvr = curOvr();
 
-    const card = document.getElementById('playerCard');
-    card.classList.add('success-glow');
-    setTimeout(() => card.classList.remove('success-glow'), 600);
-
-    spawnParticles('success');
-    addHistory('success', `+${nextLv - 1} → +${nextLv}  |  OVR ${oldOvr} → ${newOvr}  |  第${totalAttempts}次成功`);
-    showModal('success', nextLv, oldOvr, newOvr);
+    addHistory('success', '+' + (nextLv - 1) + ' → +' + nextLv + '  |  OVR ' + oldOvr + ' → ' + newOvr + '  |  第' + totalAttempts + '次成功');
+    refreshAll();
+    showBurstSuccess(nextLv, oldOvr, newOvr);
 
     if (currentLevel >= stopLevel && autoMode) stopAuto();
   } else {
-    // === FAIL ===
     const oldOvr = curOvr();
     const oldLevel = currentLevel;
-    const card = document.getElementById('playerCard');
-
-    card.classList.add('fail-shake');
-    setTimeout(() => card.classList.remove('fail-shake'), 450);
-    spawnParticles('fail');
 
     let dropTo;
     if (!hasProtection()) {
       if (currentLevel === 2) {
-        // +2→+3 失败: 掉至 +1
         dropTo = 1;
       } else if (currentLevel === 3) {
-        // +3→+4 失败: 随机掉至 +1 或 +2
         dropTo = Math.random() < 0.5 ? 1 : 2;
       } else if (currentLevel >= 4 && currentLevel <= 7) {
-        // +4→+5 ~ +7→+8 失败: 统一掉至 +1
         dropTo = 1;
       } else {
-        // +8 及以上失败: 随机掉落至 +1~+6
         dropTo = Math.floor(Math.random() * 6) + 1;
       }
       const dropOvr = baseOvr + data(dropTo).bonus;
-      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  降至 +${dropTo}  (OVR ${dropOvr})`);
-      showModal('fail', oldLevel, oldOvr, dropOvr, nextLv, dropTo);
+      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  降至 +' + dropTo + '  (OVR ' + dropOvr + ')');
       currentLevel = dropTo;
     } else {
-      // 强化等级保护: 不掉级
-      addHistory('fail', `+${oldLevel} → +${nextLv} 失败  |  强化等级保护生效，保持 +${oldLevel}`);
-      showModal('protect', oldLevel, oldOvr, oldOvr, nextLv);
+      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  强化等级保护生效，保持 +' + oldLevel);
+      dropTo = oldLevel;
     }
-  }
 
-  refreshAll();
+    refreshAll();
+    showBurstFail(oldLevel, oldOvr, nextLv, dropTo);
+  }
 }
 
 function addHistory(result, desc) {
@@ -1443,53 +1623,238 @@ function addHistory(result, desc) {
 // ============================================================
 //  Modal
 // ============================================================
-function showModal(type, level, oldOvr, newOvr, targetLv, dropTo) {
-  const overlay = document.getElementById('overlay');
-  const icon = document.getElementById('modalIcon');
-  const title = document.getElementById('modalTitle');
-  const lvl = document.getElementById('modalLevel');
-  const ovr = document.getElementById('modalOvr');
-  const detail = document.getElementById('modalDetail');
+// ============================================================
+//  Burst Animation (强化过程动画)
+// ============================================================
+let burstTimer = null;
+
+function getCardImgUrl() {
+  const avatar = document.getElementById('playerAvatar');
+  const img = avatar.querySelector('img');
+  return img ? img.src : '';
+}
+
+function showBurstOverlay() {
+  const overlay = document.getElementById('burstOverlay');
+  const burstCard = document.getElementById('burstCard');
+  const cardImg = document.getElementById('burstCardImg');
+  const rain = document.getElementById('burstRain');
+  const particles = document.getElementById('burstParticles');
+  const shatter = document.getElementById('shatterEffect');
 
   overlay.classList.add('show');
+  burstCard.classList.remove('shaking', 'shaking-intense', 'purple-shadow');
+  shatter.classList.remove('animate');
+  shatter.style.display = 'none';
+  rain.innerHTML = '';
+  particles.innerHTML = '';
 
-  switch (type) {
-    case 'success':
-      icon.textContent = '✨';
-      title.textContent = '强化成功';
-      title.className = 'title win';
-      lvl.textContent = `球员提升至 +${level}`;
-      ovr.textContent = `OVR ${newOvr}`;
-      ovr.className = 'ovr-change';
-      detail.textContent = `${oldOvr}→${newOvr} (+${newOvr - oldOvr})`;
-      break;
+  const imgUrl = getCardImgUrl();
+  cardImg.src = imgUrl;
 
-    case 'fail':
-      icon.textContent = '💔';
-      title.textContent = '强化失败';
-      title.className = 'title lose';
-      lvl.textContent = `+${level}→+${targetLv} 失败`;
-      ovr.textContent = `降至+${dropTo} OVR${newOvr}`;
-      ovr.className = 'ovr-change down';
-      detail.textContent = `OVR${oldOvr}→${newOvr} 降${level - dropTo}级`;
-      break;
+  requestAnimationFrame(function() {
+    document.querySelectorAll('.burst-spotlight, .burst-spot-glow, .burst-beam').forEach(function(el) { el.classList.add('on'); });
+  });
 
-    case 'protect':
-      icon.textContent = '🛡️';
-      title.textContent = '强化失败';
-      title.className = 'title win';
-      lvl.textContent = `+${level}→+${targetLv}`;
-      ovr.textContent = `保持+${level} OVR${newOvr}`;
-      ovr.className = 'ovr-change';
-      detail.textContent = '保护生效';
-      break;
+  setTimeout(function() { startRain(rain); }, 300);
 
+  setTimeout(function() { burstCard.classList.add('shaking'); }, 500);
+
+  setTimeout(function() { startBurstParticles(particles, burstCard); }, 900);
+
+  setTimeout(function() {
+    burstCard.classList.remove('shaking');
+    burstCard.classList.add('shaking-intense', 'purple-shadow');
+  }, 1200);
+
+  burstTimer = setTimeout(function() { finishBurstOverlay(); }, 2200);
+}
+
+function finishBurstOverlay() {
+  clearTimeout(burstTimer);
+  burstTimer = null;
+  const burstCard = document.getElementById('burstCard');
+  const rain = document.getElementById('burstRain');
+  const particles = document.getElementById('burstParticles');
+
+  document.querySelectorAll('.burst-spotlight, .burst-spot-glow, .burst-beam').forEach(function(el) { el.classList.remove('on'); });
+  burstCard.classList.remove('shaking', 'shaking-intense', 'purple-shadow');
+  rain.innerHTML = '';
+  particles.innerHTML = '';
+
+  try { executeEnhance(); }
+  catch(e) {
+    console.error('Enhance error:', e);
+    if (isEnhancing) { hideAllOverlays(); resetEnhanceBtn(); }
   }
 }
 
-function closeModal() {
-  document.getElementById('overlay').classList.remove('show');
+function skipBurst() {
+  if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
+  finishBurstOverlay();
 }
+
+function startRain(container) {
+  var count = 40;
+  for (var i = 0; i < count; i++) {
+    var drop = document.createElement('div');
+    drop.className = 'rain-particle';
+    drop.style.left = (Math.random() * 100) + '%';
+    drop.style.animationDuration = (0.6 + Math.random() * 1.0) + 's';
+    drop.style.animationDelay = (Math.random() * 1.5) + 's';
+    drop.style.opacity = (0.3 + Math.random() * 0.5);
+    container.appendChild(drop);
+  }
+}
+
+function startBurstParticles(container, cardEl) {
+  var rect = cardEl.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top + rect.height / 2;
+  var count = 30;
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'burst-particle';
+    var size = 2 + Math.random() * 6;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    var angle = Math.random() * Math.PI * 2;
+    var dist = 30 + Math.random() * 120;
+    p.style.setProperty('--bx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--by', Math.sin(angle) * dist + 'px');
+    p.style.animationDuration = (0.5 + Math.random() * 0.8) + 's';
+    p.style.animationDelay = (Math.random() * 0.3) + 's';
+    container.appendChild(p);
+    setTimeout(function() { p.remove(); }, 1500);
+  }
+}
+
+function startSmoke(container, cardEl) {
+  var rect = cardEl.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top + rect.height / 2;
+  var count = 18;
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'smoke-particle';
+    var size = 10 + Math.random() * 30;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.setProperty('--sx', (Math.random() - 0.5) * 120 + 'px');
+    p.style.setProperty('--sy', -(40 + Math.random() * 100) + 'px');
+    p.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
+    p.style.animationDelay = (Math.random() * 0.5) + 's';
+    container.appendChild(p);
+    setTimeout(function() { p.remove(); }, 2000);
+  }
+}
+
+// ============================================================
+//  Result Display
+// ============================================================
+function showBurstSuccess(level, oldOvr, newOvr) {
+  var resultOverlay = document.getElementById('resultOverlay');
+  var resultCardImg = document.getElementById('resultCardImg');
+  var title = document.getElementById('resultTitle');
+  var subtitle = document.getElementById('resultSubtitle');
+  var stats = document.getElementById('resultStats');
+  var textWrap = document.getElementById('resultTextWrap');
+
+  resultOverlay.className = 'result-overlay success';
+  resultCardImg.src = getCardImgUrl();
+  stats.classList.remove('fade-in');
+  textWrap.classList.remove('expand');
+
+  title.textContent = '强化成功！';
+  subtitle.textContent = '球员提升至 +' + level;
+
+  var ovrGain = newOvr - oldOvr;
+  stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化等级</span><span class="rs-value">+' + level + '</span></div>' +
+    '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + newOvr + ' (+' + ovrGain + ')</span></div>' +
+    '<div class="rs-row"><span class="rs-label">累计成功</span><span class="rs-value">' + totalSuccess + ' / ' + totalAttempts + ' 次</span></div>';
+
+  resultOverlay.classList.add('show');
+
+  setTimeout(function() { textWrap.classList.add('expand'); }, 400);
+  setTimeout(function() { stats.classList.add('fade-in'); }, 700);
+}
+
+function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
+  var resultOverlay = document.getElementById('resultOverlay');
+  var resultCardImg = document.getElementById('resultCardImg');
+  var title = document.getElementById('resultTitle');
+  var subtitle = document.getElementById('resultSubtitle');
+  var stats = document.getElementById('resultStats');
+  var textWrap = document.getElementById('resultTextWrap');
+  var shatter = document.getElementById('shatterEffect');
+  var burstCard = document.getElementById('burstCard');
+  var particles = document.getElementById('burstParticles');
+
+  resultOverlay.className = 'result-overlay fail';
+  resultCardImg.src = getCardImgUrl();
+  stats.classList.remove('fade-in');
+  textWrap.classList.remove('expand');
+
+  shatter.style.display = 'none';
+  shatter.classList.remove('animate');
+  void shatter.offsetWidth;
+  shatter.style.display = 'block';
+  shatter.classList.add('animate');
+
+  startSmoke(particles, burstCard);
+
+  setTimeout(function() {
+    document.getElementById('burstOverlay').classList.remove('show');
+    shatter.classList.remove('animate');
+    shatter.style.display = 'none';
+    resultOverlay.classList.add('show');
+
+    var dropOvr = baseOvr + data(dropTo).bonus;
+    var lostLevels = oldLevel - dropTo;
+
+    if (dropTo === oldLevel) {
+      title.textContent = '强化保护生效！';
+      subtitle.textContent = '强化失败，但等级保持不变';
+      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+        '<div class="rs-row"><span class="rs-label">保护效果</span><span class="rs-value" style="color:#f0b90b;">保持 +' + oldLevel + '</span></div>' +
+        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' (不变)</span></div>';
+    } else {
+      title.textContent = '强化失败';
+      subtitle.textContent = '球员降至 +' + dropTo + '，掉了 ' + lostLevels + ' 级';
+      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value" style="color:#e74c3c;">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+        '<div class="rs-row"><span class="rs-label">降至</span><span class="rs-value" style="color:#e74c3c;">+' + dropTo + ' (掉' + lostLevels + '级)</span></div>' +
+        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
+    }
+
+    setTimeout(function() { textWrap.classList.add('expand'); }, 300);
+    setTimeout(function() { stats.classList.add('fade-in'); }, 600);
+  }, 800);
+}
+
+function closeResult(isConfirm) {
+  hideAllOverlays();
+  resetEnhanceBtn();
+}
+
+function hideAllOverlays() {
+  document.getElementById('burstOverlay').classList.remove('show');
+  document.getElementById('resultOverlay').classList.remove('show');
+}
+
+function resetEnhanceBtn() {
+  isEnhancing = false;
+  var btn = document.getElementById('btnEnhance');
+  btn.disabled = false;
+  btn.textContent = '强 化';
+  btn.classList.remove('charging');
+}
+
+function closeModal() { closeResult(true); }
+function showModal() {}
 
 // ============================================================
 //  Rate help tooltip
