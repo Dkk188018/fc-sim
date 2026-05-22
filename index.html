@@ -1651,9 +1651,9 @@ function showBurstOverlay() {
 
   // Reset
   overlay.classList.add('show');
-  burstCard.classList.remove('shaking', 'shaking-intense', 'purple-shadow');
+  burstCard.classList.remove('purple-shadow');
   burstCard.style.filter = 'brightness(1)';
-  burstCard.style.animationDuration = '';
+  burstCard.style.transform = '';
   shatter.classList.remove('animate');
   shatter.style.display = 'none';
   rain.innerHTML = '';
@@ -1682,7 +1682,6 @@ function showBurstOverlay() {
   var spotShown = false;
   burstShakeTimeout = setTimeout(function() {
     burstShakeTimeout = null;
-    burstCard.classList.add('shaking');
 
     burstShakeTimer = setInterval(function() {
       shakeStep++;
@@ -1696,13 +1695,13 @@ function showBurstOverlay() {
       var glowSize = t * 18;
       var glowAlpha = Math.min(t * 1.0, 0.7);
 
+      // JS-driven shake (reliable, no CSS animation quirks)
+      var intensity = 2 + t * 12;
+      var shakeX = Math.sin(shakeStep * 1.2) * intensity;
+      burstCard.style.transform = 'translateX(' + shakeX.toFixed(1) + 'px)';
       burstCard.style.filter = 'brightness(' + bv.toFixed(2) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
 
-      // Shake speed: 0.4s → 0.08s
-      var shakeDur = Math.max(0.08, 0.4 - t * 0.32);
-      burstCard.style.animationDuration = shakeDur.toFixed(3) + 's';
-
-      // Spotlight + beams reach full at 60%, purple shadow at 70%
+      // Spotlight + beams reach full at 50%, purple shadow at 65%
       if (t >= 0.5 && !spotShown) {
         spotShown = true;
         document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '1'; });
@@ -1729,19 +1728,20 @@ function finishBurstOverlay() {
   const rain = document.getElementById('burstRain');
   const particles = document.getElementById('burstParticles');
 
-  // Fade out lights quickly
+  // Fade out lights
   document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '0'; });
   document.querySelectorAll('.burst-beam').forEach(function(el) { el.style.opacity = '0'; });
-  burstCard.classList.remove('shaking', 'shaking-intense', 'purple-shadow');
-  burstCard.style.animationDuration = '';
+  burstCard.classList.remove('purple-shadow');
+  burstCard.style.transform = '';
   rain.innerHTML = '';
   particles.innerHTML = '';
 
-  document.getElementById('burstOverlay').classList.remove('show');
-  burstCard.style.filter = '';
+  // Keep burst overlay visible during transition to result!
   try { executeEnhance(); }
   catch(e) {
     console.error('Enhance error:', e);
+    burstCard.style.filter = '';
+    document.getElementById('burstOverlay').classList.remove('show');
     if (isEnhancing) { hideAllOverlays(); resetEnhanceBtn(); }
   }
 }
@@ -1847,6 +1847,11 @@ function showBurstSuccess(level, oldOvr, newOvr) {
     '<div class="rs-row"><span class="rs-label">累计成功</span><span class="rs-value">' + totalSuccess + ' / ' + totalAttempts + ' 次</span></div>';
 
   resultOverlay.classList.add('show');
+  // Hide burst overlay after result card starts rising
+  setTimeout(function() {
+    document.getElementById('burstOverlay').classList.remove('show');
+    document.getElementById('burstCard').style.filter = '';
+  }, 400);
   setTimeout(function() { textWrap.classList.add('expand'); }, 800);
   setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
 }
@@ -1876,9 +1881,11 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
 
   startSmoke(particles, burstCard);
 
-  // After shatter (800ms), pause then show result
+  // After shatter (800ms), show result
   setTimeout(function() {
     document.getElementById('burstOverlay').classList.remove('show');
+    burstCard.style.filter = '';
+    burstCard.style.transform = '';
     shatter.classList.remove('animate');
     shatter.style.display = 'none';
 
