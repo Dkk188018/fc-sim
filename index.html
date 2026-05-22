@@ -651,12 +651,17 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-stats .rs-row:last-child { margin-bottom: 0; }
 .result-stats .rs-label { color: #888; }
 .result-stats .rs-value { color: #fff; font-weight: 700; }
+.result-btn-frame {
+  width: 85%; max-width: 320px; margin-top: 20px;
+  background: #352a23; border-radius: 6px;
+  padding: 7px 4px 8px 4px;
+}
 .result-next-bar {
-  width: 85%; max-width: 320px; padding: 14px 0; border: none;
-  background: #00e559; color: #151616;
+  width: 100%; padding: 10px 0; border: none;
+  background: #00e559; color: #1a1a1a;
   font-size: 1.05em; font-weight: 700;
-  border-radius: 0; cursor: pointer; font-family: inherit;
-  margin-top: 20px; letter-spacing: 2px;
+  border-radius: 3px; cursor: pointer; font-family: inherit;
+  letter-spacing: 2px;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .result-next-bar:active { opacity: 0.85; }
@@ -934,7 +939,9 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
     <div class="result-title" id="resultTitle"></div>
     <div class="result-subtitle" id="resultSubtitle"></div>
     <div class="result-stats" id="resultStats"></div>
-    <button class="result-next-bar" id="resultConfirmBtn" onclick="closeResult(true)">下一步</button>
+    <div class="result-btn-frame">
+      <button class="result-next-bar" id="resultConfirmBtn" onclick="closeResult(true)">下一步</button>
+    </div>
   </div>
 </div>
 
