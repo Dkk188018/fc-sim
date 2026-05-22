@@ -658,9 +658,12 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   font-size: 1.05em; font-weight: 700;
   border-radius: 10px; cursor: pointer; font-family: inherit;
   letter-spacing: 2px;
+  box-shadow: 0 4px 16px rgba(0,229,89,0.3);
+  transition: box-shadow 0.2s, transform 0.15s;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
-.result-next-bar:active { opacity: 0.85; }
+.result-next-bar:hover { box-shadow: 0 6px 24px rgba(0,229,89,0.45); }
+.result-next-bar:active { transform: translateY(1px); }
 
 @media (max-width: 480px) {
   .burst-card { width: 160px; }
