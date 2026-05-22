@@ -1252,6 +1252,7 @@ let protectCount = 0;
 let autoMode = false;
 let stopLevel = 13;
 let autoTimer = null;
+let autoCloseTimer = null;
 let isEnhancing = false;
 let history = [];
 
@@ -1559,6 +1560,7 @@ function stopAuto() {
   btn.textContent = '自动';
   btn.classList.remove('active');
   if (autoTimer) clearTimeout(autoTimer);
+  if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
 }
 
 function doAutoStep() {
@@ -1908,6 +1910,14 @@ function showBurstSuccess(level, oldOvr, newOvr) {
   }, 400);
   setTimeout(function() { textWrap.classList.add('expand'); }, 800);
   setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
+
+  if (autoMode) {
+    if (autoCloseTimer) clearTimeout(autoCloseTimer);
+    autoCloseTimer = setTimeout(function() {
+      autoCloseTimer = null;
+      document.getElementById('resultConfirmBtn').click();
+    }, 1500);
+  }
 }
 
 function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
@@ -1966,12 +1976,25 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
 
     setTimeout(function() { textWrap.classList.add('expand'); }, 800);
     setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
+
+    if (autoMode) {
+      if (autoCloseTimer) clearTimeout(autoCloseTimer);
+      autoCloseTimer = setTimeout(function() {
+        autoCloseTimer = null;
+        document.getElementById('resultConfirmBtn').click();
+      }, 1500);
+    }
   }, 800);
 }
 
 function closeResult(isConfirm) {
+  if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
   hideAllOverlays();
   resetEnhanceBtn();
+  if (autoMode) {
+    if (autoTimer) clearTimeout(autoTimer);
+    autoTimer = setTimeout(function() { doAutoStep(); }, 300);
+  }
 }
 
 function hideAllOverlays() {
