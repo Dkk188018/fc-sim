@@ -142,6 +142,11 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   font-size: 13px; font-weight: 900; padding: 1px 7px; border-radius: 3px;
   letter-spacing: 0.5px; margin-bottom: 2px;
 }
+.player-info .season-badge.season-25ucl {
+  background: none; padding: 0;
+  width: 45px; height: 18px;
+  vertical-align: middle;
+}
 .player-info .player-name {
   font-size: 15px; font-weight: 700; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1122,15 +1127,18 @@ function refreshAll() {
     default:'基础卡', live:'LIVE', hot:'HOT', tots:'TOTS', toty:'TOTY',
     icon:'ICON', 'icon-tm':'ICON TM', wc:'WC', ucl:'UCL', ng:'NG', cap:'CAP'
   };
-  sEl.textContent = seasonNames[playerSeason] || playerSeason.toUpperCase();
+  const sznName = seasonNames[playerSeason] || playerSeason.toUpperCase();
   sEl.className = 'season-badge';
   if (playerSeason === 'tots') sEl.classList.add('season-tots');
   else if (playerSeason === 'toty') sEl.classList.add('season-toty');
   else if (playerSeason === 'icon' || playerSeason === 'icon-tm') sEl.classList.add('season-icon');
   else if (playerSeason === 'hot') sEl.classList.add('season-hot');
   else if (playerSeason === 'live') sEl.classList.add('season-live');
-  else if (playerSeason === '25ucl') sEl.classList.add('season-25ucl');
-  else sEl.classList.add('season-default');
+  else if (playerSeason === '25ucl') {
+    sEl.classList.add('season-25ucl');
+    sEl.innerHTML = '<img src="images/25ucl_badge.png" alt="25UCL" style="width:100%;height:100%;">';
+  } else sEl.classList.add('season-default');
+  if (playerSeason !== '25ucl') sEl.textContent = sznName;
 
   // Avatar — show card image from PLAYER_IMAGES if available
   const avatar = document.getElementById('playerAvatar');
