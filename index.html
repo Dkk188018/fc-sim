@@ -651,14 +651,15 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-stats .rs-row:last-child { margin-bottom: 0; }
 .result-stats .rs-label { color: #888; }
 .result-stats .rs-value { color: #fff; font-weight: 700; }
-.result-retry-btn, .result-next-btn {
-  background: rgba(255,255,255,0.06); color: #ccc; border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px; padding: 10px 24px; font-size: 0.95em; font-weight: 600;
-  cursor: pointer; font-family: inherit; margin: 6px 4px;
+.result-next-bar {
+  width: 85%; max-width: 320px; padding: 14px 0; border: none;
+  background: #00e559; color: #151616;
+  font-size: 1.05em; font-weight: 700;
+  border-radius: 0; cursor: pointer; font-family: inherit;
+  margin-top: 20px; letter-spacing: 2px;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
-.result-next-btn { background: rgba(240,185,11,0.15); color: #f0b90b; border-color: rgba(240,185,11,0.3); }
-.result-retry-btn:active, .result-next-btn:active { transform: scale(0.96); }
+.result-next-bar:active { opacity: 0.85; }
 
 @media (max-width: 480px) {
   .burst-card { width: 160px; }
@@ -933,8 +934,7 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
     <div class="result-title" id="resultTitle"></div>
     <div class="result-subtitle" id="resultSubtitle"></div>
     <div class="result-stats" id="resultStats"></div>
-    <button class="result-retry-btn" onclick="closeResult(false)">重新强化</button>
-    <button class="result-next-btn" id="resultConfirmBtn" onclick="closeResult(true)">确 定</button>
+    <button class="result-next-bar" id="resultConfirmBtn" onclick="closeResult(true)">下一步</button>
   </div>
 </div>
 
