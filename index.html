@@ -472,10 +472,13 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .burst-card-wrap { position: relative; z-index: 5; }
 .burst-card {
   width: 160px; position: relative; z-index: 5; overflow: visible;
-  transition: filter 0.1s;
+  will-change: transform, filter;
+  transform: translate3d(0, 0, 0);
 }
-.burst-card.shaking { animation: burst-shake 0.4s ease-in-out infinite; }
-.burst-card.shaking-intense { animation: burst-shake 0.15s linear infinite; }
+.burst-card.shake-s1 { animation: burst-shake 0.45s ease-in-out infinite; }
+.burst-card.shake-s2 { animation: burst-shake 0.22s ease-in-out infinite; }
+.burst-card.shake-s3 { animation: burst-shake 0.10s ease-in-out infinite; }
+.burst-card.shake-s4 { animation: burst-shake 0.05s linear infinite; }
 .burst-card.purple-shadow::after {
   content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0.6;
   filter: brightness(0) drop-shadow(0 0 20px rgba(200,50,255,0.8));
@@ -483,16 +486,16 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 }
 
 @keyframes burst-shake {
-  0%,100% { transform: translateX(0); }
-  10% { transform: translateX(-2px); }
-  20% { transform: translateX(2px); }
-  30% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  50% { transform: translateX(-6px); }
-  60% { transform: translateX(7px); }
-  70% { transform: translateX(-9px); }
-  80% { transform: translateX(11px); }
-  90% { transform: translateX(-14px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  10% { transform: translate3d(-1px, 0, 0); }
+  20% { transform: translate3d(2px, 0, 0); }
+  30% { transform: translate3d(-3px, 0, 0); }
+  40% { transform: translate3d(4px, 0, 0); }
+  50% { transform: translate3d(-5px, 0, 0); }
+  60% { transform: translate3d(6px, 0, 0); }
+  70% { transform: translate3d(-7px, 0, 0); }
+  80% { transform: translate3d(9px, 0, 0); }
+  90% { transform: translate3d(-11px, 0, 0); }
 }
 
 /* Rain particles */
@@ -500,13 +503,14 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   position: absolute; width: 1px;
   background: linear-gradient(180deg, rgba(150,200,255,0.8), transparent);
   z-index: 3; pointer-events: none;
+  will-change: transform, opacity;
   animation: rainFall linear forwards;
 }
 @keyframes rainFall {
-  0% { transform: translateY(-20px); opacity: 0; }
+  0% { transform: translate3d(0, -20px, 0); opacity: 0; }
   10% { opacity: 1; }
   90% { opacity: 1; }
-  100% { transform: translateY(105vh); opacity: 0; }
+  100% { transform: translate3d(0, 105vh, 0); opacity: 0; }
 }
 /* White burst particles */
 .burst-particle {
@@ -1629,6 +1633,7 @@ function addHistory(result, desc) {
 let burstTimer = null;
 let burstShakeTimer = null;
 let burstShakeTimeout = null;
+let burstRafId = null;
 
 function getCardImgUrl() {
   const avatar = document.getElementById('playerAvatar');
@@ -1641,19 +1646,19 @@ function showBurstOverlay() {
   if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
   if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
   if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+  if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
 
-  const overlay = document.getElementById('burstOverlay');
-  const burstCard = document.getElementById('burstCard');
-  const cardImg = document.getElementById('burstCardImg');
-  const rain = document.getElementById('burstRain');
-  const particles = document.getElementById('burstParticles');
-  const shatter = document.getElementById('shatterEffect');
+  var overlay = document.getElementById('burstOverlay');
+  var burstCard = document.getElementById('burstCard');
+  var cardImg = document.getElementById('burstCardImg');
+  var rain = document.getElementById('burstRain');
+  var particles = document.getElementById('burstParticles');
+  var shatter = document.getElementById('shatterEffect');
 
   // Reset
   overlay.classList.add('show');
-  burstCard.classList.remove('purple-shadow');
+  burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'purple-shadow');
   burstCard.style.filter = 'brightness(1)';
-  burstCard.style.transform = '';
   shatter.classList.remove('animate');
   shatter.style.display = 'none';
   rain.innerHTML = '';
@@ -1662,46 +1667,54 @@ function showBurstOverlay() {
   // Set card image
   cardImg.src = getCardImgUrl();
 
-  // Start spotlight + glow immediately at 60% opacity
+  // Spotlight + glow at 60%, beams at 40%
   document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) {
     el.classList.add('on');
     el.style.opacity = '0.6';
   });
-  // Beams at 40%
   document.querySelectorAll('.burst-beam').forEach(function(el) {
     el.classList.add('on');
     el.style.opacity = '0.4';
   });
 
-  // Rain particles immediately on both sides
+  // Rain particles - slower, match shake duration
   startRain(rain, 60);
 
-  // Start shaking at 300ms
-  var shakeStep = 0;
-  var totalSteps = 25;
+  // Shake + brightness via requestAnimationFrame (synced to refresh rate)
+  var shakeStartTime = null;
+  var shakeDuration = 2100; // shake runs for 2100ms
   var spotShown = false;
+  var lastClass = '';
+
   burstShakeTimeout = setTimeout(function() {
     burstShakeTimeout = null;
+    shakeStartTime = performance.now();
 
-    burstShakeTimer = setInterval(function() {
-      shakeStep++;
-      var t = shakeStep / totalSteps;
-      if (t > 1) t = 1;
+    function tick(now) {
+      var elapsed = now - shakeStartTime;
+      var t = Math.min(elapsed / shakeDuration, 1);
 
-      // Brightness buildup, card stays visible
+      // CSS class switching for shake speed (GPU-composited, smooth)
+      var newClass;
+      if (t < 0.25) { newClass = 'shake-s1'; }
+      else if (t < 0.55) { newClass = 'shake-s2'; }
+      else if (t < 0.80) { newClass = 'shake-s3'; }
+      else { newClass = 'shake-s4'; }
+      if (newClass !== lastClass) {
+        burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4');
+        burstCard.classList.add(newClass);
+        lastClass = newClass;
+      }
+
+      // Brightness buildup via filter
       var bv = 1 + t * t * 1.0;
       var ct = 1 + t * 0.1;
       var sat = 1 + t * 0.2;
       var glowSize = t * 18;
       var glowAlpha = Math.min(t * 1.0, 0.7);
-
-      // JS-driven shake (reliable, no CSS animation quirks)
-      var intensity = 2 + t * 12;
-      var shakeX = Math.sin(shakeStep * 1.2) * intensity;
-      burstCard.style.transform = 'translateX(' + shakeX.toFixed(1) + 'px)';
       burstCard.style.filter = 'brightness(' + bv.toFixed(2) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
 
-      // Spotlight + beams reach full at 50%, purple shadow at 65%
+      // Spotlight + beams at 50%, particles at 50%, purple at 65%
       if (t >= 0.5 && !spotShown) {
         spotShown = true;
         document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '1'; });
@@ -1711,10 +1724,16 @@ function showBurstOverlay() {
       if (t >= 0.65) {
         burstCard.classList.add('purple-shadow');
       }
-    }, 75);
+
+      if (t < 1) {
+        burstRafId = requestAnimationFrame(tick);
+      }
+    }
+
+    burstRafId = requestAnimationFrame(tick);
   }, 300);
 
-  // Total: 300ms delay + (25 * 75ms) + 225ms fade = 2400ms
+  // Total: 300ms delay + 2100ms shake = 2400ms
   burstTimer = setTimeout(function() { finishBurstOverlay(); }, 2400);
 }
 
@@ -1723,20 +1742,20 @@ function finishBurstOverlay() {
   burstTimer = null;
   if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
   if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+  if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
 
-  const burstCard = document.getElementById('burstCard');
-  const rain = document.getElementById('burstRain');
-  const particles = document.getElementById('burstParticles');
+  var burstCard = document.getElementById('burstCard');
+  var rain = document.getElementById('burstRain');
+  var particles = document.getElementById('burstParticles');
 
   // Fade out lights
   document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '0'; });
   document.querySelectorAll('.burst-beam').forEach(function(el) { el.style.opacity = '0'; });
-  burstCard.classList.remove('purple-shadow');
-  burstCard.style.transform = '';
+  burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'purple-shadow');
   rain.innerHTML = '';
   particles.innerHTML = '';
 
-  // Keep burst overlay visible during transition to result!
+  // Keep burst overlay visible during transition to result
   try { executeEnhance(); }
   catch(e) {
     console.error('Enhance error:', e);
@@ -1750,6 +1769,7 @@ function skipBurst() {
   if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
   if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
   if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+  if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
   finishBurstOverlay();
 }
 
@@ -1762,17 +1782,12 @@ function startRain(container, count) {
     drop.style.left = Math.random() * 100 + '%';
     drop.style.top = '-' + h + 'px';
     drop.style.opacity = (0.3 + Math.random() * 0.5);
+    // Slower fall: 2.0-3.5s to match shake duration
+    drop.style.animationDuration = (2.0 + Math.random() * 1.5) + 's';
+    drop.style.animationDelay = Math.random() * 0.6 + 's';
     container.appendChild(drop);
-    drop.animate([
-      { transform: 'translateY(0)', opacity: drop.style.opacity },
-      { transform: 'translateY(' + (window.innerHeight + h) + 'px)', opacity: 0 }
-    ], {
-      duration: 800 + Math.random() * 600,
-      delay: Math.random() * 400,
-      easing: 'linear',
-      fill: 'forwards'
-    });
-    setTimeout(function() { drop.remove(); }, 2000);
+    // Clean up after longest possible animation
+    setTimeout(function() { drop.remove(); }, 4200);
   }
 }
 
@@ -1885,7 +1900,7 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
   setTimeout(function() {
     document.getElementById('burstOverlay').classList.remove('show');
     burstCard.style.filter = '';
-    burstCard.style.transform = '';
+    burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4');
     shatter.classList.remove('animate');
     shatter.style.display = 'none';
 
