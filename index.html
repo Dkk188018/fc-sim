@@ -1627,6 +1627,7 @@ function addHistory(result, desc) {
 //  Burst Animation (强化过程动画)
 // ============================================================
 let burstTimer = null;
+let burstShakeTimer = null;
 
 function getCardImgUrl() {
   const avatar = document.getElementById('playerAvatar');
@@ -1642,68 +1643,130 @@ function showBurstOverlay() {
   const particles = document.getElementById('burstParticles');
   const shatter = document.getElementById('shatterEffect');
 
+  // Reset
   overlay.classList.add('show');
   burstCard.classList.remove('shaking', 'shaking-intense', 'purple-shadow');
+  burstCard.style.filter = 'brightness(1)';
+  burstCard.style.animationDuration = '';
   shatter.classList.remove('animate');
   shatter.style.display = 'none';
   rain.innerHTML = '';
   particles.innerHTML = '';
 
-  const imgUrl = getCardImgUrl();
-  cardImg.src = imgUrl;
+  // Set card image
+  cardImg.src = getCardImgUrl();
 
-  requestAnimationFrame(function() {
-    document.querySelectorAll('.burst-spotlight, .burst-spot-glow, .burst-beam').forEach(function(el) { el.classList.add('on'); });
+  // Start spotlight + glow immediately at 60% opacity
+  document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) {
+    el.classList.add('on');
+    el.style.opacity = '0.6';
+  });
+  // Beams at 40%
+  document.querySelectorAll('.burst-beam').forEach(function(el) {
+    el.classList.add('on');
+    el.style.opacity = '0.4';
   });
 
-  setTimeout(function() { startRain(rain); }, 300);
+  // Rain particles immediately on both sides
+  startRain(rain, 60);
 
-  setTimeout(function() { burstCard.classList.add('shaking'); }, 500);
-
-  setTimeout(function() { startBurstParticles(particles, burstCard); }, 900);
-
+  // Start shaking at 300ms
+  var shakeStep = 0;
+  var totalSteps = 28;
+  var spotShown = false;
   setTimeout(function() {
-    burstCard.classList.remove('shaking');
-    burstCard.classList.add('shaking-intense', 'purple-shadow');
-  }, 1200);
+    burstCard.classList.add('shaking');
 
-  burstTimer = setTimeout(function() { finishBurstOverlay(); }, 2200);
+    burstShakeTimer = setInterval(function() {
+      shakeStep++;
+      var t = shakeStep / totalSteps;
+      if (t > 1) t = 1;
+
+      // Brightness buildup: 1 → 25 (quadratic)
+      var bv = 1 + t * t * 24;
+      var ct = 1 + t * 0.3;
+      var sat = 1 + t * 0.5;
+      var glowSize = t * 40;
+      var glowAlpha = Math.min(t * 1.2, 1);
+
+      burstCard.style.filter = 'brightness(' + bv.toFixed(1) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
+
+      // Shake speed: 0.4s → 0.08s
+      var shakeDur = Math.max(0.08, 0.4 - t * 0.32);
+      burstCard.style.animationDuration = shakeDur.toFixed(3) + 's';
+
+      // Spotlight + beams reach full at 60%, purple shadow at 70%
+      if (t >= 0.5 && !spotShown) {
+        spotShown = true;
+        document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '1'; });
+        document.querySelectorAll('.burst-beam').forEach(function(el) { el.style.opacity = '1'; });
+        startBurstParticles(particles, burstCard);
+      }
+      if (t >= 0.65) {
+        burstCard.classList.add('purple-shadow');
+      }
+    }, 75);
+  }, 300);
+
+  // Total: 300ms delay + (28 * 75ms) ≈ 2400ms, then 200ms fade = 2600ms
+  burstTimer = setTimeout(function() { finishBurstOverlay(); }, 2600);
 }
 
 function finishBurstOverlay() {
   clearTimeout(burstTimer);
   burstTimer = null;
+  if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+
   const burstCard = document.getElementById('burstCard');
   const rain = document.getElementById('burstRain');
   const particles = document.getElementById('burstParticles');
 
-  document.querySelectorAll('.burst-spotlight, .burst-spot-glow, .burst-beam').forEach(function(el) { el.classList.remove('on'); });
+  // Fade out lights quickly
+  document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '0'; });
+  document.querySelectorAll('.burst-beam').forEach(function(el) { el.style.opacity = '0'; });
   burstCard.classList.remove('shaking', 'shaking-intense', 'purple-shadow');
+  burstCard.style.animationDuration = '';
   rain.innerHTML = '';
   particles.innerHTML = '';
 
-  try { executeEnhance(); }
-  catch(e) {
-    console.error('Enhance error:', e);
-    if (isEnhancing) { hideAllOverlays(); resetEnhanceBtn(); }
-  }
+  // Brief pause (200ms) then execute
+  setTimeout(function() {
+    document.getElementById('burstOverlay').classList.remove('show');
+    burstCard.style.filter = '';
+    try { executeEnhance(); }
+    catch(e) {
+      console.error('Enhance error:', e);
+      if (isEnhancing) { hideAllOverlays(); resetEnhanceBtn(); }
+    }
+  }, 200);
 }
 
 function skipBurst() {
   if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
+  if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
   finishBurstOverlay();
 }
 
-function startRain(container) {
-  var count = 40;
+function startRain(container, count) {
   for (var i = 0; i < count; i++) {
     var drop = document.createElement('div');
     drop.className = 'rain-particle';
-    drop.style.left = (Math.random() * 100) + '%';
-    drop.style.animationDuration = (0.6 + Math.random() * 1.0) + 's';
-    drop.style.animationDelay = (Math.random() * 1.5) + 's';
+    var h = 30 + Math.random() * 50;
+    drop.style.height = h + 'px';
+    drop.style.left = Math.random() * 100 + '%';
+    drop.style.top = '-' + h + 'px';
     drop.style.opacity = (0.3 + Math.random() * 0.5);
     container.appendChild(drop);
+    drop.animate([
+      { transform: 'translateY(0)', opacity: drop.style.opacity },
+      { transform: 'translateY(' + (window.innerHeight + h) + 'px)', opacity: 0 }
+    ], {
+      duration: 800 + Math.random() * 600,
+      delay: Math.random() * 400,
+      easing: 'linear',
+      fill: 'forwards'
+    });
+    setTimeout(function() { drop.remove(); }, 2000);
   }
 }
 
@@ -1711,7 +1774,7 @@ function startBurstParticles(container, cardEl) {
   var rect = cardEl.getBoundingClientRect();
   var cx = rect.left + rect.width / 2;
   var cy = rect.top + rect.height / 2;
-  var count = 30;
+  var count = 40;
   for (var i = 0; i < count; i++) {
     var p = document.createElement('div');
     p.className = 'burst-particle';
@@ -1721,7 +1784,7 @@ function startBurstParticles(container, cardEl) {
     p.style.left = cx + 'px';
     p.style.top = cy + 'px';
     var angle = Math.random() * Math.PI * 2;
-    var dist = 30 + Math.random() * 120;
+    var dist = 30 + Math.random() * 140;
     p.style.setProperty('--bx', Math.cos(angle) * dist + 'px');
     p.style.setProperty('--by', Math.sin(angle) * dist + 'px');
     p.style.animationDuration = (0.5 + Math.random() * 0.8) + 's';
@@ -1777,10 +1840,12 @@ function showBurstSuccess(level, oldOvr, newOvr) {
     '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + newOvr + ' (+' + ovrGain + ')</span></div>' +
     '<div class="rs-row"><span class="rs-label">累计成功</span><span class="rs-value">' + totalSuccess + ' / ' + totalAttempts + ' 次</span></div>';
 
-  resultOverlay.classList.add('show');
-
-  setTimeout(function() { textWrap.classList.add('expand'); }, 400);
-  setTimeout(function() { stats.classList.add('fade-in'); }, 700);
+  // Pause briefly (500ms), then show card, then text
+  setTimeout(function() {
+    resultOverlay.classList.add('show');
+    setTimeout(function() { textWrap.classList.add('expand'); }, 500);
+    setTimeout(function() { stats.classList.add('fade-in'); }, 800);
+  }, 500);
 }
 
 function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
@@ -1799,6 +1864,7 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
   stats.classList.remove('fade-in');
   textWrap.classList.remove('expand');
 
+  // Shatter + smoke on burst card
   shatter.style.display = 'none';
   shatter.classList.remove('animate');
   void shatter.offsetWidth;
@@ -1807,31 +1873,35 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
 
   startSmoke(particles, burstCard);
 
+  // After shatter (800ms), pause then show result
   setTimeout(function() {
     document.getElementById('burstOverlay').classList.remove('show');
     shatter.classList.remove('animate');
     shatter.style.display = 'none';
-    resultOverlay.classList.add('show');
 
-    var dropOvr = baseOvr + data(dropTo).bonus;
-    var lostLevels = oldLevel - dropTo;
+    setTimeout(function() {
+      resultOverlay.classList.add('show');
 
-    if (dropTo === oldLevel) {
-      title.textContent = '强化保护生效！';
-      subtitle.textContent = '强化失败，但等级保持不变';
-      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
-        '<div class="rs-row"><span class="rs-label">保护效果</span><span class="rs-value" style="color:#f0b90b;">保持 +' + oldLevel + '</span></div>' +
-        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' (不变)</span></div>';
-    } else {
-      title.textContent = '强化失败';
-      subtitle.textContent = '球员降至 +' + dropTo + '，掉了 ' + lostLevels + ' 级';
-      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value" style="color:#e74c3c;">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
-        '<div class="rs-row"><span class="rs-label">降至</span><span class="rs-value" style="color:#e74c3c;">+' + dropTo + ' (掉' + lostLevels + '级)</span></div>' +
-        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
-    }
+      var dropOvr = baseOvr + data(dropTo).bonus;
+      var lostLevels = oldLevel - dropTo;
 
-    setTimeout(function() { textWrap.classList.add('expand'); }, 300);
-    setTimeout(function() { stats.classList.add('fade-in'); }, 600);
+      if (dropTo === oldLevel) {
+        title.textContent = '强化保护生效！';
+        subtitle.textContent = '强化失败，但等级保持不变';
+        stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+          '<div class="rs-row"><span class="rs-label">保护效果</span><span class="rs-value" style="color:#f0b90b;">保持 +' + oldLevel + '</span></div>' +
+          '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' (不变)</span></div>';
+      } else {
+        title.textContent = '强化失败';
+        subtitle.textContent = '球员降至 +' + dropTo + '，掉了 ' + lostLevels + ' 级';
+        stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value" style="color:#e74c3c;">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+          '<div class="rs-row"><span class="rs-label">降至</span><span class="rs-value" style="color:#e74c3c;">+' + dropTo + ' (掉' + lostLevels + '级)</span></div>' +
+          '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
+      }
+
+      setTimeout(function() { textWrap.classList.add('expand'); }, 400);
+      setTimeout(function() { stats.classList.add('fade-in'); }, 700);
+    }, 500);
   }, 800);
 }
 
