@@ -865,7 +865,9 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   <!-- Stop Level -->
   <div class="stop-row">
     <span>强化至</span>
-    <input type="number" id="inpStopLevel" value="13" min="1" max="13">
+    <select id="inpStopLevel">
+        <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option><option value="5">+5</option><option value="6">+6</option><option value="7">+7</option><option value="8">+8</option><option value="9">+9</option><option value="10">+10</option><option value="11">+11</option><option value="12">+12</option><option value="13" selected>+13</option>
+      </select>
     <span>级自动停止</span>
     <span style="flex:1;"></span>
     <span style="font-size:10px;color:var(--text3);">目标: +<b id="stopLevelDisplay" style="color:#f0b90b;">13</b></span>
@@ -2168,24 +2170,11 @@ function applySettings() {
 }
 
 // ============================================================
-//  Stop Level Input — 限制 +1 ~ +13
+//  Stop Level Select
 // ============================================================
-function clampStopLevel(el) {
-  var v = parseInt(el.value);
-  if (isNaN(v) || v < 1) v = 1;
-  if (v > 13) v = 13;
-  stopLevel = v;
-  el.value = v;
-  document.getElementById('stopLevelDisplay').textContent = '+' + v;
-}
-document.getElementById('inpStopLevel').addEventListener('input', function() {
-  clampStopLevel(this);
-});
 document.getElementById('inpStopLevel').addEventListener('change', function() {
-  clampStopLevel(this);
-});
-document.getElementById('inpStopLevel').addEventListener('blur', function() {
-  clampStopLevel(this);
+  stopLevel = parseInt(this.value) || 13;
+  document.getElementById('stopLevelDisplay').textContent = '+' + stopLevel;
 });
 
 //  Keyboard
