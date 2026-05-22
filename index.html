@@ -1916,7 +1916,7 @@ function showBurstSuccess(level, oldOvr, newOvr) {
     autoCloseTimer = setTimeout(function() {
       autoCloseTimer = null;
       document.getElementById('resultConfirmBtn').click();
-    }, 1500);
+    }, 1800);
   }
 }
 
@@ -1982,7 +1982,7 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
       autoCloseTimer = setTimeout(function() {
         autoCloseTimer = null;
         document.getElementById('resultConfirmBtn').click();
-      }, 1500);
+      }, 1800);
     }
   }, 800);
 }
@@ -1993,7 +1993,7 @@ function closeResult(isConfirm) {
   resetEnhanceBtn();
   if (autoMode) {
     if (autoTimer) clearTimeout(autoTimer);
-    autoTimer = setTimeout(function() { doAutoStep(); }, 300);
+    autoTimer = setTimeout(function() { doAutoStep(); }, 800);
   }
 }
 
