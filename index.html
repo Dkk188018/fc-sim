@@ -1677,8 +1677,8 @@ function showBurstOverlay() {
     el.style.opacity = '0.4';
   });
 
-  // Rain particles - slower, match shake duration
-  startRain(rain, 60);
+  // Rain particles
+  startRain(rain, 30);
 
   // Shake + brightness via requestAnimationFrame (synced to refresh rate)
   var shakeStartTime = null;
@@ -1782,12 +1782,10 @@ function startRain(container, count) {
     drop.style.left = Math.random() * 100 + '%';
     drop.style.top = '-' + h + 'px';
     drop.style.opacity = (0.3 + Math.random() * 0.5);
-    // Slower fall: 2.0-3.5s to match shake duration
-    drop.style.animationDuration = (2.0 + Math.random() * 1.5) + 's';
-    drop.style.animationDelay = Math.random() * 0.6 + 's';
+    drop.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+    drop.style.animationDelay = Math.random() * 0.4 + 's';
     container.appendChild(drop);
-    // Clean up after longest possible animation
-    setTimeout(function() { drop.remove(); }, 4200);
+    setTimeout(function() { drop.remove(); }, 2500);
   }
 }
 
