@@ -592,14 +592,14 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-card-wrap { position: relative; margin-bottom: 20px; }
 .result-card {
   width: 180px; position: relative; z-index: 2;
-  animation: resultCardIn 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
+  animation: resultCardIn 1.5s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 @keyframes resultCardIn {
   0% { transform: scale(0.7) translateY(100px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 .result-overlay.success .result-card {
-  animation: resultCardIn 1.2s cubic-bezier(0.25,0.46,0.45,0.94), card-float 3s ease-in-out 1.4s infinite;
+  animation: resultCardIn 1.5s cubic-bezier(0.25,0.46,0.45,0.94), card-float 3s ease-in-out 1.7s infinite;
 }
 .result-overlay.success .result-card::before {
   content: ""; position: absolute; top: 50%; left: 50%; width: 140%; height: 140%;
@@ -1628,6 +1628,7 @@ function addHistory(result, desc) {
 // ============================================================
 let burstTimer = null;
 let burstShakeTimer = null;
+let burstShakeTimeout = null;
 
 function getCardImgUrl() {
   const avatar = document.getElementById('playerAvatar');
@@ -1636,6 +1637,11 @@ function getCardImgUrl() {
 }
 
 function showBurstOverlay() {
+  // Clear any stale timers from previous runs
+  if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
+  if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
+  if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+
   const overlay = document.getElementById('burstOverlay');
   const burstCard = document.getElementById('burstCard');
   const cardImg = document.getElementById('burstCardImg');
@@ -1674,7 +1680,8 @@ function showBurstOverlay() {
   var shakeStep = 0;
   var totalSteps = 25;
   var spotShown = false;
-  setTimeout(function() {
+  burstShakeTimeout = setTimeout(function() {
+    burstShakeTimeout = null;
     burstCard.classList.add('shaking');
 
     burstShakeTimer = setInterval(function() {
@@ -1682,12 +1689,12 @@ function showBurstOverlay() {
       var t = shakeStep / totalSteps;
       if (t > 1) t = 1;
 
-      // Gentle brightness buildup, card stays visible
-      var bv = 1 + t * t * 0.6;
-      var ct = 1 + t * 0.06;
-      var sat = 1 + t * 0.12;
-      var glowSize = t * 12;
-      var glowAlpha = Math.min(t * 0.8, 0.6);
+      // Brightness buildup, card stays visible
+      var bv = 1 + t * t * 1.0;
+      var ct = 1 + t * 0.1;
+      var sat = 1 + t * 0.2;
+      var glowSize = t * 18;
+      var glowAlpha = Math.min(t * 1.0, 0.7);
 
       burstCard.style.filter = 'brightness(' + bv.toFixed(2) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
 
@@ -1715,6 +1722,7 @@ function showBurstOverlay() {
 function finishBurstOverlay() {
   clearTimeout(burstTimer);
   burstTimer = null;
+  if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
   if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
 
   const burstCard = document.getElementById('burstCard');
@@ -1740,6 +1748,7 @@ function finishBurstOverlay() {
 
 function skipBurst() {
   if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
+  if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
   if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
   finishBurstOverlay();
 }
@@ -1838,8 +1847,8 @@ function showBurstSuccess(level, oldOvr, newOvr) {
     '<div class="rs-row"><span class="rs-label">累计成功</span><span class="rs-value">' + totalSuccess + ' / ' + totalAttempts + ' 次</span></div>';
 
   resultOverlay.classList.add('show');
-  setTimeout(function() { textWrap.classList.add('expand'); }, 600);
-  setTimeout(function() { stats.classList.add('fade-in'); }, 900);
+  setTimeout(function() { textWrap.classList.add('expand'); }, 800);
+  setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
 }
 
 function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
@@ -1892,8 +1901,8 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
         '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
     }
 
-    setTimeout(function() { textWrap.classList.add('expand'); }, 600);
-    setTimeout(function() { stats.classList.add('fade-in'); }, 900);
+    setTimeout(function() { textWrap.classList.add('expand'); }, 800);
+    setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
   }, 800);
 }
 
