@@ -1724,12 +1724,12 @@ function showBurstOverlay() {
         lastClass = newClass;
       }
 
-      // Brightness buildup via filter
-      var bv = 1 + t * t * 1.0;
-      var ct = 1 + t * 0.1;
-      var sat = 1 + t * 0.2;
-      var glowSize = t * 18;
-      var glowAlpha = Math.min(t * 1.0, 0.7);
+      // Brightness buildup: cubic curve for dramatic end flash
+      var bv = 1 + t * t * t * 3.5;
+      var ct = 1 + t * t * 0.2;
+      var sat = 1 + t * t * 0.4;
+      var glowSize = t * t * 35;
+      var glowAlpha = Math.min(t * t * 1.3, 0.9);
       burstCard.style.filter = 'brightness(' + bv.toFixed(2) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
 
       // Spotlight + beams at 50%, particles at 50%, purple at 65%
