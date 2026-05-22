@@ -710,11 +710,18 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   display: flex; align-items: center; gap: 8px;
   font-size: 12px; color: var(--text2); margin-bottom: 6px;
 }
-.stop-row input {
-  width: 44px; padding: 5px 6px;
-  background: rgba(20,30,50,0.5); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 4px; color: var(--text); font-size: 13px;
-  text-align: center; font-family: inherit; outline: none;
+.stop-row select {
+  padding: 4px 20px 4px 6px;
+  background: rgba(20,30,50,0.35); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px; color: var(--text); font-size: 12px;
+  font-family: inherit; outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6'%3E%3Cpath d='M0 0l4 6 4-6z' fill='%237a8090'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+}
+.stop-row select:focus {
+  border-color: rgba(240,185,11,0.4);
 }
 </style>
 </head>
