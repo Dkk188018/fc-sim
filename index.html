@@ -2168,12 +2168,24 @@ function applySettings() {
 }
 
 // ============================================================
-//  Stop Level Input
+//  Stop Level Input — 限制 +1 ~ +13
 // ============================================================
+function clampStopLevel(el) {
+  var v = parseInt(el.value);
+  if (isNaN(v) || v < 1) v = 1;
+  if (v > 13) v = 13;
+  stopLevel = v;
+  el.value = v;
+  document.getElementById('stopLevelDisplay').textContent = '+' + v;
+}
 document.getElementById('inpStopLevel').addEventListener('input', function() {
-  stopLevel = Math.max(1, Math.min(13, parseInt(this.value) || 13));
-  this.value = stopLevel;
-  document.getElementById('stopLevelDisplay').textContent = '+' + stopLevel;
+  clampStopLevel(this);
+});
+document.getElementById('inpStopLevel').addEventListener('change', function() {
+  clampStopLevel(this);
+});
+document.getElementById('inpStopLevel').addEventListener('blur', function() {
+  clampStopLevel(this);
 });
 
 //  Keyboard
