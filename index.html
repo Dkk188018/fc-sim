@@ -471,9 +471,15 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 
 .burst-card-wrap { position: relative; z-index: 5; }
 .burst-card {
-  width: 200px; position: relative; z-index: 5; overflow: visible;
+  width: 230px; position: relative; z-index: 5; overflow: visible;
   will-change: transform, filter;
-  transform: translate3d(0, 0, 0);
+}
+.burst-card-wrap.zoom-in {
+  animation: card-zoom-in 0.5s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+}
+@keyframes card-zoom-in {
+  0% { transform: translate3d(0, 0, 0) scale(0.75); }
+  100% { transform: translate3d(0, 0, 0) scale(1.0); }
 }
 .burst-card.shake-s1 { animation: burst-shake 0.45s ease-in-out infinite; }
 .burst-card.shake-s2 { animation: burst-shake 0.22s ease-in-out infinite; }
@@ -596,7 +602,7 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-overlay.show { display: flex; }
 .result-card-wrap { position: relative; margin-bottom: 20px; }
 .result-card {
-  width: 200px; position: relative; z-index: 2;
+  width: 230px; position: relative; z-index: 2;
   animation: resultCardIn 1.5s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 @keyframes resultCardIn {
@@ -655,8 +661,8 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-retry-btn:active, .result-next-btn:active { transform: scale(0.96); }
 
 @media (max-width: 480px) {
-  .burst-card { width: 130px; }
-  .result-card { width: 150px; }
+  .burst-card { width: 160px; }
+  .result-card { width: 170px; }
   .shatter-effect.animate { animation: shatter-play 0.8s step-end forwards, shatter-scale-mobile 0.8s ease-out forwards; }
   @keyframes shatter-scale-mobile {
     0% { transform: translate(-50%, -50%) scale(1.8); }
@@ -1651,6 +1657,7 @@ function showBurstOverlay() {
 
   var overlay = document.getElementById('burstOverlay');
   var burstCard = document.getElementById('burstCard');
+  var burstCardWrap = burstCard.parentElement; // .burst-card-wrap
   var cardImg = document.getElementById('burstCardImg');
   var rain = document.getElementById('burstRain');
   var particles = document.getElementById('burstParticles');
@@ -1658,6 +1665,9 @@ function showBurstOverlay() {
 
   // Reset
   overlay.classList.add('show');
+  burstCardWrap.classList.remove('zoom-in');
+  void burstCardWrap.offsetWidth;
+  burstCardWrap.classList.add('zoom-in');
   burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'purple-shadow');
   burstCard.style.filter = 'brightness(1)';
   shatter.classList.remove('animate');
