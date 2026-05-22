@@ -471,7 +471,7 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 
 .burst-card-wrap { position: relative; z-index: 5; }
 .burst-card {
-  width: 160px; position: relative; z-index: 5; overflow: visible;
+  width: 200px; position: relative; z-index: 5; overflow: visible;
   will-change: transform, filter;
   transform: translate3d(0, 0, 0);
 }
@@ -479,6 +479,7 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .burst-card.shake-s2 { animation: burst-shake 0.22s ease-in-out infinite; }
 .burst-card.shake-s3 { animation: burst-shake 0.10s ease-in-out infinite; }
 .burst-card.shake-s4 { animation: burst-shake 0.05s linear infinite; }
+.burst-card.anim-stop { animation: none !important; }
 .burst-card.purple-shadow::after {
   content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0.6;
   filter: brightness(0) drop-shadow(0 0 20px rgba(200,50,255,0.8));
@@ -595,7 +596,7 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-overlay.show { display: flex; }
 .result-card-wrap { position: relative; margin-bottom: 20px; }
 .result-card {
-  width: 180px; position: relative; z-index: 2;
+  width: 200px; position: relative; z-index: 2;
   animation: resultCardIn 1.5s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 @keyframes resultCardIn {
@@ -1685,12 +1686,19 @@ function showBurstOverlay() {
   var shakeDuration = 2100; // shake runs for 2100ms
   var spotShown = false;
   var lastClass = '';
+  var finished = false;
 
   burstShakeTimeout = setTimeout(function() {
     burstShakeTimeout = null;
     shakeStartTime = performance.now();
 
     function tick(now) {
+      // Safety: stop if overlay was hidden externally
+      if (finished || !overlay.classList.contains('show')) {
+        burstRafId = null;
+        return;
+      }
+
       var elapsed = now - shakeStartTime;
       var t = Math.min(elapsed / shakeDuration, 1);
 
@@ -1727,19 +1735,20 @@ function showBurstOverlay() {
 
       if (t < 1) {
         burstRafId = requestAnimationFrame(tick);
+      } else {
+        // Animation complete — call finishBurstOverlay from here, no race condition
+        burstRafId = null;
+        finished = true;
+        finishBurstOverlay();
       }
     }
 
     burstRafId = requestAnimationFrame(tick);
   }, 300);
-
-  // Total: 300ms delay + 2100ms shake = 2400ms
-  burstTimer = setTimeout(function() { finishBurstOverlay(); }, 2400);
 }
 
 function finishBurstOverlay() {
-  clearTimeout(burstTimer);
-  burstTimer = null;
+  if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
   if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
   if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
   if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
@@ -1751,7 +1760,11 @@ function finishBurstOverlay() {
   // Fade out lights
   document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '0'; });
   document.querySelectorAll('.burst-beam').forEach(function(el) { el.style.opacity = '0'; });
-  burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'purple-shadow');
+
+  // Force-stop CSS animation before removing classes (prevents infinite-animation stuck bug)
+  burstCard.classList.add('anim-stop');
+  void burstCard.offsetWidth; // force reflow to apply anim-stop
+  burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'purple-shadow', 'anim-stop');
   rain.innerHTML = '';
   particles.innerHTML = '';
 
@@ -1898,7 +1911,9 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
   setTimeout(function() {
     document.getElementById('burstOverlay').classList.remove('show');
     burstCard.style.filter = '';
-    burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4');
+    burstCard.classList.add('anim-stop');
+    void burstCard.offsetWidth;
+    burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'anim-stop');
     shatter.classList.remove('animate');
     shatter.style.display = 'none';
 
