@@ -592,14 +592,14 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 .result-card-wrap { position: relative; margin-bottom: 20px; }
 .result-card {
   width: 180px; position: relative; z-index: 2;
-  animation: resultCardIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275);
+  animation: resultCardIn 1.2s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 @keyframes resultCardIn {
-  0% { transform: scale(0.7) translateY(60px); opacity: 0; }
+  0% { transform: scale(0.7) translateY(100px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 .result-overlay.success .result-card {
-  animation: resultCardIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275), card-float 3s ease-in-out 0.8s infinite;
+  animation: resultCardIn 1.2s cubic-bezier(0.25,0.46,0.45,0.94), card-float 3s ease-in-out 1.4s infinite;
 }
 .result-overlay.success .result-card::before {
   content: ""; position: absolute; top: 50%; left: 50%; width: 140%; height: 140%;
@@ -1672,7 +1672,7 @@ function showBurstOverlay() {
 
   // Start shaking at 300ms
   var shakeStep = 0;
-  var totalSteps = 28;
+  var totalSteps = 25;
   var spotShown = false;
   setTimeout(function() {
     burstCard.classList.add('shaking');
@@ -1682,14 +1682,14 @@ function showBurstOverlay() {
       var t = shakeStep / totalSteps;
       if (t > 1) t = 1;
 
-      // Brightness buildup: 1 → 25 (quadratic)
-      var bv = 1 + t * t * 24;
-      var ct = 1 + t * 0.3;
-      var sat = 1 + t * 0.5;
-      var glowSize = t * 40;
-      var glowAlpha = Math.min(t * 1.2, 1);
+      // Gentle brightness buildup, card stays visible
+      var bv = 1 + t * t * 0.6;
+      var ct = 1 + t * 0.06;
+      var sat = 1 + t * 0.12;
+      var glowSize = t * 12;
+      var glowAlpha = Math.min(t * 0.8, 0.6);
 
-      burstCard.style.filter = 'brightness(' + bv.toFixed(1) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
+      burstCard.style.filter = 'brightness(' + bv.toFixed(2) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
 
       // Shake speed: 0.4s → 0.08s
       var shakeDur = Math.max(0.08, 0.4 - t * 0.32);
@@ -1708,8 +1708,8 @@ function showBurstOverlay() {
     }, 75);
   }, 300);
 
-  // Total: 300ms delay + (28 * 75ms) ≈ 2400ms, then 200ms fade = 2600ms
-  burstTimer = setTimeout(function() { finishBurstOverlay(); }, 2600);
+  // Total: 300ms delay + (25 * 75ms) + 225ms fade = 2400ms
+  burstTimer = setTimeout(function() { finishBurstOverlay(); }, 2400);
 }
 
 function finishBurstOverlay() {
@@ -1729,16 +1729,13 @@ function finishBurstOverlay() {
   rain.innerHTML = '';
   particles.innerHTML = '';
 
-  // Brief pause (200ms) then execute
-  setTimeout(function() {
-    document.getElementById('burstOverlay').classList.remove('show');
-    burstCard.style.filter = '';
-    try { executeEnhance(); }
-    catch(e) {
-      console.error('Enhance error:', e);
-      if (isEnhancing) { hideAllOverlays(); resetEnhanceBtn(); }
-    }
-  }, 200);
+  document.getElementById('burstOverlay').classList.remove('show');
+  burstCard.style.filter = '';
+  try { executeEnhance(); }
+  catch(e) {
+    console.error('Enhance error:', e);
+    if (isEnhancing) { hideAllOverlays(); resetEnhanceBtn(); }
+  }
 }
 
 function skipBurst() {
@@ -1840,12 +1837,9 @@ function showBurstSuccess(level, oldOvr, newOvr) {
     '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + newOvr + ' (+' + ovrGain + ')</span></div>' +
     '<div class="rs-row"><span class="rs-label">累计成功</span><span class="rs-value">' + totalSuccess + ' / ' + totalAttempts + ' 次</span></div>';
 
-  // Pause briefly (500ms), then show card, then text
-  setTimeout(function() {
-    resultOverlay.classList.add('show');
-    setTimeout(function() { textWrap.classList.add('expand'); }, 500);
-    setTimeout(function() { stats.classList.add('fade-in'); }, 800);
-  }, 500);
+  resultOverlay.classList.add('show');
+  setTimeout(function() { textWrap.classList.add('expand'); }, 600);
+  setTimeout(function() { stats.classList.add('fade-in'); }, 900);
 }
 
 function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
@@ -1879,29 +1873,27 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
     shatter.classList.remove('animate');
     shatter.style.display = 'none';
 
-    setTimeout(function() {
-      resultOverlay.classList.add('show');
+    resultOverlay.classList.add('show');
 
-      var dropOvr = baseOvr + data(dropTo).bonus;
-      var lostLevels = oldLevel - dropTo;
+    var dropOvr = baseOvr + data(dropTo).bonus;
+    var lostLevels = oldLevel - dropTo;
 
-      if (dropTo === oldLevel) {
-        title.textContent = '强化保护生效！';
-        subtitle.textContent = '强化失败，但等级保持不变';
-        stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
-          '<div class="rs-row"><span class="rs-label">保护效果</span><span class="rs-value" style="color:#f0b90b;">保持 +' + oldLevel + '</span></div>' +
-          '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' (不变)</span></div>';
-      } else {
-        title.textContent = '强化失败';
-        subtitle.textContent = '球员降至 +' + dropTo + '，掉了 ' + lostLevels + ' 级';
-        stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value" style="color:#e74c3c;">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
-          '<div class="rs-row"><span class="rs-label">降至</span><span class="rs-value" style="color:#e74c3c;">+' + dropTo + ' (掉' + lostLevels + '级)</span></div>' +
-          '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
-      }
+    if (dropTo === oldLevel) {
+      title.textContent = '强化保护生效！';
+      subtitle.textContent = '强化失败，但等级保持不变';
+      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+        '<div class="rs-row"><span class="rs-label">保护效果</span><span class="rs-value" style="color:#f0b90b;">保持 +' + oldLevel + '</span></div>' +
+        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' (不变)</span></div>';
+    } else {
+      title.textContent = '强化失败';
+      subtitle.textContent = '球员降至 +' + dropTo + '，掉了 ' + lostLevels + ' 级';
+      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value" style="color:#e74c3c;">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+        '<div class="rs-row"><span class="rs-label">降至</span><span class="rs-value" style="color:#e74c3c;">+' + dropTo + ' (掉' + lostLevels + '级)</span></div>' +
+        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
+    }
 
-      setTimeout(function() { textWrap.classList.add('expand'); }, 400);
-      setTimeout(function() { stats.classList.add('fade-in'); }, 700);
-    }, 500);
+    setTimeout(function() { textWrap.classList.add('expand'); }, 600);
+    setTimeout(function() { stats.classList.add('fade-in'); }, 900);
   }, 800);
 }
 
