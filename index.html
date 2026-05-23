@@ -1399,10 +1399,15 @@ function refreshAll() {
   } else sEl.classList.add('season-default');
   if (playerSeason !== '25ucl') sEl.textContent = sznName;
 
-  // Avatar — show card image from PLAYER_IMAGES if available
+  // Avatar — Mbappe uses level-specific images, others use PLAYER_IMAGES
   const avatar = document.getElementById('playerAvatar');
   avatar.classList.remove('elite','legend','ultimate','has-img');
-  const imgUrl = (typeof PLAYER_IMAGES !== 'undefined' && PLAYER_IMAGES[playerName]) ? PLAYER_IMAGES[playerName] : null;
+  let imgUrl = null;
+  if (playerName === '姆巴佩') {
+    imgUrl = `images/mbappe/mbappe_${currentLevel}.png`;
+  } else if (typeof PLAYER_IMAGES !== 'undefined' && PLAYER_IMAGES[playerName]) {
+    imgUrl = PLAYER_IMAGES[playerName];
+  }
   if (imgUrl) {
     avatar.textContent = '';
     avatar.innerHTML = `<img src="${imgUrl}" alt="${playerName}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
