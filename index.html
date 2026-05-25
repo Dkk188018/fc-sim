@@ -46,7 +46,7 @@ body::after {
   background: radial-gradient(ellipse 60% 20% at 50% 100%, rgba(70,110,170,0.10) 0%, transparent 100%);
 }
 
-button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.settings-trigger,.btn {
+button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-trigger,.btn {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -64,11 +64,20 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 /* ===== Settings Trigger ===== */
 .settings-trigger {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12px; color: var(--gold); cursor: pointer;
-  padding: 4px 10px; margin-bottom: 6px;
-  border: 1px solid rgba(240,185,11,0.3); border-radius: 14px;
+  font-size: 12px; color: rgba(255,255,255,0.85); cursor: pointer;
+  padding: 5px 14px; margin-bottom: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
   user-select: none; touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+.settings-trigger:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
 }
 
 /* ===== Settings Modal ===== */
@@ -155,23 +164,23 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 }
 
 .info-enhance-icon {
-  height: 18px; width: auto; display: block; flex-shrink: 0;
+  height: 22px; width: auto; display: block;
 }
 
 .info-row-item {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 4px 0; line-height: 1.3;
+  padding: 3px 0;
 }
 .info-label {
-  font-size: 13px; color: rgba(255,255,255,0.5);
-  font-weight: 400; flex-shrink: 0;
+  font-size: 14px; color: rgba(255,255,255,0.5);
+  font-weight: 400;
 }
 .info-value {
-  font-size: 14px; font-weight: 700; color: #fff;
+  font-size: 15px; font-weight: 700; color: #fff;
   text-align: right;
 }
 .info-value.stars {
-  color: #f0b90b; font-size: 15px; letter-spacing: 2px;
+  color: #f0b90b; font-size: 16px; letter-spacing: 2px;
 }
 
 /* ===== Progress Bar ===== */
@@ -223,46 +232,221 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 /* ===== Protection ===== */
 .protect-row {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 12px; color: var(--text2); margin-bottom: 6px;
+  font-size: 15px; color: var(--text2); margin-bottom: 0;
   gap: 10px;
 }
-.protect-badge {
-  font-size: 10px; background: rgba(240,185,11,0.15);
-  color: var(--gold); padding: 1px 6px; border-radius: 3px; font-weight: 600;
+.protect-divider {
+  width: 100%; height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 10px 0;
 }
+.protect-row + .protect-divider { margin-top: 20px; }
+.protect-divider + .protect-row { margin-top: 20px; }
+.protect-divider + .material-header { margin-top: 20px; }
+/* ===== 保护滑块 ===== */
+.protect-slider-wrap {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.protect-track-container {
+  position: relative; width: 130px; height: 18px;
+  display: flex; align-items: center;
+  transform: translateX(-4px);
+}
+.protect-track-bg {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  left: 0; width: 100%; height: 1.5px;
+  background: rgba(255,255,255,0.15); border-radius: 1px;
+}
+.protect-track-fill {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  left: 0; height: 1.5px;
+  background: #1ec35a; border-radius: 1px;
+  transition: width 0.15s ease;
+}
+.protect-track-fill.no-trans { transition: none; }
+.protect-handle {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 1.5px solid #c4c4c4;
+  cursor: pointer; transition: left 0.15s ease;
+}
+.protect-handle.no-trans { transition: none; }
+.protect-handle:hover { border-color: #999; }
+.protect-slider-wrap.disabled .protect-handle { cursor: default; opacity: 0.4; }
+.protect-slider-wrap.disabled .protect-track-fill { opacity: 0.4; }
+.protect-arrow {
+  font-size: 15px; color: #888; cursor: pointer; user-select: none; line-height: 1;
+  padding: 0 4px;
+}
+.protect-slider-wrap.disabled .protect-arrow { color: #444; cursor: default; pointer-events: none; }
+.protect-pct {
+  display: inline-flex; align-items: baseline; justify-content: center;
+  font-size: 22px; font-weight: 700; color: #1ec35a; line-height: 1;
+  width: 52px; text-align: center;
+}
+.protect-pct-num {
+  display: inline-block; text-align: center; letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.no-select { user-select: none; -webkit-user-select: none; }
 
 /* ===== Material Slots ===== */
 .material-section { margin-bottom: 6px; }
 .material-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 5px; font-size: 11px;
+  margin-bottom: 20px; font-size: 15px;
 }
 .material-header .title { color: var(--text2); font-weight: 600; }
 .material-header .boost { color: var(--accent); font-weight: 600; }
-.energy-slots { display: flex; gap: 5px; margin-bottom: 5px; }
+
+/* ===== 分页指示器 (替换能量条) ===== */
+@keyframes stripe-slide {
+  0% { background-position: 0 0; }
+  100% { background-position: 7px 0; }
+}
+.energy-slots { display: flex; gap: 5px; margin-bottom: 18px; }
 .energy-slot {
-  flex: 1; height: 30px; border-radius: 5px;
-  background: rgba(20,30,50,0.5); border: 2px solid rgba(255,255,255,0.08);
-  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+  position: relative; overflow: hidden;
+  flex: 1; height: 40px;
+  background: #2d2d2d; color: #999;
+  display: flex; align-items: center; justify-content: flex-start;
+  padding-left: 8px; font-size: 28px; font-weight: 400;
+  border-radius: 1px; cursor: pointer; user-select: none;
+  letter-spacing: 0.5px;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s, color 0.2s;
 }
-.energy-slot::before {
-  content: attr(data-slot);
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800; color: #000;
-  z-index: 2; pointer-events: none;
+.energy-slot span {
+  position: relative; z-index: 2;
 }
-.energy-slot.filled::before { color: #000; }
+.energy-slot:hover { background: #363636; color: #aaa; }
+.energy-slot.filled { color: #000; }
+
 .energy-slot .fill {
+  position: absolute; top: 0; left: 0; height: 100%; z-index: 1;
+  background-color: #0b91f6;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent, transparent 2px,
+    #097dd4 2px, #097dd4 5px
+  );
+  background-size: 7px 7px;
+  animation: stripe-slide 0.8s linear infinite;
+  transition: width 0.3s linear;
+}
+.energy-slot.filled .fill { /* ensures fill gets width from JS */ }
+
+/* ===== 六边形卡槽 ===== */
+@keyframes hex-wave {
+  0%, 100% { opacity: 0.08; }
+  20%      { opacity: 0.45; }
+  40%      { opacity: 0.08; }
+}
+.hex-slots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 5px; margin-bottom: 8px;
+}
+.hex-card {
+  position: relative;
+  flex: 1; aspect-ratio: 100/145;
+  clip-path: polygon(50% 0%, 100% 12%, 100% 88%, 50% 100%, 0% 88%, 0% 12%);
+  background: #1a2030;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s;
+}
+.hex-card:hover { background: #242e42; }
+
+.hex-card-stripes {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg,#5bb8ff 0%,#3a9aee 100%);
-  transition: width 0.3s ease; border-radius: 3px;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent, transparent 12px,
+    rgba(255,255,255,0.025) 12px, rgba(255,255,255,0.025) 24px
+  );
+  z-index: 0;
 }
-.energy-slot.filled {
-  border-color: #5bb8ff;
-  box-shadow: 0 0 6px rgba(91,184,255,0.3);
+
+.hex-card-plus {
+  position: relative; z-index: 1;
+  color: #6a7a9a; font-size: 32px; font-weight: 300;
+  font-family: Arial, sans-serif; line-height: 1;
+  user-select: none;
+  animation: hex-wave 4s ease-in-out infinite;
 }
+.hex-card:nth-child(1) .hex-card-plus { animation-delay: 0s; }
+.hex-card:nth-child(2) .hex-card-plus { animation-delay: 0.18s; }
+.hex-card:nth-child(3) .hex-card-plus { animation-delay: 0.36s; }
+.hex-card:nth-child(4) .hex-card-plus { animation-delay: 0.54s; }
+.hex-card:nth-child(5) .hex-card-plus { animation-delay: 0.72s; }
+
+.hex-card.active .hex-card-plus { display: none; }
+
+.hex-card-form {
+  display: none; position: relative; z-index: 1;
+  flex-direction: column; align-items: center; gap: 3px;
+  width: 100%; padding: 10px 8px;
+}
+.hex-card.active .hex-card-form { display: flex; }
+
+.hex-ovr-label {
+  font-size: 11px; color: #6a7a9a; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.hex-input-row {
+  position: relative; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.hex-input-row input {
+  width: 38px; height: 24px;
+  background: #141c2c; border: 1px solid #2e3c56;
+  border-radius: 3px; color: #e0e4f0; text-align: center;
+  font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.hex-input-row input::-webkit-outer-spin-button,
+.hex-input-row input::-webkit-inner-spin-button {
+  -webkit-appearance: none; margin: 0;
+}
+.hex-arrows {
+  display: flex; flex-direction: column; gap: 1px;
+  position: absolute; right: 50%; margin-right: -28px;
+}
+.hex-arrows button {
+  width: 14px; height: 11px;
+  background: #252d3e; border: 1px solid #3a4460;
+  border-radius: 2px; color: #8a9bc0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6px; line-height: 1; padding: 0;
+  transition: background 0.15s;
+}
+.hex-arrows button:hover { background: #313d58; }
+
+.hex-progress-wrap { width: 100%; margin-top: 1px; }
+.hex-progress-outer {
+  width: 100%; height: 3px;
+  background: #0c1220; border-radius: 2px; overflow: hidden;
+}
+.hex-progress-inner {
+  height: 100%; background: #3dc45e;
+  border-radius: 2px; transition: width 0.15s ease;
+}
+.hex-progress-pct {
+  font-size: 12px; color: #3dc45e; text-align: center; margin-top: 2px;
+}
+
+.hex-close {
+  display: none;
+  position: absolute; top: 19px; right: 10px;
+  width: 14px; height: 14px;
+  background: #d94a4a; border: none; border-radius: 50%;
+  color: #fff; font-size: 9px; font-weight: 700;
+  cursor: pointer; align-items: center; justify-content: center;
+  line-height: 1; z-index: 5;
+}
+.hex-card.active .hex-close { display: flex; }
 
 /* ===== Buttons ===== */
 .btn-row { display: flex; gap: 6px; margin-bottom: 6px; }
@@ -658,17 +842,17 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
 @media (max-width: 480px) {
   .app { padding: 0 10px; }
   .player-card { gap: 10px; padding: 8px 0; margin-bottom: 6px; }
-  .player-face { width: 115px; height: 115px; font-size: 50px; }
-  .player-face.has-img { width: 145px; height: 189px; }
+  .player-face { width: 80px; height: 80px; font-size: 36px; }
+  .player-face.has-img { width: 105px; height: 137px; }
   .player-info { gap: 4px; }
   .info-title-row { gap: 6px; margin-top: -12px; }
   .info-season-icon { height: 22px; }
   .info-player-name { font-size: 17px; }
-  .info-enhance-icon { height: 15px; }
+  .info-enhance-icon { height: 18px; }
   .info-label { font-size: 11px; }
   .info-value { font-size: 12px; }
   .info-value.stars { font-size: 13px; letter-spacing: 1px; }
-  #playerOvr { font-size: 13px; }
+  #playerOvr { font-size: 30px; }
 
   .progress-bar { gap: 0; }
   .progress-step { width: 16px; height: 16px; min-width: 12px; font-size: 6px; border-radius: 3px; }
@@ -679,8 +863,20 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
   .info-chip .val { font-size: 12px; }
   .info-chip .lbl { font-size: 8px; }
 
-  .protect-row { font-size: 11px; gap: 6px; }
-  .energy-slot { height: 26px; }
+  .protect-row { font-size: 12px; gap: 6px; }
+  .material-header { font-size: 12px; }
+  .hex-slots { gap: 3px; }
+  .energy-slot { height: 30px; font-size: 18px; padding-left: 6px; }
+  .hex-card { aspect-ratio: 100/145; }
+  .hex-card-plus { font-size: 22px; }
+  .hex-input-row input { width: 30px; height: 20px; font-size: 11px; }
+  .hex-arrows { margin-right: -22px; }
+  .hex-arrows button { width: 12px; height: 9px; font-size: 5px; }
+  .hex-ovr-label { font-size: 9px; }
+  .hex-progress-pct { font-size: 10px; }
+  .hex-close { width: 12px; height: 12px; font-size: 7px; bottom: 4px; left: 2px; }
+  .hex-card.active .hex-close { display: flex; }
+  .hex-card-form { padding: 6px 5px; gap: 2px; }
   .mat-input-row { gap: 4px; font-size: 10px; }
   .mat-input-row input { width: 50px; font-size: 11px; }
   .mat-btn { font-size: 10px; padding: 4px 8px; }
@@ -835,7 +1031,7 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
       </div>
       <div class="info-row-item">
         <span class="info-label">强化等级</span>
-        <img class="info-enhance-icon" id="infoEnhanceIcon" src="images/enhance/1.png" alt="+1">
+        <img class="info-enhance-icon" id="infoEnhanceIcon" src="images/enhance/+1.png" alt="+1">
       </div>
       <div class="info-row-item">
         <span class="info-label">位置</span>
@@ -887,27 +1083,149 @@ button,input,select,textarea,[onclick],.energy-slot,.stat-box.clickable,.setting
     </div>
   </div>
 
+  <div class="protect-divider"></div>
+
   <!-- Protection -->
   <div class="protect-row">
     <span style="font-weight:600;">强化等级保护</span>
-    <span class="protect-badge" id="protectBadge" style="display:none;">推荐开启</span>
-    <span style="flex:1;"></span>
-    <input type="range" id="protectSlider" min="0" max="100" value="0" oninput="onProtectSlider()" style="width:100px;accent-color:#f0b90b;cursor:pointer;touch-action:manipulation;">
-    <span style="font-size:13px;font-weight:700;color:#f0b90b;min-width:28px;text-align:right;" id="protectCount">0</span>
+    <span style="margin-left:16px;"></span>
+    <div class="protect-slider-wrap" id="protectSliderWrap">
+      <div class="protect-track-container" id="protectTrack">
+        <div class="protect-track-bg"></div>
+        <div class="protect-track-fill no-trans" id="protectFill" style="width:0%"></div>
+        <div class="protect-handle no-trans" id="protectHandle" style="left:0%" onmousedown="protectDragStart(event)" ontouchstart="protectDragStart(event)"></div>
+      </div>
+      <span class="protect-arrow" id="protectArrL">◀</span>
+      <span class="protect-pct"><span class="protect-pct-num" id="protectPctNum">0</span>%</span>
+      <span class="protect-arrow" id="protectArrR">▶</span>
+    </div>
+  </div>
+
+  <div class="protect-divider"></div>
+
+  <!-- Material Header -->
+  <div class="material-header">
+    <span class="title">强化概率加成</span>
+    <span>成功率加成: <span class="boost" id="materialBoost">+0%</span> <span class="rate-help" id="rateHelpIcon" onclick="toggleRateHelp(event)" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span></span>
+  </div>
+
+  <!-- Energy Bar -->
+  <div class="energy-slots" id="energySlots">
+    <div class="energy-slot" data-slot="1" onclick="clickSlot(1)"><span>1</span></div>
+    <div class="energy-slot" data-slot="2" onclick="clickSlot(2)"><span>2</span></div>
+    <div class="energy-slot" data-slot="3" onclick="clickSlot(3)"><span>3</span></div>
+    <div class="energy-slot" data-slot="4" onclick="clickSlot(4)"><span>4</span></div>
+    <div class="energy-slot" data-slot="5" onclick="clickSlot(5)"><span>5</span></div>
   </div>
 
   <!-- Material Slots -->
   <div class="material-section">
-    <div class="material-header">
-      <span class="title">强化概率加成</span>
-      <span>成功率加成: <span class="boost" id="materialBoost">+0%</span> <span class="rate-help" id="rateHelpIcon" onclick="toggleRateHelp(event)" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span></span>
-    </div>
-    <div class="energy-slots" id="energySlots">
-      <div class="energy-slot" data-slot="1" onclick="clickSlot(1)"></div>
-      <div class="energy-slot" data-slot="2" onclick="clickSlot(2)"></div>
-      <div class="energy-slot" data-slot="3" onclick="clickSlot(3)"></div>
-      <div class="energy-slot" data-slot="4" onclick="clickSlot(4)"></div>
-      <div class="energy-slot" data-slot="5" onclick="clickSlot(5)"></div>
+    <div class="hex-slots" id="hexSlots">
+      <div class="hex-card" data-slot="0" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="1" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="2" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="3" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="4" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
     </div>
     <div class="mat-input-row">
       <span style="font-size:10px;color:var(--text3);flex-shrink:0;">添加材料 OVR</span>
@@ -1146,106 +1464,106 @@ const TABLE = [
 //  25UCL 球员数据库 (105名)
 // ============================================================
 const PLAYER_DB = [
-  {"position":"中锋","name":"哈里·凯恩","ovr":123,"salary":31,"enhance":1},
-  {"position":"左边锋","name":"克瓦拉茨赫利亚","ovr":123,"salary":30,"enhance":1},
-  {"position":"左边锋","name":"路易斯·迪亚斯","ovr":123,"salary":29,"enhance":1},
-  {"position":"中场","name":"赖斯","ovr":123,"salary":28,"enhance":1},
-  {"position":"中锋","name":"姆巴佩","ovr":122,"salary":31,"enhance":1},
-  {"position":"影锋","name":"J.阿尔瓦雷斯","ovr":122,"salary":30,"enhance":1},
-  {"position":"右边锋","name":"拉明·亚马尔","ovr":122,"salary":29,"enhance":1},
-  {"position":"中场","name":"维蒂尼亚","ovr":122,"salary":29,"enhance":1},
-  {"position":"右边锋","name":"奥利塞","ovr":122,"salary":29,"enhance":1},
-  {"position":"中后卫","name":"加布里埃尔","ovr":122,"salary":29,"enhance":1},
-  {"position":"中场","name":"若昂·内维斯","ovr":122,"salary":27,"enhance":1},
-  {"position":"守门员","name":"大卫·拉亚","ovr":122,"salary":26,"enhance":1},
-  {"position":"中锋","name":"哈兰德","ovr":120,"salary":31,"enhance":1},
-  {"position":"前腰","name":"D.索博斯洛伊","ovr":120,"salary":29,"enhance":1},
-  {"position":"右边锋","name":"萨卡","ovr":120,"salary":28,"enhance":1},
-  {"position":"前腰","name":"费尔明","ovr":120,"salary":27,"enhance":1},
-  {"position":"守门员","name":"库尔图瓦","ovr":120,"salary":26,"enhance":1},
-  {"position":"中锋","name":"奥斯梅恩","ovr":119,"salary":30,"enhance":1},
-  {"position":"前腰","name":"F.维尔茨","ovr":119,"salary":29,"enhance":1},
-  {"position":"左后卫","name":"努诺·门德斯","ovr":119,"salary":28,"enhance":1},
-  {"position":"后腰","name":"苏比门迪","ovr":119,"salary":28,"enhance":1},
-  {"position":"左边锋","name":"J.多库","ovr":119,"salary":28,"enhance":1},
-  {"position":"前腰","name":"L.卡尔","ovr":119,"salary":28,"enhance":1},
-  {"position":"中后卫","name":"W.帕乔","ovr":119,"salary":27,"enhance":1},
-  {"position":"中后卫","name":"W.萨利巴","ovr":119,"salary":27,"enhance":1},
-  {"position":"守门员","name":"U.卡科尔","ovr":119,"salary":25,"enhance":1},
-  {"position":"左边锋","name":"G.马丁内利","ovr":118,"salary":30,"enhance":1},
-  {"position":"左边锋","name":"拉什福德","ovr":118,"salary":30,"enhance":1},
-  {"position":"中后卫","name":"范戴克","ovr":118,"salary":30,"enhance":1},
-  {"position":"中场","name":"佩德里","ovr":118,"salary":29,"enhance":1},
-  {"position":"中后卫","name":"J.格瓦迪奥尔","ovr":118,"salary":29,"enhance":1},
-  {"position":"前腰","name":"德凯特拉雷","ovr":118,"salary":29,"enhance":1},
-  {"position":"左边锋","name":"A.戈登","ovr":118,"salary":29,"enhance":1},
-  {"position":"右边锋","name":"哈维·巴恩斯","ovr":118,"salary":29,"enhance":1},
-  {"position":"中锋","name":"劳塔罗·马丁内斯","ovr":118,"salary":29,"enhance":1},
-  {"position":"右后卫","name":"马科斯·略伦特","ovr":118,"salary":29,"enhance":1},
-  {"position":"左边锋","name":"格纳布里","ovr":118,"salary":29,"enhance":1},
-  {"position":"后腰","name":"M.凯塞多","ovr":118,"salary":28,"enhance":1},
-  {"position":"前腰","name":"特林康","ovr":118,"salary":28,"enhance":1},
-  {"position":"后腰","name":"楚阿梅尼","ovr":118,"salary":28,"enhance":1},
-  {"position":"左边锋","name":"维尼修斯","ovr":118,"salary":28,"enhance":1},
-  {"position":"左边锋","name":"J.海于格","ovr":118,"salary":28,"enhance":1},
-  {"position":"左边卫","name":"格里马尔多","ovr":118,"salary":28,"enhance":1},
-  {"position":"右后卫","name":"佩德罗·波罗","ovr":118,"salary":27,"enhance":1},
-  {"position":"影锋","name":"格列兹曼","ovr":118,"salary":27,"enhance":1},
-  {"position":"前腰","name":"居莱尔","ovr":118,"salary":26,"enhance":1},
-  {"position":"后腰","name":"基米希","ovr":118,"salary":26,"enhance":1},
-  {"position":"左边锋","name":"K.伊尔迪兹","ovr":117,"salary":29,"enhance":1},
-  {"position":"中场","name":"恩梅加","ovr":117,"salary":29,"enhance":1},
-  {"position":"后腰","name":"恰尔汗奥卢","ovr":117,"salary":29,"enhance":1},
-  {"position":"前腰","name":"J.贝林厄姆","ovr":117,"salary":28,"enhance":1},
-  {"position":"前腰","name":"福登","ovr":117,"salary":28,"enhance":1},
-  {"position":"中后卫","name":"A.巴斯托尼","ovr":117,"salary":28,"enhance":1},
-  {"position":"右边锋","name":"杜埃","ovr":117,"salary":27,"enhance":1},
-  {"position":"守门员","name":"M.卡尔内塞基","ovr":117,"salary":26,"enhance":1},
-  {"position":"守门员","name":"N.克海金","ovr":117,"salary":25,"enhance":1},
-  {"position":"左边锋","name":"特洛萨德","ovr":116,"salary":29,"enhance":1},
-  {"position":"右边锋","name":"谢尔基","ovr":116,"salary":28,"enhance":1},
-  {"position":"右前卫","name":"W.麦克凯尼","ovr":116,"salary":28,"enhance":1},
-  {"position":"中后卫","name":"C.罗梅罗","ovr":116,"salary":28,"enhance":1},
-  {"position":"右边锋","name":"L.萨内","ovr":116,"salary":28,"enhance":1},
-  {"position":"前腰","name":"H.瓦纳肯","ovr":116,"salary":28,"enhance":1},
-  {"position":"右边锋","name":"埃斯特旺","ovr":116,"salary":28,"enhance":1},
-  {"position":"中场","name":"法比安-鲁易斯","ovr":116,"salary":27,"enhance":1},
-  {"position":"守门员","name":"G.维卡里奥","ovr":116,"salary":26,"enhance":1},
-  {"position":"守门员","name":"波普","ovr":116,"salary":26,"enhance":1},
-  {"position":"后腰","name":"A.帕夫洛维奇","ovr":116,"salary":25,"enhance":1},
-  {"position":"守门员","name":"多纳鲁马","ovr":116,"salary":25,"enhance":1},
-  {"position":"中后卫","name":"范德芬","ovr":115,"salary":28,"enhance":1},
-  {"position":"右边锋","name":"N.马杜克","ovr":115,"salary":28,"enhance":1},
-  {"position":"影锋","name":"K.阿德耶米","ovr":115,"salary":28,"enhance":1},
-  {"position":"右后卫","name":"J.廷贝尔","ovr":115,"salary":28,"enhance":1},
-  {"position":"左边锋","name":"加克波","ovr":115,"salary":28,"enhance":1},
-  {"position":"中锋","name":"哲凯赖什","ovr":115,"salary":28,"enhance":1},
-  {"position":"中锋","name":"吉拉西","ovr":115,"salary":28,"enhance":1},
-  {"position":"左边锋","name":"B.巴科拉","ovr":115,"salary":27,"enhance":1},
-  {"position":"右边卫","name":"扬·科托","ovr":115,"salary":27,"enhance":1},
-  {"position":"中场","name":"布鲁诺·吉马良斯","ovr":115,"salary":27,"enhance":1},
-  {"position":"中后卫","name":"Y.比塞克","ovr":115,"salary":27,"enhance":1},
-  {"position":"中场","name":"巴尔维德","ovr":115,"salary":27,"enhance":1},
-  {"position":"右边卫","name":"D.邓弗里斯","ovr":115,"salary":27,"enhance":1},
-  {"position":"左边卫","name":"F.迪马尔科","ovr":115,"salary":27,"enhance":1},
-  {"position":"前腰","name":"厄德高","ovr":115,"salary":27,"enhance":1},
-  {"position":"左后卫","name":"罗伯逊","ovr":115,"salary":27,"enhance":1},
-  {"position":"中后卫","name":"马尔基尼奥斯","ovr":115,"salary":27,"enhance":1},
-  {"position":"中锋","name":"H.埃基蒂克","ovr":115,"salary":26,"enhance":1},
-  {"position":"前腰","name":"埃泽","ovr":115,"salary":26,"enhance":1},
-  {"position":"守门员","name":"P.科恩","ovr":115,"salary":25,"enhance":1},
-  {"position":"守门员","name":"索默","ovr":115,"salary":25,"enhance":1},
-  {"position":"守门员","name":"鲁伊·席尔瓦","ovr":115,"salary":24,"enhance":1},
-  {"position":"前腰","name":"布兰特","ovr":114,"salary":28,"enhance":1},
-  {"position":"右后卫","name":"特里皮尔","ovr":114,"salary":28,"enhance":1},
-  {"position":"中锋","name":"马库斯·图拉姆","ovr":114,"salary":27,"enhance":1},
-  {"position":"右后卫","name":"莱默尔","ovr":114,"salary":27,"enhance":1},
-  {"position":"中场","name":"迈克尔梅里诺","ovr":114,"salary":27,"enhance":1},
-  {"position":"中后卫","name":"丹·伯恩","ovr":114,"salary":27,"enhance":1},
-  {"position":"影锋","name":"A.卢克曼","ovr":114,"salary":26,"enhance":1},
-  {"position":"后腰","name":"P.伯格","ovr":114,"salary":26,"enhance":1},
-  {"position":"守门员","name":"阿利松","ovr":114,"salary":25,"enhance":1},
-  {"position":"左后卫","name":"杰拉德·马丁","ovr":114,"salary":25,"enhance":1}
+  {"position":"中锋","name":"哈里·凯恩","ovr":123,"enhance":1},
+  {"position":"左边锋","name":"克瓦拉茨赫利亚","ovr":123,"enhance":1},
+  {"position":"左边锋","name":"路易斯·迪亚斯","ovr":123,"enhance":1},
+  {"position":"中场","name":"赖斯","ovr":123,"enhance":1},
+  {"position":"中锋","name":"姆巴佩","ovr":122,"enhance":1},
+  {"position":"影锋","name":"J.阿尔瓦雷斯","ovr":122,"enhance":1},
+  {"position":"右边锋","name":"拉明·亚马尔","ovr":122,"enhance":1},
+  {"position":"中场","name":"维蒂尼亚","ovr":122,"enhance":1},
+  {"position":"右边锋","name":"奥利塞","ovr":122,"enhance":1},
+  {"position":"中后卫","name":"加布里埃尔","ovr":122,"enhance":1},
+  {"position":"中场","name":"若昂·内维斯","ovr":122,"enhance":1},
+  {"position":"守门员","name":"大卫·拉亚","ovr":122,"enhance":1},
+  {"position":"中锋","name":"哈兰德","ovr":120,"enhance":1},
+  {"position":"前腰","name":"D.索博斯洛伊","ovr":120,"enhance":1},
+  {"position":"右边锋","name":"萨卡","ovr":120,"enhance":1},
+  {"position":"前腰","name":"费尔明","ovr":120,"enhance":1},
+  {"position":"守门员","name":"库尔图瓦","ovr":120,"enhance":1},
+  {"position":"中锋","name":"奥斯梅恩","ovr":119,"enhance":1},
+  {"position":"前腰","name":"F.维尔茨","ovr":119,"enhance":1},
+  {"position":"左后卫","name":"努诺·门德斯","ovr":119,"enhance":1},
+  {"position":"后腰","name":"苏比门迪","ovr":119,"enhance":1},
+  {"position":"左边锋","name":"J.多库","ovr":119,"enhance":1},
+  {"position":"前腰","name":"L.卡尔","ovr":119,"enhance":1},
+  {"position":"中后卫","name":"W.帕乔","ovr":119,"enhance":1},
+  {"position":"中后卫","name":"W.萨利巴","ovr":119,"enhance":1},
+  {"position":"守门员","name":"U.卡科尔","ovr":119,"enhance":1},
+  {"position":"左边锋","name":"G.马丁内利","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"拉什福德","ovr":118,"enhance":1},
+  {"position":"中后卫","name":"范戴克","ovr":118,"enhance":1},
+  {"position":"中场","name":"佩德里","ovr":118,"enhance":1},
+  {"position":"中后卫","name":"J.格瓦迪奥尔","ovr":118,"enhance":1},
+  {"position":"前腰","name":"德凯特拉雷","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"A.戈登","ovr":118,"enhance":1},
+  {"position":"右边锋","name":"哈维·巴恩斯","ovr":118,"enhance":1},
+  {"position":"中锋","name":"劳塔罗·马丁内斯","ovr":118,"enhance":1},
+  {"position":"右后卫","name":"马科斯·略伦特","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"格纳布里","ovr":118,"enhance":1},
+  {"position":"后腰","name":"M.凯塞多","ovr":118,"enhance":1},
+  {"position":"前腰","name":"特林康","ovr":118,"enhance":1},
+  {"position":"后腰","name":"楚阿梅尼","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"维尼修斯","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"J.海于格","ovr":118,"enhance":1},
+  {"position":"左边卫","name":"格里马尔多","ovr":118,"enhance":1},
+  {"position":"右后卫","name":"佩德罗·波罗","ovr":118,"enhance":1},
+  {"position":"影锋","name":"格列兹曼","ovr":118,"enhance":1},
+  {"position":"前腰","name":"居莱尔","ovr":118,"enhance":1},
+  {"position":"后腰","name":"基米希","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"K.伊尔迪兹","ovr":117,"enhance":1},
+  {"position":"中场","name":"恩梅加","ovr":117,"enhance":1},
+  {"position":"后腰","name":"恰尔汗奥卢","ovr":117,"enhance":1},
+  {"position":"前腰","name":"J.贝林厄姆","ovr":117,"enhance":1},
+  {"position":"前腰","name":"福登","ovr":117,"enhance":1},
+  {"position":"中后卫","name":"A.巴斯托尼","ovr":117,"enhance":1},
+  {"position":"右边锋","name":"杜埃","ovr":117,"enhance":1},
+  {"position":"守门员","name":"M.卡尔内塞基","ovr":117,"enhance":1},
+  {"position":"守门员","name":"N.克海金","ovr":117,"enhance":1},
+  {"position":"左边锋","name":"特洛萨德","ovr":116,"enhance":1},
+  {"position":"右边锋","name":"谢尔基","ovr":116,"enhance":1},
+  {"position":"右前卫","name":"W.麦克凯尼","ovr":116,"enhance":1},
+  {"position":"中后卫","name":"C.罗梅罗","ovr":116,"enhance":1},
+  {"position":"右边锋","name":"L.萨内","ovr":116,"enhance":1},
+  {"position":"前腰","name":"H.瓦纳肯","ovr":116,"enhance":1},
+  {"position":"右边锋","name":"埃斯特旺","ovr":116,"enhance":1},
+  {"position":"中场","name":"法比安-鲁易斯","ovr":116,"enhance":1},
+  {"position":"守门员","name":"G.维卡里奥","ovr":116,"enhance":1},
+  {"position":"守门员","name":"波普","ovr":116,"enhance":1},
+  {"position":"后腰","name":"A.帕夫洛维奇","ovr":116,"enhance":1},
+  {"position":"守门员","name":"多纳鲁马","ovr":116,"enhance":1},
+  {"position":"中后卫","name":"范德芬","ovr":115,"enhance":1},
+  {"position":"右边锋","name":"N.马杜克","ovr":115,"enhance":1},
+  {"position":"影锋","name":"K.阿德耶米","ovr":115,"enhance":1},
+  {"position":"右后卫","name":"J.廷贝尔","ovr":115,"enhance":1},
+  {"position":"左边锋","name":"加克波","ovr":115,"enhance":1},
+  {"position":"中锋","name":"哲凯赖什","ovr":115,"enhance":1},
+  {"position":"中锋","name":"吉拉西","ovr":115,"enhance":1},
+  {"position":"左边锋","name":"B.巴科拉","ovr":115,"enhance":1},
+  {"position":"右边卫","name":"扬·科托","ovr":115,"enhance":1},
+  {"position":"中场","name":"布鲁诺·吉马良斯","ovr":115,"enhance":1},
+  {"position":"中后卫","name":"Y.比塞克","ovr":115,"enhance":1},
+  {"position":"中场","name":"巴尔维德","ovr":115,"enhance":1},
+  {"position":"右边卫","name":"D.邓弗里斯","ovr":115,"enhance":1},
+  {"position":"左边卫","name":"F.迪马尔科","ovr":115,"enhance":1},
+  {"position":"前腰","name":"厄德高","ovr":115,"enhance":1},
+  {"position":"左后卫","name":"罗伯逊","ovr":115,"enhance":1},
+  {"position":"中后卫","name":"马尔基尼奥斯","ovr":115,"enhance":1},
+  {"position":"中锋","name":"H.埃基蒂克","ovr":115,"enhance":1},
+  {"position":"前腰","name":"埃泽","ovr":115,"enhance":1},
+  {"position":"守门员","name":"P.科恩","ovr":115,"enhance":1},
+  {"position":"守门员","name":"索默","ovr":115,"enhance":1},
+  {"position":"守门员","name":"鲁伊·席尔瓦","ovr":115,"enhance":1},
+  {"position":"前腰","name":"布兰特","ovr":114,"enhance":1},
+  {"position":"右后卫","name":"特里皮尔","ovr":114,"enhance":1},
+  {"position":"中锋","name":"马库斯·图拉姆","ovr":114,"enhance":1},
+  {"position":"右后卫","name":"莱默尔","ovr":114,"enhance":1},
+  {"position":"中场","name":"迈克尔梅里诺","ovr":114,"enhance":1},
+  {"position":"中后卫","name":"丹·伯恩","ovr":114,"enhance":1},
+  {"position":"影锋","name":"A.卢克曼","ovr":114,"enhance":1},
+  {"position":"后腰","name":"P.伯格","ovr":114,"enhance":1},
+  {"position":"守门员","name":"阿利松","ovr":114,"enhance":1},
+  {"position":"左后卫","name":"杰拉德·马丁","ovr":114,"enhance":1}
 ];
 
 const PLAYER_ENG = {
@@ -1338,40 +1656,85 @@ let history = [];
 let materialCards = []; // {ovr: number}
 
 // ============================================================
-//  Material Card Energy Bar
+//  Material Card — 六边形卡槽
 // ============================================================
+
 function addMaterial() {
-  if (materialCards.length >= 5) return;
+  let idx = -1;
+  for (let i = 0; i < 5; i++) {
+    if (!materialCards[i]) { idx = i; break; }
+  }
+  if (idx === -1) return;
   const inp = document.getElementById('inpMaterialOvr');
   const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
   inp.value = ovr;
-  materialCards.push({ ovr });
+  materialCards[idx] = { ovr: ovr };
+  updateHexSlots();
   updateEnergyBar();
 }
 
 function clearMaterials() {
   materialCards = [];
+  updateHexSlots();
   updateEnergyBar();
 }
 
-function clickSlot(n) {
-  // Manual fill: clicking slot N means fill slots 1..N
-  const currentFilled = Math.round(getTotalFill());
-  if (currentFilled === n) {
-    // Toggle off
-    materialCards = [];
-  } else {
-    // Fill to N slots with current-OVR materials
-    materialCards = [];
-    for (let i = 0; i < n; i++) {
-      materialCards.push({ ovr: curOvr() });
-    }
-  }
+function toggleHexCard(card) {
+  if (card.classList.contains('active')) return;
+  const input = card.querySelector('.hex-input-row input');
+  if (input) input.value = '';
+  const bar = card.querySelector('.hex-progress-inner');
+  if (bar) bar.style.width = '0%';
+  const label = card.querySelector('.hex-progress-pct');
+  if (label) label.textContent = '0.00%';
+  card.classList.add('active');
+  // Auto-focus the input
+  setTimeout(() => { if (input) input.focus(); }, 50);
+}
+
+function closeHexCard(btn) {
+  const card = btn.closest('.hex-card');
+  const idx = parseInt(card.dataset.slot);
+  delete materialCards[idx];
+  card.classList.remove('active');
+  updateHexSlots();
   updateEnergyBar();
+}
+
+function commitHexOvr(card) {
+  const idx = parseInt(card.dataset.slot);
+  const input = card.querySelector('.hex-input-row input');
+  const val = parseInt(input.value) || 0;
+  materialCards[idx] = { ovr: Math.max(0, Math.min(999, val)) };
+  updateHexSlots();
+  updateEnergyBar();
+  refreshAll();
+}
+
+function onHexOvrInput(input) {
+  const card = input.closest('.hex-card');
+  commitHexOvr(card);
+}
+
+function stepHexOvr(btn, delta) {
+  const card = btn.closest('.hex-card');
+  const input = card.querySelector('.hex-input-row input');
+  let val = (parseInt(input.value) || 0) + delta;
+  val = Math.max(0, Math.min(999, val));
+  input.value = val;
+  commitHexOvr(card);
+}
+
+function updateHexProgress(card, ovr) {
+  const ratio = calcFillRatio(ovr);
+  const pct = Math.min(100, ratio * 100);
+  const bar = card.querySelector('.hex-progress-inner');
+  const label = card.querySelector('.hex-progress-pct');
+  if (bar) bar.style.width = pct + '%';
+  if (label) label.textContent = pct.toFixed(2) + '%';
 }
 
 function calcFillRatio(matOvr) {
-  // 以球员当前实际OVR为基准（非基础OVR）
   const currentOvr = curOvr();
   const diff = matOvr - currentOvr;
   return Math.max(0.1, 1.0 + diff * 0.1);
@@ -1384,7 +1747,43 @@ function getTotalFill() {
 }
 
 function getMaterialBoost() {
-  return Math.round(getTotalFill()) * 1; // 每格 +1% 成功率
+  return Math.round(getTotalFill()) * 1;
+}
+
+function updateHexSlots() {
+  let count = 0;
+  for (let i = 0; i < 5; i++) {
+    const card = document.querySelector(`.hex-card[data-slot="${i}"]`);
+    if (!card) continue;
+
+    if (materialCards[i]) {
+      count++;
+      card.classList.add('active');
+      const inp = card.querySelector('.hex-input-row input');
+      if (inp) inp.value = materialCards[i].ovr;
+      updateHexProgress(card, materialCards[i].ovr);
+    } else {
+      card.classList.remove('active');
+    }
+  }
+
+  document.getElementById('materialCount').textContent = `已填 ${count}/5`;
+  const boost = getMaterialBoost();
+  document.getElementById('materialBoost').textContent = '+' + boost + '%';
+
+  if (getTotalFill() >= 5) {
+    const btn = document.getElementById('btnEnhance');
+    if (btn) btn.disabled = true;
+  }
+  var enhBtn = document.getElementById('btnEnhance');
+  if (enhBtn) {
+    if (count === 0) { enhBtn.style.background = '#444'; enhBtn.style.color = '#888'; enhBtn.style.boxShadow = 'none'; }
+    else { enhBtn.style.background = ''; enhBtn.style.color = ''; enhBtn.style.boxShadow = ''; }
+  }
+}
+
+function clickSlot(n) {
+  // Energy bar is display-only — no action on click
 }
 
 function updateEnergyBar() {
@@ -1395,37 +1794,49 @@ function updateEnergyBar() {
   for (let i = 0; i < 5; i++) {
     const slot = document.querySelector(`.energy-slot[data-slot="${i+1}"]`);
     if (!slot) continue;
-    // Clear old fill
-    const oldFill = slot.querySelector('.fill');
-    if (oldFill) oldFill.remove();
+    let fill = slot.querySelector('.fill');
+    let targetWidth;
 
     if (i < fullSlots) {
-      // Fully filled
-      slot.classList.add('filled');
-      const fill = document.createElement('div');
-      fill.className = 'fill';
-      fill.style.width = '100%';
-      slot.appendChild(fill);
+      targetWidth = 100;
     } else if (i === fullSlots && partialFill > 0) {
-      // Partially filled
-      slot.classList.add('filled');
-      const fill = document.createElement('div');
-      fill.className = 'fill';
-      fill.style.width = (partialFill * 100) + '%';
-      slot.appendChild(fill);
+      targetWidth = partialFill * 100;
     } else {
-      // Empty
+      targetWidth = 0;
+    }
+
+    if (targetWidth > 0) {
+      slot.classList.add('filled');
+      if (!fill) {
+        fill = document.createElement('div');
+        fill.className = 'fill';
+        fill.style.width = '0%';
+        slot.appendChild(fill);
+      }
+      // Sequential: each slot starts after the previous one, always in order 1→5
+      fill.style.transition = ''; // reset any inline override from removal
+      const delay = i * 300;
+      setTimeout(function() {
+        fill.style.width = targetWidth + '%';
+      }, delay);
+    } else {
       slot.classList.remove('filled');
+      if (fill) {
+        // Right-to-left removal: slot 5 first, slot 1 last. 0.5s total.
+        var reverseIdx = 4 - i;
+        var removeDelay = reverseIdx * 100;
+        setTimeout(function() {
+          fill.style.transition = 'width 0.1s linear';
+          fill.style.width = '0%';
+          setTimeout(function() { if (fill.parentNode) fill.remove(); }, 100);
+        }, removeDelay);
+      }
     }
   }
-
-  document.getElementById('materialCount').textContent = `已填 ${materialCards.length}/5`;
-  const boost = getMaterialBoost();
-  document.getElementById('materialBoost').textContent = '+' + boost + '%';
 }
 
 function getFinalRate(baseRate) {
-  const boost = getMaterialBoost() / 100; // convert to decimal
+  const boost = getMaterialBoost() / 100;
   return Math.min(1, baseRate + boost);
 }
 
@@ -1450,7 +1861,7 @@ function refreshAll() {
   // Player card
   document.getElementById('playerOvr').textContent = ovr;
   const enhanceIcon = document.getElementById('infoEnhanceIcon');
-  enhanceIcon.src = `images/enhance/${currentLevel}.png`;
+  enhanceIcon.src = `images/enhance/+${currentLevel}.png`;
   enhanceIcon.alt = '+' + currentLevel;
   document.getElementById('playerName').textContent = playerName;
   document.getElementById('playerMeta').textContent = playerPos;
@@ -1520,27 +1931,13 @@ function refreshAll() {
   document.getElementById('infoTargetOvr').textContent = canUp ? (baseOvr + nextD.bonus) : (baseOvr + d.bonus);
 
   // Protection slider: only available at +8 and above
-  const slider = document.getElementById('protectSlider');
-  const protectBadge = document.getElementById('protectBadge');
-  if (slider) {
+  const protectWrap = document.getElementById('protectSliderWrap');
+  if (protectWrap) {
     if (currentLevel < 8) {
-      slider.disabled = true;
-      slider.value = 0;
-      protectCount = 0;
-      document.getElementById('protectCount').textContent = '0';
-      if (protectBadge) protectBadge.style.display = 'none';
-      if (slider.parentElement) slider.parentElement.style.opacity = '0.35';
+      protectWrap.classList.add('disabled');
+      updateProtectUI(0);
     } else {
-      slider.disabled = false;
-      if (slider.parentElement) slider.parentElement.style.opacity = '1';
-      if (protectBadge) {
-        if (protectCount === 0) {
-          protectBadge.style.display = 'inline';
-          protectBadge.textContent = '推荐开启';
-        } else {
-          protectBadge.style.display = 'none';
-        }
-      }
+      protectWrap.classList.remove('disabled');
     }
   }
 
@@ -1599,11 +1996,79 @@ function renderHistory() {
 // ============================================================
 //  Actions
 // ============================================================
-function onProtectSlider() {
-  const slider = document.getElementById('protectSlider');
-  protectCount = parseInt(slider.value) || 0;
-  document.getElementById('protectCount').textContent = protectCount;
+function updateProtectUI(val) {
+  val = Math.max(0, Math.min(100, Math.round(val)));
+  protectCount = val;
+  document.getElementById('protectFill').style.width = val + '%';
+  document.getElementById('protectHandle').style.left = val + '%';
+  document.getElementById('protectPctNum').textContent = val;
+  var arrL = document.getElementById('protectArrL');
+  var arrR = document.getElementById('protectArrR');
+  var active = '#aaa';
+  var inactive = '#555';
+  if (val === 0) { arrL.style.color = inactive; arrR.style.color = active; }
+  else if (val === 100) { arrL.style.color = active; arrR.style.color = inactive; }
+  else { arrL.style.color = active; arrR.style.color = active; }
 }
+
+function setProtectAnimated(on) {
+  var fill = document.getElementById('protectFill');
+  var handle = document.getElementById('protectHandle');
+  if (on) {
+    fill.classList.remove('no-trans');
+    handle.classList.remove('no-trans');
+  } else {
+    fill.classList.add('no-trans');
+    handle.classList.add('no-trans');
+  }
+}
+
+var protectDragging = false;
+
+function protectDragStart(e) {
+  var wrap = document.getElementById('protectSliderWrap');
+  if (wrap.classList.contains('disabled')) return;
+  protectDragging = true;
+  setProtectAnimated(false);
+  document.body.classList.add('no-select');
+  e.preventDefault();
+}
+
+document.getElementById('protectArrL').onclick = function() {
+  var wrap = document.getElementById('protectSliderWrap');
+  if (wrap.classList.contains('disabled')) return;
+  setProtectAnimated(true);
+  updateProtectUI(protectCount - 1);
+  requestAnimationFrame(function() { setProtectAnimated(false); });
+};
+document.getElementById('protectArrR').onclick = function() {
+  var wrap = document.getElementById('protectSliderWrap');
+  if (wrap.classList.contains('disabled')) return;
+  setProtectAnimated(true);
+  updateProtectUI(protectCount + 1);
+  requestAnimationFrame(function() { setProtectAnimated(false); });
+};
+
+window.addEventListener('mouseup', function() {
+  if (!protectDragging) return;
+  protectDragging = false;
+  document.body.classList.remove('no-select');
+});
+window.addEventListener('mousemove', function(e) {
+  if (!protectDragging) return;
+  var rect = document.getElementById('protectTrack').getBoundingClientRect();
+  updateProtectUI(((e.pageX - rect.left) / rect.width) * 100);
+});
+window.addEventListener('touchend', function() {
+  if (!protectDragging) return;
+  protectDragging = false;
+  document.body.classList.remove('no-select');
+});
+window.addEventListener('touchmove', function(e) {
+  if (!protectDragging) return;
+  var rect = document.getElementById('protectTrack').getBoundingClientRect();
+  updateProtectUI(((e.touches[0].pageX - rect.left) / rect.width) * 100);
+}, {passive: false});
 function hasProtection() { return currentLevel >= 8 && protectCount > 0; }
 
 function toggleAuto() {
@@ -1645,8 +2110,7 @@ function resetCard() {
   stopLevel = 13;
   document.getElementById('inpStopLevel').value = 13;
   protectCount = 0;
-  document.getElementById('protectSlider').value = 0;
-  document.getElementById('protectCount').textContent = '0';
+  updateProtectUI(0);
   clearMaterials();
   document.getElementById('inpMaterialOvr').value = baseOvr;
   refreshAll();
@@ -2294,6 +2758,7 @@ populatePlayerSelect();
 //  Init
 // ============================================================
 refreshAll();
+updateHexSlots();
 
 </script>
 </body>
