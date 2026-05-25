@@ -64,11 +64,20 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 /* ===== Settings Trigger ===== */
 .settings-trigger {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: 12px; color: var(--gold); cursor: pointer;
-  padding: 4px 10px; margin-bottom: 6px;
-  border: 1px solid rgba(240,185,11,0.3); border-radius: 14px;
+  font-size: 12px; color: rgba(255,255,255,0.85); cursor: pointer;
+  padding: 5px 14px; margin-bottom: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
   user-select: none; touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+.settings-trigger:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.25);
+  color: #fff;
 }
 
 /* ===== Settings Modal ===== */
@@ -223,48 +232,108 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 /* ===== Protection ===== */
 .protect-row {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 12px; color: var(--text2); margin-bottom: 6px;
+  font-size: 15px; color: var(--text2); margin-bottom: 0;
   gap: 10px;
 }
-.protect-badge {
-  font-size: 10px; background: rgba(240,185,11,0.15);
-  color: var(--gold); padding: 1px 6px; border-radius: 3px; font-weight: 600;
+.protect-divider {
+  width: 100%; height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 10px 0;
 }
+.protect-row + .protect-divider { margin-top: 30px; }
+.protect-divider + .protect-row { margin-top: 20px; }
+.protect-divider + .material-header { margin-top: 4px; }
+/* ===== 保护滑块 ===== */
+.protect-slider-wrap {
+  display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+}
+.protect-track-container {
+  position: relative; width: 130px; height: 18px;
+  display: flex; align-items: center;
+}
+.protect-track-bg {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  left: 0; width: 100%; height: 1.5px;
+  background: rgba(255,255,255,0.15); border-radius: 1px;
+}
+.protect-track-fill {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  left: 0; height: 1.5px;
+  background: #1ec35a; border-radius: 1px;
+  transition: width 0.15s ease;
+}
+.protect-track-fill.no-trans { transition: none; }
+.protect-handle {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 1.5px solid #c4c4c4;
+  cursor: pointer; transition: left 0.15s ease;
+}
+.protect-handle.no-trans { transition: none; }
+.protect-handle:hover { border-color: #999; }
+.protect-slider-wrap.disabled .protect-handle { cursor: default; opacity: 0.4; }
+.protect-slider-wrap.disabled .protect-track-fill { opacity: 0.4; }
+.protect-arrow {
+  font-size: 15px; color: #888; cursor: pointer; user-select: none; line-height: 1;
+  padding: 0 4px;
+}
+.protect-slider-wrap.disabled .protect-arrow { color: #444; cursor: default; pointer-events: none; }
+.protect-pct {
+  display: inline-flex; align-items: baseline; justify-content: center;
+  font-size: 22px; font-weight: 700; color: #1ec35a; line-height: 1;
+  width: 52px; text-align: center;
+}
+.protect-pct-num {
+  display: inline-block; text-align: center; letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.no-select { user-select: none; -webkit-user-select: none; }
 
 /* ===== Material Slots ===== */
 .material-section { margin-bottom: 6px; }
 .material-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 5px; font-size: 11px;
+  margin-bottom: 18px; font-size: 15px;
 }
 .material-header .title { color: var(--text2); font-weight: 600; }
 .material-header .boost { color: var(--accent); font-weight: 600; }
 
-/* ===== 能量条 (长条) ===== */
-.energy-slots { display: flex; gap: 5px; margin-bottom: 8px; }
+/* ===== 分页指示器 (替换能量条) ===== */
+@keyframes stripe-slide {
+  0% { background-position: 0 0; }
+  100% { background-position: 7px 0; }
+}
+.energy-slots { display: flex; gap: 5px; margin-bottom: 18px; }
 .energy-slot {
-  flex: 1; height: 30px; border-radius: 5px;
-  background: rgba(20,30,50,0.5); border: 2px solid rgba(255,255,255,0.08);
-  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+  position: relative; overflow: hidden;
+  flex: 1; height: 40px;
+  background: #2d2d2d; color: #999;
+  display: flex; align-items: center; justify-content: flex-start;
+  padding-left: 8px; font-size: 28px; font-weight: 400;
+  border-radius: 1px; cursor: pointer; user-select: none;
+  letter-spacing: 0.5px;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s, color 0.2s;
 }
-.energy-slot::before {
-  content: attr(data-slot);
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800; color: #000;
-  z-index: 2; pointer-events: none;
+.energy-slot span {
+  position: relative; z-index: 2;
 }
-.energy-slot.filled::before { color: #000; }
+.energy-slot:hover { background: #363636; color: #aaa; }
+.energy-slot.filled { color: #000; }
+
 .energy-slot .fill {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg,#5bb8ff 0%,#3a9aee 100%);
-  transition: width 0.3s ease; border-radius: 3px;
+  position: absolute; top: 0; left: 0; height: 100%; z-index: 1;
+  background-color: #0b91f6;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent, transparent 2px,
+    #097dd4 2px, #097dd4 5px
+  );
+  background-size: 7px 7px;
+  animation: stripe-slide 0.8s linear infinite;
+  transition: width 0.8s linear;
 }
-.energy-slot.filled {
-  border-color: #5bb8ff;
-  box-shadow: 0 0 6px rgba(91,184,255,0.3);
-}
+.energy-slot.filled .fill { /* ensures fill gets width from JS */ }
 
 /* ===== 六边形卡槽 ===== */
 @keyframes hex-wave {
@@ -274,12 +343,11 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 }
 .hex-slots {
   display: flex; align-items: center; justify-content: center;
-  gap: 6px; margin-bottom: 8px;
+  gap: 5px; margin-bottom: 8px;
 }
 .hex-card {
   position: relative;
-  width: 100px; height: 145px;
-  flex-shrink: 0;
+  flex: 1; aspect-ratio: 100/145;
   clip-path: polygon(50% 0%, 100% 12%, 100% 88%, 50% 100%, 0% 88%, 0% 12%);
   background: #1a2030;
   display: flex; align-items: center; justify-content: center;
@@ -322,7 +390,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 .hex-card.active .hex-card-form { display: flex; }
 
 .hex-ovr-label {
-  font-size: 8px; color: #6a7a9a; font-weight: 600;
+  font-size: 11px; color: #6a7a9a; font-weight: 600;
   letter-spacing: 1px; text-transform: uppercase;
 }
 .hex-input-row {
@@ -365,7 +433,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   border-radius: 2px; transition: width 0.15s ease;
 }
 .hex-progress-pct {
-  font-size: 10px; color: #3dc45e; text-align: center; margin-top: 2px;
+  font-size: 12px; color: #3dc45e; text-align: center; margin-top: 2px;
 }
 
 .hex-close {
@@ -794,16 +862,17 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   .info-chip .val { font-size: 12px; }
   .info-chip .lbl { font-size: 8px; }
 
-  .protect-row { font-size: 11px; gap: 6px; }
+  .protect-row { font-size: 12px; gap: 6px; }
+  .material-header { font-size: 12px; }
   .hex-slots { gap: 3px; }
-  .energy-slot { height: 26px; }
-  .hex-card { width: 58px; height: 84px; }
+  .energy-slot { height: 30px; font-size: 18px; padding-left: 6px; }
+  .hex-card { aspect-ratio: 100/145; }
   .hex-card-plus { font-size: 22px; }
   .hex-input-row input { width: 30px; height: 20px; font-size: 11px; }
   .hex-arrows { margin-right: -22px; }
   .hex-arrows button { width: 12px; height: 9px; font-size: 5px; }
-  .hex-ovr-label { font-size: 7px; }
-  .hex-progress-pct { font-size: 8px; }
+  .hex-ovr-label { font-size: 9px; }
+  .hex-progress-pct { font-size: 10px; }
   .hex-close { width: 12px; height: 12px; font-size: 7px; bottom: 4px; left: 2px; }
   .hex-card.active .hex-close { display: flex; }
   .hex-card-form { padding: 6px 5px; gap: 2px; }
@@ -1013,30 +1082,43 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
     </div>
   </div>
 
+  <div class="protect-divider"></div>
+
   <!-- Protection -->
   <div class="protect-row">
     <span style="font-weight:600;">强化等级保护</span>
-    <span class="protect-badge" id="protectBadge" style="display:none;">推荐开启</span>
-    <span style="flex:1;"></span>
-    <input type="range" id="protectSlider" min="0" max="100" value="0" oninput="onProtectSlider()" style="width:100px;accent-color:#f0b90b;cursor:pointer;touch-action:manipulation;">
-    <span style="font-size:13px;font-weight:700;color:#f0b90b;min-width:28px;text-align:right;" id="protectCount">0</span>
+    <span style="margin-left:16px;"></span>
+    <div class="protect-slider-wrap" id="protectSliderWrap">
+      <div class="protect-track-container" id="protectTrack">
+        <div class="protect-track-bg"></div>
+        <div class="protect-track-fill no-trans" id="protectFill" style="width:0%"></div>
+        <div class="protect-handle no-trans" id="protectHandle" style="left:0%" onmousedown="protectDragStart(event)" ontouchstart="protectDragStart(event)"></div>
+      </div>
+      <span class="protect-arrow" id="protectArrL">◀</span>
+      <span class="protect-pct"><span class="protect-pct-num" id="protectPctNum">0</span>%</span>
+      <span class="protect-arrow" id="protectArrR">▶</span>
+    </div>
+  </div>
+
+  <div class="protect-divider"></div>
+
+  <!-- Material Header -->
+  <div class="material-header">
+    <span class="title">强化概率加成</span>
+    <span>成功率加成: <span class="boost" id="materialBoost">+0%</span> <span class="rate-help" id="rateHelpIcon" onclick="toggleRateHelp(event)" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span></span>
   </div>
 
   <!-- Energy Bar -->
   <div class="energy-slots" id="energySlots">
-    <div class="energy-slot" data-slot="1" onclick="clickSlot(1)"></div>
-    <div class="energy-slot" data-slot="2" onclick="clickSlot(2)"></div>
-    <div class="energy-slot" data-slot="3" onclick="clickSlot(3)"></div>
-    <div class="energy-slot" data-slot="4" onclick="clickSlot(4)"></div>
-    <div class="energy-slot" data-slot="5" onclick="clickSlot(5)"></div>
+    <div class="energy-slot" data-slot="1" onclick="clickSlot(1)"><span>1</span></div>
+    <div class="energy-slot" data-slot="2" onclick="clickSlot(2)"><span>2</span></div>
+    <div class="energy-slot" data-slot="3" onclick="clickSlot(3)"><span>3</span></div>
+    <div class="energy-slot" data-slot="4" onclick="clickSlot(4)"><span>4</span></div>
+    <div class="energy-slot" data-slot="5" onclick="clickSlot(5)"><span>5</span></div>
   </div>
 
   <!-- Material Slots -->
   <div class="material-section">
-    <div class="material-header">
-      <span class="title">强化概率加成</span>
-      <span>成功率加成: <span class="boost" id="materialBoost">+0%</span> <span class="rate-help" id="rateHelpIcon" onclick="toggleRateHelp(event)" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span></span>
-    </div>
     <div class="hex-slots" id="hexSlots">
       <div class="hex-card" data-slot="0" onclick="toggleHexCard(this)">
         <div class="hex-card-stripes"></div>
@@ -1044,10 +1126,10 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
-              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
-              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
             </div>
           </div>
           <div class="hex-progress-wrap">
@@ -1065,10 +1147,10 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
-              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
-              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
             </div>
           </div>
           <div class="hex-progress-wrap">
@@ -1086,10 +1168,10 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
-              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
-              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
             </div>
           </div>
           <div class="hex-progress-wrap">
@@ -1107,10 +1189,10 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
-              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
-              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
             </div>
           </div>
           <div class="hex-progress-wrap">
@@ -1128,10 +1210,10 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
-              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
-              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
             </div>
           </div>
           <div class="hex-progress-wrap">
@@ -1577,63 +1659,69 @@ let materialCards = []; // {ovr: number}
 // ============================================================
 
 function addMaterial() {
-  if (materialCards.length >= 5) return;
+  let idx = -1;
+  for (let i = 0; i < 5; i++) {
+    if (!materialCards[i]) { idx = i; break; }
+  }
+  if (idx === -1) return;
   const inp = document.getElementById('inpMaterialOvr');
   const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
   inp.value = ovr;
-  materialCards.push({ ovr });
+  materialCards[idx] = { ovr: ovr };
   updateHexSlots();
+  updateEnergyBar();
 }
 
 function clearMaterials() {
   materialCards = [];
   updateHexSlots();
+  updateEnergyBar();
 }
 
 function toggleHexCard(card) {
   if (card.classList.contains('active')) return;
-  const idx = parseInt(card.dataset.slot);
-  // Fill empty slots up to this one
-  while (materialCards.length <= idx) {
-    const inp = document.getElementById('inpMaterialOvr');
-    const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
-    materialCards.push({ ovr });
-  }
-  updateHexSlots();
+  const input = card.querySelector('.hex-input-row input');
+  if (input) input.value = '';
+  const bar = card.querySelector('.hex-progress-inner');
+  if (bar) bar.style.width = '0%';
+  const label = card.querySelector('.hex-progress-pct');
+  if (label) label.textContent = '0.00%';
+  card.classList.add('active');
+  // Auto-focus the input
+  setTimeout(() => { if (input) input.focus(); }, 50);
 }
 
 function closeHexCard(btn) {
   const card = btn.closest('.hex-card');
   const idx = parseInt(card.dataset.slot);
-  if (idx < materialCards.length) {
-    materialCards.splice(idx, 1);
-  }
+  delete materialCards[idx];
+  card.classList.remove('active');
   updateHexSlots();
+  updateEnergyBar();
+}
+
+function commitHexOvr(card) {
+  const idx = parseInt(card.dataset.slot);
+  const input = card.querySelector('.hex-input-row input');
+  const val = parseInt(input.value) || 0;
+  materialCards[idx] = { ovr: Math.max(0, Math.min(999, val)) };
+  updateHexSlots();
+  updateEnergyBar();
+  refreshAll();
 }
 
 function onHexOvrInput(input) {
   const card = input.closest('.hex-card');
-  const idx = parseInt(card.dataset.slot);
-  const val = parseInt(input.value) || 0;
-  if (idx < materialCards.length) {
-    materialCards[idx].ovr = Math.max(0, Math.min(999, val));
-  }
-  updateHexProgress(card, materialCards[idx].ovr);
-  refreshAll();
+  commitHexOvr(card);
 }
 
 function stepHexOvr(btn, delta) {
   const card = btn.closest('.hex-card');
   const input = card.querySelector('.hex-input-row input');
-  const idx = parseInt(card.dataset.slot);
   let val = (parseInt(input.value) || 0) + delta;
   val = Math.max(0, Math.min(999, val));
   input.value = val;
-  if (idx < materialCards.length) {
-    materialCards[idx].ovr = val;
-  }
-  updateHexProgress(card, val);
-  refreshAll();
+  commitHexOvr(card);
 }
 
 function updateHexProgress(card, ovr) {
@@ -1662,11 +1750,13 @@ function getMaterialBoost() {
 }
 
 function updateHexSlots() {
+  let count = 0;
   for (let i = 0; i < 5; i++) {
     const card = document.querySelector(`.hex-card[data-slot="${i}"]`);
     if (!card) continue;
 
-    if (i < materialCards.length) {
+    if (materialCards[i]) {
+      count++;
       card.classList.add('active');
       const inp = card.querySelector('.hex-input-row input');
       if (inp) inp.value = materialCards[i].ovr;
@@ -1676,7 +1766,7 @@ function updateHexSlots() {
     }
   }
 
-  document.getElementById('materialCount').textContent = `已填 ${materialCards.length}/5`;
+  document.getElementById('materialCount').textContent = `已填 ${count}/5`;
   const boost = getMaterialBoost();
   document.getElementById('materialBoost').textContent = '+' + boost + '%';
 
@@ -1684,23 +1774,10 @@ function updateHexSlots() {
     const btn = document.getElementById('btnEnhance');
     if (btn) btn.disabled = true;
   }
-
-  updateEnergyBar(); // 同步长条能量条
 }
 
 function clickSlot(n) {
-  const currentFilled = Math.round(getTotalFill());
-  if (currentFilled === n) {
-    materialCards = [];
-  } else {
-    materialCards = [];
-    const inp = document.getElementById('inpMaterialOvr');
-    const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
-    for (let i = 0; i < n; i++) {
-      materialCards.push({ ovr });
-    }
-  }
-  updateHexSlots();
+  // Energy bar is display-only — no action on click
 }
 
 function updateEnergyBar() {
@@ -1711,23 +1788,35 @@ function updateEnergyBar() {
   for (let i = 0; i < 5; i++) {
     const slot = document.querySelector(`.energy-slot[data-slot="${i+1}"]`);
     if (!slot) continue;
-    const oldFill = slot.querySelector('.fill');
-    if (oldFill) oldFill.remove();
+    let fill = slot.querySelector('.fill');
+    let targetWidth;
 
     if (i < fullSlots) {
-      slot.classList.add('filled');
-      const fill = document.createElement('div');
-      fill.className = 'fill';
-      fill.style.width = '100%';
-      slot.appendChild(fill);
+      targetWidth = 100;
     } else if (i === fullSlots && partialFill > 0) {
+      targetWidth = partialFill * 100;
+    } else {
+      targetWidth = 0;
+    }
+
+    if (targetWidth > 0) {
       slot.classList.add('filled');
-      const fill = document.createElement('div');
-      fill.className = 'fill';
-      fill.style.width = (partialFill * 100) + '%';
-      slot.appendChild(fill);
+      if (!fill) {
+        fill = document.createElement('div');
+        fill.className = 'fill';
+        fill.style.width = '0%';
+        slot.appendChild(fill);
+        // Stagger each new slot: slot 1 starts at 0ms, slot 2 at 800ms, etc.
+        const delay = i * 800;
+        setTimeout(() => {
+          fill.style.width = targetWidth + '%';
+        }, delay);
+      } else {
+        fill.style.width = targetWidth + '%';
+      }
     } else {
       slot.classList.remove('filled');
+      if (fill) fill.remove();
     }
   }
 }
@@ -1828,27 +1917,13 @@ function refreshAll() {
   document.getElementById('infoTargetOvr').textContent = canUp ? (baseOvr + nextD.bonus) : (baseOvr + d.bonus);
 
   // Protection slider: only available at +8 and above
-  const slider = document.getElementById('protectSlider');
-  const protectBadge = document.getElementById('protectBadge');
-  if (slider) {
+  const protectWrap = document.getElementById('protectSliderWrap');
+  if (protectWrap) {
     if (currentLevel < 8) {
-      slider.disabled = true;
-      slider.value = 0;
-      protectCount = 0;
-      document.getElementById('protectCount').textContent = '0';
-      if (protectBadge) protectBadge.style.display = 'none';
-      if (slider.parentElement) slider.parentElement.style.opacity = '0.35';
+      protectWrap.classList.add('disabled');
+      updateProtectUI(0);
     } else {
-      slider.disabled = false;
-      if (slider.parentElement) slider.parentElement.style.opacity = '1';
-      if (protectBadge) {
-        if (protectCount === 0) {
-          protectBadge.style.display = 'inline';
-          protectBadge.textContent = '推荐开启';
-        } else {
-          protectBadge.style.display = 'none';
-        }
-      }
+      protectWrap.classList.remove('disabled');
     }
   }
 
@@ -1907,11 +1982,72 @@ function renderHistory() {
 // ============================================================
 //  Actions
 // ============================================================
-function onProtectSlider() {
-  const slider = document.getElementById('protectSlider');
-  protectCount = parseInt(slider.value) || 0;
-  document.getElementById('protectCount').textContent = protectCount;
+function updateProtectUI(val) {
+  val = Math.max(0, Math.min(100, Math.round(val)));
+  protectCount = val;
+  document.getElementById('protectFill').style.width = val + '%';
+  document.getElementById('protectHandle').style.left = val + '%';
+  document.getElementById('protectPctNum').textContent = val;
 }
+
+function setProtectAnimated(on) {
+  var fill = document.getElementById('protectFill');
+  var handle = document.getElementById('protectHandle');
+  if (on) {
+    fill.classList.remove('no-trans');
+    handle.classList.remove('no-trans');
+  } else {
+    fill.classList.add('no-trans');
+    handle.classList.add('no-trans');
+  }
+}
+
+var protectDragging = false;
+
+function protectDragStart(e) {
+  var wrap = document.getElementById('protectSliderWrap');
+  if (wrap.classList.contains('disabled')) return;
+  protectDragging = true;
+  setProtectAnimated(false);
+  document.body.classList.add('no-select');
+  e.preventDefault();
+}
+
+document.getElementById('protectArrL').onclick = function() {
+  var wrap = document.getElementById('protectSliderWrap');
+  if (wrap.classList.contains('disabled')) return;
+  setProtectAnimated(true);
+  updateProtectUI(protectCount - 1);
+  requestAnimationFrame(function() { setProtectAnimated(false); });
+};
+document.getElementById('protectArrR').onclick = function() {
+  var wrap = document.getElementById('protectSliderWrap');
+  if (wrap.classList.contains('disabled')) return;
+  setProtectAnimated(true);
+  updateProtectUI(protectCount + 1);
+  requestAnimationFrame(function() { setProtectAnimated(false); });
+};
+
+window.addEventListener('mouseup', function() {
+  if (!protectDragging) return;
+  protectDragging = false;
+  document.body.classList.remove('no-select');
+});
+window.addEventListener('mousemove', function(e) {
+  if (!protectDragging) return;
+  var rect = document.getElementById('protectTrack').getBoundingClientRect();
+  updateProtectUI(((e.pageX - rect.left) / rect.width) * 100);
+});
+window.addEventListener('touchend', function() {
+  if (!protectDragging) return;
+  protectDragging = false;
+  document.body.classList.remove('no-select');
+});
+window.addEventListener('touchmove', function(e) {
+  if (!protectDragging) return;
+  var rect = document.getElementById('protectTrack').getBoundingClientRect();
+  updateProtectUI(((e.touches[0].pageX - rect.left) / rect.width) * 100);
+}, {passive: false});
 function hasProtection() { return currentLevel >= 8 && protectCount > 0; }
 
 function toggleAuto() {
@@ -1953,8 +2089,7 @@ function resetCard() {
   stopLevel = 13;
   document.getElementById('inpStopLevel').value = 13;
   protectCount = 0;
-  document.getElementById('protectSlider').value = 0;
-  document.getElementById('protectCount').textContent = '0';
+  updateProtectUI(0);
   clearMaterials();
   document.getElementById('inpMaterialOvr').value = baseOvr;
   refreshAll();
