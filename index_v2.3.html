@@ -1,0 +1,2608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>FC Online 4 - 球员强化模拟器</title>
+<style>
+:root {
+  --gold: #f0b90b;
+  --gold2: #d4a00a;
+  --success: #00c853;
+  --fail: #e53935;
+  --text: #e8eaed;
+  --text2: #b0b8c0;
+  --text3: #7a8090;
+  --accent: #448aff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100vh; height: 100dvh;
+  overflow-x: hidden; overflow-y: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  color: var(--text);
+  font-family: 'Microsoft YaHei','PingFang SC','Segoe UI',sans-serif;
+  display: flex; justify-content: center; align-items: center;
+  position: relative; isolation: isolate;
+  padding: 10px 0;
+  background: #080C14;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -2;
+  background: radial-gradient(ellipse 80% 30% at 50% 100%, rgba(60,100,160,0.22) 0%, rgba(45,70,120,0.08) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 60% 20% at 50% 100%, rgba(70,110,170,0.10) 0%, transparent 100%);
+}
+
+button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-trigger,.btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app { width: 600px; max-width: 100vw; padding: 0 14px; }
+
+/* ===== Header ===== */
+.header { text-align: center; margin-bottom: 4px; }
+.header h1 {
+  font-size: 18px; font-weight: 900; letter-spacing: 1px;
+  background: linear-gradient(135deg,#f0b90b 0%,#ffd54f 40%,#ffab00 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* ===== Settings Trigger ===== */
+.settings-trigger {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--gold); cursor: pointer;
+  padding: 4px 10px; margin-bottom: 6px;
+  border: 1px solid rgba(240,185,11,0.3); border-radius: 14px;
+  user-select: none; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== Settings Modal ===== */
+.settings-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.75);
+  justify-content: center; align-items: center;
+  padding: 20px;
+}
+.settings-overlay.show { display: flex; }
+.settings-modal {
+  background: #fff; border: 1px solid #d0d5dd;
+  border-radius: 12px; padding: 20px; width: 100%; max-width: 440px;
+  max-height: 85vh; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: modalIn 0.25s ease-out;
+  color: #1a1a1a;
+}
+@keyframes modalIn {
+  0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.settings-modal .field { margin-bottom: 10px; }
+.settings-modal label {
+  display: block; font-size: 11px; color: #555;
+  margin-bottom: 4px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.settings-modal input, .settings-modal select {
+  width: 100%; padding: 8px 12px;
+  background: #f5f6f8; border: 1px solid #d0d5dd; border-radius: 6px;
+  color: #1a1a1a; font-size: 14px; font-family: inherit; outline: none;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.settings-modal input:focus, .settings-modal select:focus { border-color: #2979ff; }
+.settings-modal .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.settings-modal .btn-row { display: flex; gap: 8px; margin-top: 14px; }
+.settings-modal .btn-row button { flex: 1; }
+.settings-modal .btn-secondary {
+  background: #e8eaed; color: #333;
+  border: 1px solid #c0c5cc; font-size: 13px; font-weight: 600;
+}
+.settings-modal .btn-secondary:hover { background: #d0d5dd; }
+.settings-modal .btn-main {
+  background: #2979ff; color: #fff;
+  border: none; font-size: 13px; font-weight: 700;
+}
+.settings-modal .btn-main:hover { background: #1c6ae8; }
+
+/* ===== Player Card ===== */
+.player-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 0; margin-bottom: 10px;
+  background: none; border: none; box-shadow: none;
+}
+.player-face {
+  width: 110px; height: 110px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 50px; color: rgba(255,255,255,0.15);
+  overflow: hidden;
+}
+.player-face.has-img {
+  width: 180px; height: 234px;
+  background: transparent; border: none; border-radius: 0;
+  outline: none; box-shadow: none;
+}
+
+/* ===== Player Info List (right side) ===== */
+.player-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+
+.info-title-row {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: -16px;
+}
+.info-season-icon {
+  height: 28px; width: auto; flex-shrink: 0;
+  object-fit: contain; display: block;
+}
+.info-player-name {
+  font-size: 22px; font-weight: 900; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  letter-spacing: 0.5px;
+}
+
+.info-enhance-icon {
+  height: 22px; width: auto; display: block;
+}
+
+.info-row-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 3px 0;
+}
+.info-label {
+  font-size: 14px; color: rgba(255,255,255,0.5);
+  font-weight: 400;
+}
+.info-value {
+  font-size: 15px; font-weight: 700; color: #fff;
+  text-align: right;
+}
+.info-value.stars {
+  color: #f0b90b; font-size: 16px; letter-spacing: 2px;
+}
+
+/* ===== Progress Bar ===== */
+.progress-section { margin-bottom: 6px; }
+.progress-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 4px; font-size: 11px;
+}
+.progress-title { color: var(--text2); font-weight: 600; }
+.progress-rate { color: var(--text3); }
+.progress-rate strong { color: #fff; }
+.progress-bar {
+  display: flex; align-items: center; gap: 2px; overflow: hidden;
+}
+.progress-step {
+  width: 26px; height: 26px; min-width: 16px;
+  border-radius: 5px;
+  background: rgba(20,30,50,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: #5a6070;
+  transition: all 0.35s; flex-shrink: 1;
+}
+.progress-step.reached {
+  background: rgba(0,200,83,0.15); border-color: rgba(0,200,83,0.3);
+  color: #6aaa70;
+}
+.progress-step.current {
+  background: linear-gradient(135deg,#6a3808,#4a2804);
+  border-color: #f0b90b; color: #fff;
+  box-shadow: 0 0 10px rgba(240,185,11,0.35);
+  animation: stepPulse 0.6s ease-in-out infinite;
+  transform: scale(1.1); z-index: 1;
+}
+@keyframes stepPulse {
+  0%,100% { box-shadow: 0 0 10px rgba(240,185,11,0.35); }
+  50% { box-shadow: 0 0 18px rgba(240,185,11,0.55); }
+}
+.progress-arrow { font-size: 10px; color: rgba(255,255,255,0.1); flex-shrink: 0; margin: 0 1px; }
+/* ===== Info Chips ===== */
+.info-row { display: flex; gap: 6px; margin-bottom: 6px; }
+.info-chip { flex: 1; text-align: center; padding: 6px 4px; }
+.info-chip .val { font-size: 14px; font-weight: 700; color: #fff; }
+.info-chip .val.gold { color: var(--gold); }
+.info-chip .val.green { color: var(--success); }
+.info-chip .val.red { color: var(--fail); }
+.info-chip .lbl { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+/* ===== Protection ===== */
+.protect-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--text2); margin-bottom: 6px;
+  gap: 10px;
+}
+.protect-badge {
+  font-size: 10px; background: rgba(240,185,11,0.15);
+  color: var(--gold); padding: 1px 6px; border-radius: 3px; font-weight: 600;
+}
+
+/* ===== Material Slots ===== */
+.material-section { margin-bottom: 6px; }
+.material-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 5px; font-size: 11px;
+}
+.material-header .title { color: var(--text2); font-weight: 600; }
+.material-header .boost { color: var(--accent); font-weight: 600; }
+
+/* ===== 能量条 (长条) ===== */
+.energy-slots { display: flex; gap: 5px; margin-bottom: 8px; }
+.energy-slot {
+  flex: 1; height: 30px; border-radius: 5px;
+  background: rgba(20,30,50,0.5); border: 2px solid rgba(255,255,255,0.08);
+  cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.energy-slot::before {
+  content: attr(data-slot);
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #000;
+  z-index: 2; pointer-events: none;
+}
+.energy-slot.filled::before { color: #000; }
+.energy-slot .fill {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,#5bb8ff 0%,#3a9aee 100%);
+  transition: width 0.3s ease; border-radius: 3px;
+}
+.energy-slot.filled {
+  border-color: #5bb8ff;
+  box-shadow: 0 0 6px rgba(91,184,255,0.3);
+}
+
+/* ===== 六边形卡槽 ===== */
+@keyframes hex-wave {
+  0%, 100% { opacity: 0.08; }
+  20%      { opacity: 0.45; }
+  40%      { opacity: 0.08; }
+}
+.hex-slots {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-bottom: 8px;
+}
+.hex-card {
+  position: relative;
+  width: 100px; height: 145px;
+  flex-shrink: 0;
+  clip-path: polygon(50% 0%, 100% 12%, 100% 88%, 50% 100%, 0% 88%, 0% 12%);
+  background: #1a2030;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s;
+}
+.hex-card:hover { background: #242e42; }
+
+.hex-card-stripes {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent, transparent 12px,
+    rgba(255,255,255,0.025) 12px, rgba(255,255,255,0.025) 24px
+  );
+  z-index: 0;
+}
+
+.hex-card-plus {
+  position: relative; z-index: 1;
+  color: #6a7a9a; font-size: 32px; font-weight: 300;
+  font-family: Arial, sans-serif; line-height: 1;
+  user-select: none;
+  animation: hex-wave 4s ease-in-out infinite;
+}
+.hex-card:nth-child(1) .hex-card-plus { animation-delay: 0s; }
+.hex-card:nth-child(2) .hex-card-plus { animation-delay: 0.18s; }
+.hex-card:nth-child(3) .hex-card-plus { animation-delay: 0.36s; }
+.hex-card:nth-child(4) .hex-card-plus { animation-delay: 0.54s; }
+.hex-card:nth-child(5) .hex-card-plus { animation-delay: 0.72s; }
+
+.hex-card.active .hex-card-plus { display: none; }
+
+.hex-card-form {
+  display: none; position: relative; z-index: 1;
+  flex-direction: column; align-items: center; gap: 3px;
+  width: 100%; padding: 10px 8px;
+}
+.hex-card.active .hex-card-form { display: flex; }
+
+.hex-ovr-label {
+  font-size: 8px; color: #6a7a9a; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.hex-input-row {
+  position: relative; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.hex-input-row input {
+  width: 38px; height: 24px;
+  background: #141c2c; border: 1px solid #2e3c56;
+  border-radius: 3px; color: #e0e4f0; text-align: center;
+  font-size: 14px; font-weight: 700; font-family: Arial, sans-serif;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.hex-input-row input::-webkit-outer-spin-button,
+.hex-input-row input::-webkit-inner-spin-button {
+  -webkit-appearance: none; margin: 0;
+}
+.hex-arrows {
+  display: flex; flex-direction: column; gap: 1px;
+  position: absolute; right: 50%; margin-right: -28px;
+}
+.hex-arrows button {
+  width: 14px; height: 11px;
+  background: #252d3e; border: 1px solid #3a4460;
+  border-radius: 2px; color: #8a9bc0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6px; line-height: 1; padding: 0;
+  transition: background 0.15s;
+}
+.hex-arrows button:hover { background: #313d58; }
+
+.hex-progress-wrap { width: 100%; margin-top: 1px; }
+.hex-progress-outer {
+  width: 100%; height: 3px;
+  background: #0c1220; border-radius: 2px; overflow: hidden;
+}
+.hex-progress-inner {
+  height: 100%; background: #3dc45e;
+  border-radius: 2px; transition: width 0.15s ease;
+}
+.hex-progress-pct {
+  font-size: 10px; color: #3dc45e; text-align: center; margin-top: 2px;
+}
+
+.hex-close {
+  display: none;
+  position: absolute; top: 19px; right: 10px;
+  width: 14px; height: 14px;
+  background: #d94a4a; border: none; border-radius: 50%;
+  color: #fff; font-size: 9px; font-weight: 700;
+  cursor: pointer; align-items: center; justify-content: center;
+  line-height: 1; z-index: 5;
+}
+.hex-card.active .hex-close { display: flex; }
+
+/* ===== Buttons ===== */
+.btn-row { display: flex; gap: 6px; margin-bottom: 6px; }
+.btn {
+  padding: 10px 16px; border-radius: 6px; border: none;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit; letter-spacing: 0.5px;
+  user-select: none; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.15s;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.btn-main {
+  flex: 1;
+  background: #00e559;
+  color: #151616; font-size: 18px; letter-spacing: 3px;
+  box-shadow: 0 4px 16px rgba(0,229,89,0.3);
+  position: relative; overflow: hidden;
+}
+.btn-main:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(0,229,89,0.45); }
+.btn-main:active:not(:disabled) { transform: translateY(1px); }
+.btn-main.charging {
+  animation: btnCharge 0.2s ease-in-out infinite;
+  background: #00e559;
+}
+@keyframes btnCharge {
+  0%,100% { box-shadow: 0 4px 16px rgba(0,229,89,0.3); }
+  50% { box-shadow: 0 4px 32px rgba(0,229,89,0.7),0 0 60px rgba(0,229,89,0.3); }
+}
+.btn-secondary {
+  background: rgba(255,255,255,0.08); color: var(--text2);
+  font-size: 12px; border: 1px solid rgba(255,255,255,0.1);
+}
+.btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.14); color: #fff; }
+.btn-secondary.active { background: rgba(41,121,255,0.2); border-color: var(--accent); color: #aaccff; }
+
+/* ===== Stats ===== */
+.stats {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 4px; margin-bottom: 4px;
+}
+.stat-box { text-align: center; padding: 6px 4px; }
+.stat-box .num { font-size: 17px; font-weight: 700; color: #fff; }
+.stat-box .num.g { color: var(--gold); }
+.stat-box .num.s { color: var(--success); }
+.stat-box .num.f { color: var(--fail); }
+.stat-box .tag { font-size: 9px; color: var(--text3); margin-top: 1px; }
+.stat-box.clickable { cursor: pointer; position: relative; touch-action: manipulation; }
+
+/* ===== History ===== */
+.history-box {
+  height: 120px; overflow-y: scroll !important;
+  -webkit-overflow-scrolling: touch; overscroll-behavior: auto;
+  scroll-behavior: smooth; will-change: scroll-position;
+  padding-right: 4px;
+  touch-action: pan-y; -webkit-user-select: text;
+  pointer-events: auto;
+}
+.history-box::-webkit-scrollbar { width: 3px; }
+.history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.history-title { font-size: 10px; color: var(--text3); margin-bottom: 4px; font-weight: 600; }
+.history-list { list-style: none; }
+.history-item {
+  display: flex; align-items: center; gap: 4px;
+  padding: 2px; font-size: 10px;
+}
+.hist-num { color: var(--text3); font-size: 9px; min-width: 20px; }
+.hist-tag { font-weight: 700; padding: 0px 5px; border-radius: 2px; font-size: 9px; flex-shrink: 0; }
+.hist-tag.win { background: rgba(0,200,83,0.15); color: var(--success); }
+.hist-tag.lose { background: rgba(229,57,53,0.12); color: var(--fail); }
+.hist-detail { color: var(--text2); flex: 1; }
+.hist-empty { color: var(--text3); text-align: center; padding: 16px; font-size: 11px; }
+
+/* ===== Hint ===== */
+.hint { text-align: center; font-size: 9px; color: var(--text3); margin-top: 6px; }
+.hint kbd {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 2px; padding: 0px 4px; font-size: 9px; font-family: inherit;
+}
+
+/* ===== Rate help icon ===== */
+.rate-help {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
+  font-size: 9px; font-weight: 700; cursor: pointer;
+  vertical-align: middle; margin-left: 2px;
+  touch-action: manipulation; user-select: none; position: relative;
+}
+.rate-help:hover,.rate-help.active { background: #f0b90b; color: #000; }
+.rate-tooltip {
+  display: none; position: fixed;
+  background: #0a0a0a; color: #ddd; font-size: 11px; font-weight: 400;
+  line-height: 1.6; padding: 10px 14px; border-radius: 8px;
+  border: 1px solid #3a4860; white-space: pre-line;
+  min-width: 260px; max-width: 320px; z-index: 600;
+  pointer-events: auto; cursor: default;
+}
+.rate-tooltip.show { display: block; animation: fadeIn 0.15s ease-out; }
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Control Panel ===== */
+.control-panel {
+  background: #16161A;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-bottom: none;
+  border-radius: 10px;
+  padding: 16px 14px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  margin-bottom: 12px;
+}
+
+/* ===== Success Tooltip (narrow, scrollable) ===== */
+.success-tooltip {
+  display: none; position: fixed;
+  background: #0a0a0a; color: #ddd;
+  border: 1px solid #3a4860; border-radius: 8px;
+  padding: 8px 10px; width: 195px; max-width: 195px;
+  max-height: 220px; overflow-y: auto;
+  z-index: 700; pointer-events: auto; cursor: default;
+  font-size: 10px; line-height: 1.45;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.success-tooltip.show { display: block; animation: fadeIn 0.15s ease-out; }
+.st-list { }
+.st-item {
+  padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: normal; word-break: break-all;
+  font-size: 10px; color: #bbb;
+}
+.st-item:last-child { border-bottom: none; }
+
+/* ===== Player Card Animations ===== */
+.player-card.success-glow { box-shadow: 0 0 24px rgba(0,200,83,0.5); }
+.player-card.enhance-flash { animation: cardFlash 0.1s ease-in-out 3; }
+@keyframes cardFlash {
+  0%,100% { box-shadow: none; }
+  50% { box-shadow: 0 0 16px rgba(240,185,11,0.3); }
+}
+.player-card.fail-shake { animation: shake 0.3s ease-out; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  15% { transform: translateX(-8px); }
+  30% { transform: translateX(8px); }
+  45% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+  90% { transform: translateX(3px); }
+}
+
+/* ===== Burst Overlay (强化过程动画) ===== */
+.burst-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 9998; display: none; justify-content: center; align-items: center;
+  flex-direction: column; overflow: hidden;
+}
+.burst-overlay.show { display: flex; }
+.burst-overlay .burst-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 60%, #0a2a3a 0%, #060c16 60%, #000 100%);
+}
+.burst-overlay .burst-bg::after {
+  content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(30,120,70,0.3) 0%, transparent 70%);
+}
+.burst-spotlight {
+  position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+  width: 350px; height: 75%; z-index: 3; opacity: 0;
+  background: linear-gradient(180deg, rgba(180,220,255,0.6) 0%, rgba(100,200,255,0.25) 25%, rgba(100,200,255,0.08) 50%, transparent 80%);
+  clip-path: polygon(35% 0%, 65% 0%, 90% 100%, 10% 100%); filter: blur(25px);
+  transition: opacity 0.6s;
+}
+.burst-spotlight.on { opacity: 1; }
+.burst-spot-glow {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; height: 55%; z-index: 2; opacity: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(150,210,255,0.18) 0%, rgba(100,180,255,0.06) 40%, transparent 70%);
+  filter: blur(10px); transition: opacity 0.6s;
+}
+.burst-spot-glow.on { opacity: 1; }
+.burst-beam {
+  position: absolute; left: 50%; top: -5%; height: 110%;
+  background: linear-gradient(180deg, rgba(100,200,255,0.6) 0%, rgba(100,200,255,0.3) 40%, transparent 100%);
+  z-index: 3; opacity: 0; transition: opacity 0.3s;
+}
+.burst-beam.on { opacity: 1; }
+.burst-beam.b1 { width: 3px; margin-left: 0; }
+.burst-beam.b2 { width: 2px; margin-left: -40px; }
+.burst-beam.b3 { width: 1px; margin-left: 50px; }
+.burst-beam.b4 { width: 3px; margin-left: -80px; }
+.burst-beam.b5 { width: 1px; margin-left: 70px; }
+
+.burst-card-wrap { position: relative; z-index: 5; }
+.burst-card {
+  width: 230px; position: relative; z-index: 5; overflow: visible;
+  will-change: transform, filter;
+}
+.burst-card-wrap.zoom-in {
+  animation: card-zoom-in 0.5s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+}
+@keyframes card-zoom-in {
+  0% { transform: translate3d(0, 0, 0) scale(0.75); }
+  100% { transform: translate3d(0, 0, 0) scale(1.0); }
+}
+.burst-card.shake-s1 { animation: burst-shake 0.45s ease-in-out infinite; }
+.burst-card.shake-s2 { animation: burst-shake 0.22s ease-in-out infinite; }
+.burst-card.shake-s3 { animation: burst-shake 0.10s ease-in-out infinite; }
+.burst-card.shake-s4 { animation: burst-shake 0.05s linear infinite; }
+.burst-card.anim-stop { animation: none !important; }
+.burst-card.purple-shadow::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0.6;
+  filter: brightness(0) drop-shadow(0 0 20px rgba(200,50,255,0.8));
+  mix-blend-mode: screen;
+}
+
+@keyframes burst-shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  10% { transform: translate3d(-1px, 0, 0); }
+  20% { transform: translate3d(2px, 0, 0); }
+  30% { transform: translate3d(-3px, 0, 0); }
+  40% { transform: translate3d(4px, 0, 0); }
+  50% { transform: translate3d(-5px, 0, 0); }
+  60% { transform: translate3d(6px, 0, 0); }
+  70% { transform: translate3d(-7px, 0, 0); }
+  80% { transform: translate3d(9px, 0, 0); }
+  90% { transform: translate3d(-11px, 0, 0); }
+}
+
+/* Rain particles */
+.rain-particle {
+  position: absolute; width: 1px;
+  background: linear-gradient(180deg, rgba(150,200,255,0.8), transparent);
+  z-index: 3; pointer-events: none;
+  will-change: transform, opacity;
+  animation: rainFall linear forwards;
+}
+@keyframes rainFall {
+  0% { transform: translate3d(0, -20px, 0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translate3d(0, 105vh, 0); opacity: 0; }
+}
+/* White burst particles */
+.burst-particle {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 100;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.4));
+  box-shadow: 0 0 15px rgba(255,255,255,0.9); filter: blur(3px);
+  animation: burstParticleFly ease-out forwards;
+}
+@keyframes burstParticleFly {
+  0% { opacity: 1; transform: translate(0,0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--bx),var(--by)) scale(0); }
+}
+
+/* Smoke particles for fail */
+.smoke-particle {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 10;
+  background: radial-gradient(circle, rgba(80,80,80,0.6) 0%, rgba(40,40,40,0.3) 40%, transparent 70%);
+  filter: blur(4px); animation: smokeRise ease-out forwards;
+}
+@keyframes smokeRise {
+  0% { opacity: 0.7; transform: translate(0,0) scale(0.5); }
+  100% { opacity: 0; transform: translate(var(--sx),var(--sy)) scale(2); }
+}
+
+/* Shatter effect */
+.shatter-effect {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(1.5);
+  width: 256px; height: 256px;
+  background-image: url("images/shatter_sprite.webp");
+  background-size: 2048px auto; background-repeat: no-repeat;
+  pointer-events: none; z-index: 100; display: none;
+}
+.shatter-effect.animate {
+  display: block;
+  animation: shatter-play 0.8s step-end forwards, shatter-scale 0.8s ease-out forwards;
+  filter: brightness(2) contrast(1.2) drop-shadow(0 0 25px #fff);
+  mix-blend-mode: screen;
+}
+@keyframes shatter-scale {
+  0% { transform: translate(-50%, -50%) scale(2.2); }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+@keyframes shatter-play {
+  0% { background-position: 0px 0px; }
+  5.5% { background-position: -256px 0px; }
+  11.1% { background-position: -512px 0px; }
+  16.6% { background-position: -768px 0px; }
+  22.2% { background-position: -1024px 0px; }
+  27.7% { background-position: -1280px 0px; }
+  33.3% { background-position: -1536px 0px; }
+  38.8% { background-position: -1792px 0px; }
+  44.4% { background-position: 0px -256px; }
+  50% { background-position: -256px -256px; }
+  55.5% { background-position: -512px -256px; }
+  61.1% { background-position: -768px -256px; }
+  66.6% { background-position: -1024px -256px; }
+  72.2% { background-position: -1280px -256px; }
+  77.7% { background-position: -1536px -256px; }
+  83.3% { background-position: -1792px -256px; }
+  88.8% { background-position: 0px -512px; }
+  94.4% { background-position: -256px -512px; }
+  100% { background-position: -512px -512px; }
+}
+
+/* Skip button */
+.burst-skip {
+  position: absolute; bottom: 30px; right: 20px; color: rgba(255,255,255,0.5);
+  font-weight: 700; font-size: 0.9em; cursor: pointer; z-index: 20;
+  letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,0,0,0.8);
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== Result Overlay ===== */
+.result-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 9999; display: none; justify-content: center; align-items: center;
+  flex-direction: column;
+  background: radial-gradient(ellipse at 50% 60%, #0a2a3a 0%, #060c16 60%, #000 100%);
+  overflow-y: auto; overflow-x: hidden;
+}
+.result-overlay.show { display: flex; }
+.result-card-wrap { position: relative; margin-bottom: 20px; }
+.result-card {
+  width: 230px; position: relative; z-index: 2;
+  animation: resultCardIn 1.5s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+@keyframes resultCardIn {
+  0% { transform: scale(0.7) translateY(100px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.result-overlay.success .result-card {
+  animation: resultCardIn 1.5s cubic-bezier(0.25,0.46,0.45,0.94), card-float 3s ease-in-out 1.7s infinite;
+}
+.result-overlay.success .result-card::before {
+  content: ""; position: absolute; top: 50%; left: 50%; width: 140%; height: 140%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 20%, rgba(0,255,234,0.15) 45%, transparent 70%);
+  border-radius: 50%; z-index: -1;
+  animation: glow-pulse 2s infinite alternate;
+}
+.result-overlay.fail .result-card { filter: grayscale(0.85) brightness(0.45); }
+@keyframes glow-pulse {
+  0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+@keyframes card-float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.result-text-wrap {
+  max-height: 0; overflow: hidden; opacity: 0;
+  transition: max-height 1.2s cubic-bezier(0.22,0.61,0.36,1), opacity 0.6s ease;
+  width: 85%; max-width: 320px; text-align: center;
+}
+.result-text-wrap.expand { max-height: 600px; opacity: 1; overflow: visible; }
+.result-title { font-size: 1.6em; font-weight: 700; margin: 10px 0 16px; }
+.result-overlay.success .result-title { color: #e8d5a3; text-shadow: 0 0 20px rgba(232,213,163,0.5); }
+.result-overlay.fail .result-title { color: #e74c3c; text-shadow: 0 0 20px rgba(231,76,60,0.4); }
+.result-subtitle { font-size: 1em; color: #aaa; margin-bottom: 16px; }
+.result-stats {
+  background: rgba(18,18,24,0.9); border-radius: 12px; padding: 16px; width: 100%;
+  margin: 10px 0; border: 1px solid rgba(255,255,255,0.08);
+  opacity: 0; transform: translateY(15px);
+  transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+  box-sizing: border-box;
+}
+.result-stats.fade-in { opacity: 1; transform: translateY(0); }
+.result-stats .rs-row { display: flex; justify-content: space-between; font-size: 0.9em; color: #ccc; margin-bottom: 6px; }
+.result-stats .rs-row:last-child { margin-bottom: 0; }
+.result-stats .rs-label { color: #888; }
+.result-stats .rs-value { color: #fff; font-weight: 700; }
+.result-next-bar {
+  display: block; width: 100%; max-width: 360px; margin: 20px auto 0;
+  padding: 13px 0; border: none;
+  background: #00e559; color: #151616;
+  font-size: 1.05em; font-weight: 700;
+  border-radius: 10px; cursor: pointer; font-family: inherit;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 16px rgba(0,229,89,0.3);
+  transition: box-shadow 0.2s, transform 0.15s;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.result-next-bar:hover { box-shadow: 0 6px 24px rgba(0,229,89,0.45); }
+.result-next-bar:active { transform: translateY(1px); }
+
+@media (max-width: 480px) {
+  .app { padding: 0 10px; }
+  .player-card { gap: 10px; padding: 8px 0; margin-bottom: 6px; }
+  .player-face { width: 80px; height: 80px; font-size: 36px; }
+  .player-face.has-img { width: 105px; height: 137px; }
+  .player-info { gap: 4px; }
+  .info-title-row { gap: 6px; margin-top: -12px; }
+  .info-season-icon { height: 22px; }
+  .info-player-name { font-size: 17px; }
+  .info-enhance-icon { height: 18px; }
+  .info-label { font-size: 11px; }
+  .info-value { font-size: 12px; }
+  .info-value.stars { font-size: 13px; letter-spacing: 1px; }
+  #playerOvr { font-size: 30px; }
+
+  .progress-bar { gap: 0; }
+  .progress-step { width: 16px; height: 16px; min-width: 12px; font-size: 6px; border-radius: 3px; }
+  .progress-arrow { font-size: 6px; flex-shrink: 1; margin: 0; }
+
+  .info-row { gap: 3px; }
+  .info-chip { padding: 4px 2px; }
+  .info-chip .val { font-size: 12px; }
+  .info-chip .lbl { font-size: 8px; }
+
+  .protect-row { font-size: 11px; gap: 6px; }
+  .hex-slots { gap: 3px; }
+  .energy-slot { height: 26px; }
+  .hex-card { width: 58px; height: 84px; }
+  .hex-card-plus { font-size: 22px; }
+  .hex-input-row input { width: 30px; height: 20px; font-size: 11px; }
+  .hex-arrows { margin-right: -22px; }
+  .hex-arrows button { width: 12px; height: 9px; font-size: 5px; }
+  .hex-ovr-label { font-size: 7px; }
+  .hex-progress-pct { font-size: 8px; }
+  .hex-close { width: 12px; height: 12px; font-size: 7px; bottom: 4px; left: 2px; }
+  .hex-card.active .hex-close { display: flex; }
+  .hex-card-form { padding: 6px 5px; gap: 2px; }
+  .mat-input-row { gap: 4px; font-size: 10px; }
+  .mat-input-row input { width: 50px; font-size: 11px; }
+  .mat-btn { font-size: 10px; padding: 4px 8px; }
+
+  .stop-row { font-size: 11px; gap: 4px; }
+  .stop-row select { font-size: 10px; padding: 3px 16px 3px 4px; }
+
+  .btn { padding: 8px 12px; font-size: 12px; }
+  .btn-main { font-size: 15px; letter-spacing: 2px; }
+  .btn-row { gap: 4px; }
+
+  .control-panel { padding: 12px 10px; border-radius: 8px; margin-bottom: 8px; }
+
+  .stats { gap: 2px; }
+  .stat-box { padding: 4px 2px; }
+  .stat-box .num { font-size: 14px; }
+  .stat-box .tag { font-size: 8px; }
+
+  .burst-card { width: 160px; }
+  .result-card { width: 170px; }
+  .shatter-effect.animate { animation: shatter-play 0.8s step-end forwards, shatter-scale-mobile 0.8s ease-out forwards; }
+  @keyframes shatter-scale-mobile {
+    0% { transform: translate(-50%, -50%) scale(1.8); }
+    100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
+  }
+}
+
+/* ===== Particles ===== */
+.particle-layer { position: fixed; inset: 0; pointer-events: none; z-index: 250; }
+.pt {
+  position: absolute; font-size: 22px;
+  animation: ptFly 0.6s ease-out forwards;
+  will-change: transform,opacity;
+}
+@keyframes ptFly {
+  0% { opacity: 1; transform: translate(0,0) scale(1.2); }
+  100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(0); }
+}
+
+/* ===== Material Input ===== */
+.mat-input-row { display: flex; gap: 5px; align-items: center; margin-bottom: 6px; }
+.mat-input-row input {
+  width: 52px; padding: 5px 6px;
+  background: rgba(20,30,50,0.5); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px; color: var(--text); font-size: 12px;
+  text-align: center; font-family: inherit; outline: none;
+}
+.mat-input-row .mat-btn {
+  background: rgba(255,255,255,0.06); color: var(--text2);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
+  padding: 5px 10px; font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+
+/* ===== Stop Level ===== */
+.stop-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text2); margin-bottom: 6px;
+}
+.stop-row select {
+  padding: 4px 20px 4px 6px;
+  background: rgba(20,30,50,0.35); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px; color: var(--text); font-size: 12px;
+  font-family: inherit; outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='6'%3E%3Cpath d='M0 0l4 6 4-6z' fill='%237a8090'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+}
+.stop-row select:focus {
+  border-color: rgba(240,185,11,0.4);
+}
+.stop-row select option {
+  background: #fff; color: #1a1a1a;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1>FC Online 4 强化模拟器 <span style="font-size:9px;color:#ff6d00;vertical-align:super;">v5.22</span></h1>
+  </div>
+
+  <!-- Settings Trigger -->
+  <span class="settings-trigger" onclick="openSettings()">⚙ 球员设置</span>
+
+  <!-- Settings Modal -->
+  <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
+    <div class="settings-modal" onclick="event.stopPropagation()">
+      <div class="field">
+        <label>快速选择球员 — 25UCL 赛季</label>
+        <select id="inpPlayerSelect" onchange="onPlayerSelect()">
+          <option value="">— 自定义球员 —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>球员名称</label>
+        <input type="text" id="inpName" value="姆巴佩" placeholder="输入球员名称">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>赛季 / 卡种</label>
+          <select id="inpSeason">
+            <option value="default">基础卡 (普通)</option>
+            <option value="live">LIVE 实时</option>
+            <option value="hot">HOT 焦点</option>
+            <option value="tots">TOTS 赛季最佳</option>
+            <option value="toty">TOTY 年度最佳</option>
+            <option value="icon">ICON 传奇</option>
+            <option value="icon-tm">ICON TM 传奇时刻</option>
+            <option value="wc">WC 世界杯</option>
+            <option value="ucl">UCL 欧冠</option>
+            <option value="25ucl" selected>25UCL 25欧冠</option>
+            <option value="ng">NG 新星</option>
+            <option value="cap">CAP 队长</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>位置</label>
+          <input type="text" id="inpPos" value="右边锋" placeholder="如 ST, CF">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>基础能力值 (OVR)</label>
+          <input type="number" id="inpOvr" value="122" min="40" max="150">
+        </div>
+        <div class="field">
+          <label>当前强化等级</label>
+          <select id="inpLevel">
+            <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option><option value="5">+5</option><option value="6">+6</option><option value="7">+7</option><option value="8">+8</option><option value="9">+9</option><option value="10">+10</option><option value="11">+11</option><option value="12">+12</option><option value="13">+13</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="closeSettingsDirect()">取消</button>
+        <button class="btn btn-main" style="font-size:14px;letter-spacing:1px;" onclick="applySettings()">应用设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Card -->
+  <div class="player-card" id="playerCard">
+    <div class="player-face" id="playerAvatar">⚽</div>
+    <div class="player-info">
+      <div class="info-title-row">
+        <img class="info-season-icon" id="infoSeasonIcon" src="images/25ucl_badge.png" alt="25UCL">
+        <span class="info-player-name" id="playerName">R. Pirès</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">强化等级</span>
+        <img class="info-enhance-icon" id="infoEnhanceIcon" src="images/enhance/+1.png" alt="+1">
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">位置</span>
+        <span class="info-value" id="playerMeta">ST</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">OVR</span>
+        <span class="info-value" id="playerOvr">89</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">特性槽</span>
+        <span class="info-value" id="infoTraitCount">3</span>
+      </div>
+      <div class="info-row-item">
+        <span class="info-label">花式技巧</span>
+        <span class="info-value stars" id="infoSkillStars">★★★★★☆</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-panel">
+
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span class="progress-title">强化进度</span>
+      <span class="progress-rate" id="rateInfo">点击强化按钮开始</span>
+    </div>
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Info Chips -->
+  <div class="info-row">
+    <div class="info-chip">
+      <div class="val" id="infoNextLevel">+1</div>
+      <div class="lbl">目标等级</div>
+    </div>
+    <div class="info-chip">
+      <div class="val gold" id="infoRate">100%</div>
+      <div class="lbl">成功率</div>
+    </div>
+    <div class="info-chip">
+      <div class="val green" id="infoOvrGain">+0</div>
+      <div class="lbl">单级OVR提升</div>
+    </div>
+    <div class="info-chip">
+      <div class="val" id="infoTargetOvr">89</div>
+      <div class="lbl">成功后能力值</div>
+    </div>
+  </div>
+
+  <!-- Protection -->
+  <div class="protect-row">
+    <span style="font-weight:600;">强化等级保护</span>
+    <span class="protect-badge" id="protectBadge" style="display:none;">推荐开启</span>
+    <span style="flex:1;"></span>
+    <input type="range" id="protectSlider" min="0" max="100" value="0" oninput="onProtectSlider()" style="width:100px;accent-color:#f0b90b;cursor:pointer;touch-action:manipulation;">
+    <span style="font-size:13px;font-weight:700;color:#f0b90b;min-width:28px;text-align:right;" id="protectCount">0</span>
+  </div>
+
+  <!-- Energy Bar -->
+  <div class="energy-slots" id="energySlots">
+    <div class="energy-slot" data-slot="1" onclick="clickSlot(1)"></div>
+    <div class="energy-slot" data-slot="2" onclick="clickSlot(2)"></div>
+    <div class="energy-slot" data-slot="3" onclick="clickSlot(3)"></div>
+    <div class="energy-slot" data-slot="4" onclick="clickSlot(4)"></div>
+    <div class="energy-slot" data-slot="5" onclick="clickSlot(5)"></div>
+  </div>
+
+  <!-- Material Slots -->
+  <div class="material-section">
+    <div class="material-header">
+      <span class="title">强化概率加成</span>
+      <span>成功率加成: <span class="boost" id="materialBoost">+0%</span> <span class="rate-help" id="rateHelpIcon" onclick="toggleRateHelp(event)" title="1. 2024年3月起Nexon依法在FC Online官网「数据中心」公开的概率。&#10;2. Inven / DC Inside 社区实测 — 韩国玩家大量实测数据验证，每格材料卡贡献约 +1% 基础成功率&#10;3. 贴吧 / NGA 中文社区 — 国服腾讯 FC Online 4 材料卡加成与韩服一致，均为每格 +1%">?</span></span>
+    </div>
+    <div class="hex-slots" id="hexSlots">
+      <div class="hex-card" data-slot="0" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="1" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="2" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="3" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+      <div class="hex-card" data-slot="4" onclick="toggleHexCard(this)">
+        <div class="hex-card-stripes"></div>
+        <div class="hex-card-plus">+</div>
+        <div class="hex-card-form">
+          <div class="hex-ovr-label">OVR</div>
+          <div class="hex-input-row">
+            <input type="number" value="200" min="0" max="999" oninput="onHexOvrInput(this)">
+            <div class="hex-arrows">
+              <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▲</button>
+              <button onclick="event.stopPropagation();stepHexOvr(this,1)">▼</button>
+            </div>
+          </div>
+          <div class="hex-progress-wrap">
+            <div class="hex-progress-outer">
+              <div class="hex-progress-inner" style="width:100%"></div>
+            </div>
+            <div class="hex-progress-pct">100.00%</div>
+          </div>
+        </div>
+        <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
+      </div>
+    </div>
+    <div class="mat-input-row">
+      <span style="font-size:10px;color:var(--text3);flex-shrink:0;">添加材料 OVR</span>
+      <input type="number" id="inpMaterialOvr" value="122" min="40" max="150">
+      <button class="mat-btn" onclick="addMaterial()">添加</button>
+      <button class="mat-btn" onclick="clearMaterials()">清空</button>
+      <span style="font-size:10px;color:var(--text3);flex:1;text-align:right;" id="materialCount">已填 0/5</span>
+    </div>
+  </div>
+
+  <!-- Stop Level -->
+  <div class="stop-row">
+    <span>强化至</span>
+    <select id="inpStopLevel">
+        <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option><option value="5">+5</option><option value="6">+6</option><option value="7">+7</option><option value="8">+8</option><option value="9">+9</option><option value="10">+10</option><option value="11">+11</option><option value="12">+12</option><option value="13" selected>+13</option>
+      </select>
+    <span>级自动停止</span>
+    <span style="flex:1;"></span>
+    <span style="font-size:10px;color:var(--text3);">目标: +<b id="stopLevelDisplay" style="color:#f0b90b;">13</b></span>
+  </div>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-main" id="btnEnhance" onclick="startEnhance()">强 化</button>
+    <button class="btn btn-secondary" id="btnAuto" onclick="toggleAuto()">自动</button>
+    <button class="btn btn-secondary" onclick="resetCard()">重置</button>
+  </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-box">
+      <div class="num" id="sAttempts">0</div>
+      <div class="tag">总次数</div>
+    </div>
+    <div class="stat-box clickable" id="statSuccessBox" onclick="toggleSuccessTip(event)">
+      <div class="num s" id="sSuccess">0</div>
+      <div class="tag">成功</div>
+    </div>
+    <div class="stat-box">
+      <div class="num f" id="sFail">0</div>
+      <div class="tag">失败</div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-box">
+    <div class="history-title">强化记录</div>
+    <ul class="history-list" id="historyList">
+      <li class="hist-empty">等待首次强化...</li>
+    </ul>
+  </div>
+
+  <div class="hint">
+    按 <kbd>空格</kbd> 强化 · 按 <kbd>A</kbd> 切换自动强化
+  </div>
+</div>
+
+
+<!-- Burst Overlay (强化过程动画) -->
+<div class="burst-overlay" id="burstOverlay">
+  <div class="burst-bg"></div>
+  <div class="burst-spotlight"></div>
+  <div class="burst-spot-glow"></div>
+  <div class="burst-beam b1"></div>
+  <div class="burst-beam b2"></div>
+  <div class="burst-beam b3"></div>
+  <div class="burst-beam b4"></div>
+  <div class="burst-beam b5"></div>
+  <div class="burst-card-wrap">
+    <div class="burst-card" id="burstCard">
+      <img id="burstCardImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+    <div class="shatter-effect" id="shatterEffect"></div>
+  </div>
+  <div class="burst-rain" id="burstRain"></div>
+  <div class="burst-particles" id="burstParticles"></div>
+  <div class="burst-skip" id="burstSkip" onclick="skipBurst()">跳过 ▸</div>
+</div>
+
+<!-- Result Overlay (结果展示) -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card-wrap">
+    <div class="result-card" id="resultCard">
+      <img id="resultCardImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+  </div>
+  <div class="result-text-wrap" id="resultTextWrap">
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-subtitle" id="resultSubtitle"></div>
+    <div class="result-stats" id="resultStats"></div>
+    <button class="result-next-bar" id="resultConfirmBtn" onclick="closeResult(true)">下一步</button>
+  </div>
+</div>
+
+<!-- Particle Layer -->
+<div class="particle-layer" id="particleLayer"></div>
+<script>
+
+const PLAYER_IMAGES = {
+"马库斯·图拉姆":"images/player_000.png",
+"巴尔维德":"images/player_001.png",
+"吉拉西":"images/player_002.png",
+"多纳鲁马":"images/player_003.png",
+"G.马丁内利":"images/player_004.png",
+"若昂·内维斯":"images/player_005.png",
+"迈克尔梅里诺":"images/player_006.png",
+"维蒂尼亚":"images/player_007.png",
+"费尔明":"images/player_008.png",
+"B.巴科拉":"images/player_009.png",
+"赖斯":"images/player_010.png",
+"谢尔基":"images/player_011.png",
+"U.卡科尔":"images/player_012.png",
+"特洛萨德":"images/player_013.png",
+"范德芬":"images/player_014.png",
+"哈里·凯恩":"images/player_015.png",
+"C.罗梅罗":"images/player_016.png",
+"格纳布里":"images/player_017.png",
+"布鲁诺·吉马良斯":"images/player_018.png",
+"恩梅加":"images/player_019.png",
+"K.伊尔迪兹":"images/player_020.png",
+"哈兰德":"images/player_021.png",
+"路易斯·迪亚斯":"images/player_022.png",
+"H.瓦纳肯":"images/player_023.png",
+"恰尔汗奥卢":"images/player_024.png",
+"罗伯逊":"images/player_025.png",
+"维尼修斯":"images/player_026.png",
+"W.帕乔":"images/player_027.png",
+"福登":"images/player_028.png",
+"丹·伯恩":"images/player_029.png",
+"阿利松":"images/player_030.png",
+"居莱尔":"images/player_031.png",
+"杰拉德·马丁":"images/player_032.png",
+"D.索博斯洛伊":"images/player_033.png",
+"埃斯特旺":"images/player_034.png",
+"J.海于格":"images/player_035.png",
+"D.邓弗里斯":"images/player_036.png",
+"萨卡":"images/player_037.png",
+"姆巴佩":"images/player_038.png",
+"格里马尔多":"images/player_039.png",
+"P.科恩":"images/player_040.png",
+"拉什福德":"images/player_041.png",
+"P.伯格":"images/player_042.png",
+"奥斯梅恩":"images/player_043.png",
+"J.阿尔瓦雷斯":"images/player_044.png",
+"法比安-鲁易斯":"images/player_045.png",
+"L.萨内":"images/player_046.png",
+"埃泽":"images/player_047.png",
+"楚阿梅尼":"images/player_048.png",
+"加克波":"images/player_049.png",
+"L.卡尔":"images/player_050.png",
+"基米希":"images/player_051.png",
+"哲凯赖什":"images/player_052.png",
+"N.克海金":"images/player_053.png",
+"G.维卡里奥":"images/player_054.png",
+"拉明·亚马尔":"images/player_055.png",
+"布兰特":"images/player_056.png",
+"F.维尔茨":"images/player_057.png",
+"特里皮尔":"images/player_058.png",
+"德凯特拉雷":"images/player_059.png",
+"格列兹曼":"images/player_060.png",
+"佩德罗·波罗":"images/player_061.png",
+"A.卢克曼":"images/player_062.png",
+"F.迪马尔科":"images/player_063.png",
+"M.凯塞多":"images/player_064.png",
+"J.贝林厄姆":"images/player_065.png",
+"努诺·门德斯":"images/player_066.png",
+"马尔基尼奥斯":"images/player_067.png",
+"A.戈登":"images/player_068.png",
+"厄德高":"images/player_069.png",
+"加布里埃尔":"images/player_070.png",
+"佩德里":"images/player_071.png",
+"A.帕夫洛维奇":"images/player_072.png",
+"J.多库":"images/player_073.png",
+"J.格瓦迪奥尔":"images/player_074.png",
+"K.阿德耶米":"images/player_075.png",
+"Y.比塞克":"images/player_076.png",
+"J.廷贝尔":"images/player_077.png",
+"W.萨利巴":"images/player_078.png",
+"库尔图瓦":"images/player_079.png",
+"特林康":"images/player_080.png",
+"克瓦拉茨赫利亚":"images/player_081.png",
+"M.卡尔内塞基":"images/player_082.png",
+"H.埃基蒂克":"images/player_083.png",
+"苏比门迪":"images/player_084.png",
+"莱默尔":"images/player_085.png",
+"索默":"images/player_086.png",
+"波普":"images/player_087.png",
+"A.巴斯托尼":"images/player_088.png",
+"马科斯·略伦特":"images/player_089.png",
+"W.麦克凯尼":"images/player_090.png",
+"N.马杜克":"images/player_091.png",
+"劳塔罗·马丁内斯":"images/player_092.png",
+"扬·科托":"images/player_093.png",
+"鲁伊·席尔瓦":"images/player_094.png",
+"奥利塞":"images/player_095.png",
+"大卫·拉亚":"images/player_096.png",
+"杜埃":"images/player_097.png",
+"哈维·巴恩斯":"images/player_098.png",
+"范戴克":"images/player_099.png"
+};
+
+
+
+// ============================================================
+//  FC Online 4 (腾讯) 强化数据表 — 严格按用户提供的数据
+// ============================================================
+//  level: 强化等级
+//  bonus: 该等级累计 OVR 加成 (相对于 +1 卡)
+//  rate:  升级到下一级的成功率
+//  gain:  升级到下一级的单级 OVR 提升
+//
+//  说明：+1 为基准卡（总加成=0），+0 为未强化白卡
+
+const TABLE = [
+  // bonus = 该等级累计 OVR 加成（从 +0 算起）
+  // +0 和 +1 能力值相同；+1→+2 是第一次涨属性
+  { level: 0,  bonus: 0,  rate: 1.00, gain: 0  },  // 0→1: 100%, OVR不变
+  { level: 1,  bonus: 0,  rate: 1.00, gain: 1  },  // 1→2: 100%, +1, 总+1
+  { level: 2,  bonus: 1,  rate: 0.81, gain: 1  },  // 2→3: 81%,  +1, 总+2
+  { level: 3,  bonus: 2,  rate: 0.64, gain: 2  },  // 3→4: 64%,  +2, 总+4
+  { level: 4,  bonus: 4,  rate: 0.50, gain: 2  },  // 4→5: 50%,  +2, 总+6
+  { level: 5,  bonus: 6,  rate: 0.26, gain: 2  },  // 5→6: 26%,  +2, 总+8
+  { level: 6,  bonus: 8,  rate: 0.15, gain: 3  },  // 6→7: 15%,  +3, 总+11
+  { level: 7,  bonus: 11, rate: 0.07, gain: 4  },  // 7→8: 7%,   +4, 总+15
+  { level: 8,  bonus: 15, rate: 0.05, gain: 2  },  // 8→9: 5%,   +2, 总+17
+  { level: 9,  bonus: 17, rate: 0.04, gain: 2  },  // 9→10: 4%,  +2, 总+19
+  { level: 10, bonus: 19, rate: 0.03, gain: 2  },  // 10→11: 3%, +2, 总+21
+  { level: 11, bonus: 21, rate: 0.02, gain: 3  },  // 11→12: 2%, +3, 总+24
+  { level: 12, bonus: 24, rate: 0.01, gain: 3  },  // 12→13: 1%, +3, 总+27
+  { level: 13, bonus: 27, rate: null, gain: 0  },  // MAX
+];
+
+
+// ============================================================
+//  25UCL 球员数据库 (105名)
+// ============================================================
+const PLAYER_DB = [
+  {"position":"中锋","name":"哈里·凯恩","ovr":123,"enhance":1},
+  {"position":"左边锋","name":"克瓦拉茨赫利亚","ovr":123,"enhance":1},
+  {"position":"左边锋","name":"路易斯·迪亚斯","ovr":123,"enhance":1},
+  {"position":"中场","name":"赖斯","ovr":123,"enhance":1},
+  {"position":"中锋","name":"姆巴佩","ovr":122,"enhance":1},
+  {"position":"影锋","name":"J.阿尔瓦雷斯","ovr":122,"enhance":1},
+  {"position":"右边锋","name":"拉明·亚马尔","ovr":122,"enhance":1},
+  {"position":"中场","name":"维蒂尼亚","ovr":122,"enhance":1},
+  {"position":"右边锋","name":"奥利塞","ovr":122,"enhance":1},
+  {"position":"中后卫","name":"加布里埃尔","ovr":122,"enhance":1},
+  {"position":"中场","name":"若昂·内维斯","ovr":122,"enhance":1},
+  {"position":"守门员","name":"大卫·拉亚","ovr":122,"enhance":1},
+  {"position":"中锋","name":"哈兰德","ovr":120,"enhance":1},
+  {"position":"前腰","name":"D.索博斯洛伊","ovr":120,"enhance":1},
+  {"position":"右边锋","name":"萨卡","ovr":120,"enhance":1},
+  {"position":"前腰","name":"费尔明","ovr":120,"enhance":1},
+  {"position":"守门员","name":"库尔图瓦","ovr":120,"enhance":1},
+  {"position":"中锋","name":"奥斯梅恩","ovr":119,"enhance":1},
+  {"position":"前腰","name":"F.维尔茨","ovr":119,"enhance":1},
+  {"position":"左后卫","name":"努诺·门德斯","ovr":119,"enhance":1},
+  {"position":"后腰","name":"苏比门迪","ovr":119,"enhance":1},
+  {"position":"左边锋","name":"J.多库","ovr":119,"enhance":1},
+  {"position":"前腰","name":"L.卡尔","ovr":119,"enhance":1},
+  {"position":"中后卫","name":"W.帕乔","ovr":119,"enhance":1},
+  {"position":"中后卫","name":"W.萨利巴","ovr":119,"enhance":1},
+  {"position":"守门员","name":"U.卡科尔","ovr":119,"enhance":1},
+  {"position":"左边锋","name":"G.马丁内利","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"拉什福德","ovr":118,"enhance":1},
+  {"position":"中后卫","name":"范戴克","ovr":118,"enhance":1},
+  {"position":"中场","name":"佩德里","ovr":118,"enhance":1},
+  {"position":"中后卫","name":"J.格瓦迪奥尔","ovr":118,"enhance":1},
+  {"position":"前腰","name":"德凯特拉雷","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"A.戈登","ovr":118,"enhance":1},
+  {"position":"右边锋","name":"哈维·巴恩斯","ovr":118,"enhance":1},
+  {"position":"中锋","name":"劳塔罗·马丁内斯","ovr":118,"enhance":1},
+  {"position":"右后卫","name":"马科斯·略伦特","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"格纳布里","ovr":118,"enhance":1},
+  {"position":"后腰","name":"M.凯塞多","ovr":118,"enhance":1},
+  {"position":"前腰","name":"特林康","ovr":118,"enhance":1},
+  {"position":"后腰","name":"楚阿梅尼","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"维尼修斯","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"J.海于格","ovr":118,"enhance":1},
+  {"position":"左边卫","name":"格里马尔多","ovr":118,"enhance":1},
+  {"position":"右后卫","name":"佩德罗·波罗","ovr":118,"enhance":1},
+  {"position":"影锋","name":"格列兹曼","ovr":118,"enhance":1},
+  {"position":"前腰","name":"居莱尔","ovr":118,"enhance":1},
+  {"position":"后腰","name":"基米希","ovr":118,"enhance":1},
+  {"position":"左边锋","name":"K.伊尔迪兹","ovr":117,"enhance":1},
+  {"position":"中场","name":"恩梅加","ovr":117,"enhance":1},
+  {"position":"后腰","name":"恰尔汗奥卢","ovr":117,"enhance":1},
+  {"position":"前腰","name":"J.贝林厄姆","ovr":117,"enhance":1},
+  {"position":"前腰","name":"福登","ovr":117,"enhance":1},
+  {"position":"中后卫","name":"A.巴斯托尼","ovr":117,"enhance":1},
+  {"position":"右边锋","name":"杜埃","ovr":117,"enhance":1},
+  {"position":"守门员","name":"M.卡尔内塞基","ovr":117,"enhance":1},
+  {"position":"守门员","name":"N.克海金","ovr":117,"enhance":1},
+  {"position":"左边锋","name":"特洛萨德","ovr":116,"enhance":1},
+  {"position":"右边锋","name":"谢尔基","ovr":116,"enhance":1},
+  {"position":"右前卫","name":"W.麦克凯尼","ovr":116,"enhance":1},
+  {"position":"中后卫","name":"C.罗梅罗","ovr":116,"enhance":1},
+  {"position":"右边锋","name":"L.萨内","ovr":116,"enhance":1},
+  {"position":"前腰","name":"H.瓦纳肯","ovr":116,"enhance":1},
+  {"position":"右边锋","name":"埃斯特旺","ovr":116,"enhance":1},
+  {"position":"中场","name":"法比安-鲁易斯","ovr":116,"enhance":1},
+  {"position":"守门员","name":"G.维卡里奥","ovr":116,"enhance":1},
+  {"position":"守门员","name":"波普","ovr":116,"enhance":1},
+  {"position":"后腰","name":"A.帕夫洛维奇","ovr":116,"enhance":1},
+  {"position":"守门员","name":"多纳鲁马","ovr":116,"enhance":1},
+  {"position":"中后卫","name":"范德芬","ovr":115,"enhance":1},
+  {"position":"右边锋","name":"N.马杜克","ovr":115,"enhance":1},
+  {"position":"影锋","name":"K.阿德耶米","ovr":115,"enhance":1},
+  {"position":"右后卫","name":"J.廷贝尔","ovr":115,"enhance":1},
+  {"position":"左边锋","name":"加克波","ovr":115,"enhance":1},
+  {"position":"中锋","name":"哲凯赖什","ovr":115,"enhance":1},
+  {"position":"中锋","name":"吉拉西","ovr":115,"enhance":1},
+  {"position":"左边锋","name":"B.巴科拉","ovr":115,"enhance":1},
+  {"position":"右边卫","name":"扬·科托","ovr":115,"enhance":1},
+  {"position":"中场","name":"布鲁诺·吉马良斯","ovr":115,"enhance":1},
+  {"position":"中后卫","name":"Y.比塞克","ovr":115,"enhance":1},
+  {"position":"中场","name":"巴尔维德","ovr":115,"enhance":1},
+  {"position":"右边卫","name":"D.邓弗里斯","ovr":115,"enhance":1},
+  {"position":"左边卫","name":"F.迪马尔科","ovr":115,"enhance":1},
+  {"position":"前腰","name":"厄德高","ovr":115,"enhance":1},
+  {"position":"左后卫","name":"罗伯逊","ovr":115,"enhance":1},
+  {"position":"中后卫","name":"马尔基尼奥斯","ovr":115,"enhance":1},
+  {"position":"中锋","name":"H.埃基蒂克","ovr":115,"enhance":1},
+  {"position":"前腰","name":"埃泽","ovr":115,"enhance":1},
+  {"position":"守门员","name":"P.科恩","ovr":115,"enhance":1},
+  {"position":"守门员","name":"索默","ovr":115,"enhance":1},
+  {"position":"守门员","name":"鲁伊·席尔瓦","ovr":115,"enhance":1},
+  {"position":"前腰","name":"布兰特","ovr":114,"enhance":1},
+  {"position":"右后卫","name":"特里皮尔","ovr":114,"enhance":1},
+  {"position":"中锋","name":"马库斯·图拉姆","ovr":114,"enhance":1},
+  {"position":"右后卫","name":"莱默尔","ovr":114,"enhance":1},
+  {"position":"中场","name":"迈克尔梅里诺","ovr":114,"enhance":1},
+  {"position":"中后卫","name":"丹·伯恩","ovr":114,"enhance":1},
+  {"position":"影锋","name":"A.卢克曼","ovr":114,"enhance":1},
+  {"position":"后腰","name":"P.伯格","ovr":114,"enhance":1},
+  {"position":"守门员","name":"阿利松","ovr":114,"enhance":1},
+  {"position":"左后卫","name":"杰拉德·马丁","ovr":114,"enhance":1}
+];
+
+const PLAYER_ENG = {
+  '姆巴佩':'K. Mbappé','哈里·凯恩':'H. Kane','克瓦拉茨赫利亚':'K. Kvaratskhelia','路易斯·迪亚斯':'L. Díaz','赖斯':'D. Rice',
+  'J.阿尔瓦雷斯':'J. Álvarez','拉明·亚马尔':'L. Yamal','维蒂尼亚':'Vitinha','奥利塞':'M. Olise','加布里埃尔':'Gabriel',
+  '若昂·内维斯':'J. Neves','大卫·拉亚':'D. Raya','哈兰德':'E. Haaland','D.索博斯洛伊':'D. Szoboszlai','萨卡':'B. Saka',
+  '费尔明':'Fermín','库尔图瓦':'T. Courtois','奥斯梅恩':'V. Osimhen','F.维尔茨':'F. Wirtz','努诺·门德斯':'N. Mendes',
+  '苏比门迪':'M. Zubimendi','J.多库':'J. Doku','L.卡尔':'L. Carl','W.帕乔':'W. Pacho','W.萨利巴':'W. Saliba',
+  'U.卡科尔':'U. Cakir','G.马丁内利':'G. Martinelli','拉什福德':'M. Rashford','范戴克':'V. van Dijk','佩德里':'Pedri',
+  'J.格瓦迪奥尔':'J. Gvardiol','德凯特拉雷':'C. De Ketelaere','A.戈登':'A. Gordon','哈维·巴恩斯':'H. Barnes',
+  '劳塔罗·马丁内斯':'L. Martínez','马科斯·略伦特':'M. Llorente','格纳布里':'S. Gnabry','M.凯塞多':'M. Caicedo',
+  '特林康':'Trincão','楚阿梅尼':'A. Tchouaméni','维尼修斯':'Vinícius Jr.','J.海于格':'J. Hauge','格里马尔多':'Grimaldo',
+  '佩德罗·波罗':'Pedro Porro','格列兹曼':'A. Griezmann','居莱尔':'A. Güler','基米希':'J. Kimmich',
+  'K.伊尔迪兹':'K. Yildiz','恩梅加':'F. Nmecha','布兰特':'J. Brandt','特里皮尔':'K. Trippier',
+  '马库斯·图拉姆':'M. Thuram','莱默尔':'K. Laimer','迈克尔梅里诺':'M. Merino','丹·伯恩':'D. Burn',
+  'A.卢克曼':'A. Lookman','P.伯格':'P. Berg','阿利松':'Alisson','杰拉德·马丁':'G. Martín'
+};
+
+const PLAYER_SKILL = {
+  '姆巴佩':5,'哈里·凯恩':3,'克瓦拉茨赫利亚':5,'路易斯·迪亚斯':4,'赖斯':2,
+  'J.阿尔瓦雷斯':4,'拉明·亚马尔':5,'维蒂尼亚':4,'奥利塞':4,'加布里埃尔':2,
+  '若昂·内维斯':3,'大卫·拉亚':1,'哈兰德':3,'D.索博斯洛伊':4,'萨卡':4,
+  '费尔明':3,'库尔图瓦':1,'奥斯梅恩':3,'F.维尔茨':5,'努诺·门德斯':4,
+  '苏比门迪':2,'J.多库':5,'L.卡尔':3,'W.帕乔':2,'W.萨利巴':2,
+  'U.卡科尔':1,'G.马丁内利':4,'拉什福德':4,'范戴克':2,'佩德里':4,
+  'J.格瓦迪奥尔':2,'德凯特拉雷':3,'A.戈登':4,'哈维·巴恩斯':4,
+  '劳塔罗·马丁内斯':3,'马科斯·略伦特':3,'格纳布里':4,'M.凯塞多':2,
+  '特林康':4,'楚阿梅尼':2,'维尼修斯':5,'J.海于格':4,'格里马尔多':3,
+  '佩德罗·波罗':3,'格列兹曼':4,'居莱尔':4,'基米希':3,
+  'K.伊尔迪兹':4,'恩梅加':2,'布兰特':3,'特里皮尔':2,
+  '马库斯·图拉姆':3,'莱默尔':2,'迈克尔梅里诺':2,'丹·伯恩':2,
+  'A.卢克曼':4,'P.伯格':2,'阿利松':1,'杰拉德·马丁':2
+};
+
+function populatePlayerSelect() {
+  const sel = document.getElementById('inpPlayerSelect');
+  // Keep the first "custom" option
+  sel.innerHTML = '<option value="">— 自定义球员 —</option>';
+  // Group by position
+  const positions = [...new Set(PLAYER_DB.map(p => p.position))];
+  positions.sort();
+  positions.forEach(pos => {
+    const group = document.createElement('optgroup');
+    group.label = pos;
+    const players = PLAYER_DB.filter(p => p.position === pos);
+    players.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.name;
+      opt.textContent = p.name + ' · OVR ' + p.ovr;
+      opt.dataset.position = p.position;
+      opt.dataset.ovr = p.ovr;
+      opt.dataset.enhance = p.enhance;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
+  });
+}
+
+function onPlayerSelect() {
+  const sel = document.getElementById('inpPlayerSelect');
+  const name = sel.value;
+  if (!name) return; // "自定义" option
+  const opt = sel.selectedOptions[0];
+  document.getElementById('inpName').value = name;
+  document.getElementById('inpPos').value = opt.dataset.position;
+  document.getElementById('inpOvr').value = opt.dataset.ovr;
+  document.getElementById('inpLevel').value = opt.dataset.enhance;
+  document.getElementById('inpSeason').value = '25ucl';
+  // Don't auto-apply — user must click 应用设置
+}
+
+// ============================================================
+//  State
+// ============================================================
+let baseOvr = 122;
+let currentLevel = 1;
+let playerName = '姆巴佩';
+let playerPos = '右边锋';
+let playerSeason = '25ucl';
+let totalAttempts = 0;
+let totalSuccess = 0;
+let protectCount = 0;
+let autoMode = false;
+let stopLevel = 13;
+let autoTimer = null;
+let autoCloseTimer = null;
+let isEnhancing = false;
+let history = [];
+
+let materialCards = []; // {ovr: number}
+
+// ============================================================
+//  Material Card — 六边形卡槽
+// ============================================================
+
+function addMaterial() {
+  if (materialCards.length >= 5) return;
+  const inp = document.getElementById('inpMaterialOvr');
+  const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
+  inp.value = ovr;
+  materialCards.push({ ovr });
+  updateHexSlots();
+}
+
+function clearMaterials() {
+  materialCards = [];
+  updateHexSlots();
+}
+
+function toggleHexCard(card) {
+  if (card.classList.contains('active')) return;
+  const idx = parseInt(card.dataset.slot);
+  // Fill empty slots up to this one
+  while (materialCards.length <= idx) {
+    const inp = document.getElementById('inpMaterialOvr');
+    const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
+    materialCards.push({ ovr });
+  }
+  updateHexSlots();
+}
+
+function closeHexCard(btn) {
+  const card = btn.closest('.hex-card');
+  const idx = parseInt(card.dataset.slot);
+  if (idx < materialCards.length) {
+    materialCards.splice(idx, 1);
+  }
+  updateHexSlots();
+}
+
+function onHexOvrInput(input) {
+  const card = input.closest('.hex-card');
+  const idx = parseInt(card.dataset.slot);
+  const val = parseInt(input.value) || 0;
+  if (idx < materialCards.length) {
+    materialCards[idx].ovr = Math.max(0, Math.min(999, val));
+  }
+  updateHexProgress(card, materialCards[idx].ovr);
+  refreshAll();
+}
+
+function stepHexOvr(btn, delta) {
+  const card = btn.closest('.hex-card');
+  const input = card.querySelector('.hex-input-row input');
+  const idx = parseInt(card.dataset.slot);
+  let val = (parseInt(input.value) || 0) + delta;
+  val = Math.max(0, Math.min(999, val));
+  input.value = val;
+  if (idx < materialCards.length) {
+    materialCards[idx].ovr = val;
+  }
+  updateHexProgress(card, val);
+  refreshAll();
+}
+
+function updateHexProgress(card, ovr) {
+  const ratio = calcFillRatio(ovr);
+  const pct = Math.min(100, ratio * 100);
+  const bar = card.querySelector('.hex-progress-inner');
+  const label = card.querySelector('.hex-progress-pct');
+  if (bar) bar.style.width = pct + '%';
+  if (label) label.textContent = pct.toFixed(2) + '%';
+}
+
+function calcFillRatio(matOvr) {
+  const currentOvr = curOvr();
+  const diff = matOvr - currentOvr;
+  return Math.max(0.1, 1.0 + diff * 0.1);
+}
+
+function getTotalFill() {
+  let total = 0;
+  materialCards.forEach(m => { total += calcFillRatio(m.ovr); });
+  return Math.min(total, 5);
+}
+
+function getMaterialBoost() {
+  return Math.round(getTotalFill()) * 1;
+}
+
+function updateHexSlots() {
+  for (let i = 0; i < 5; i++) {
+    const card = document.querySelector(`.hex-card[data-slot="${i}"]`);
+    if (!card) continue;
+
+    if (i < materialCards.length) {
+      card.classList.add('active');
+      const inp = card.querySelector('.hex-input-row input');
+      if (inp) inp.value = materialCards[i].ovr;
+      updateHexProgress(card, materialCards[i].ovr);
+    } else {
+      card.classList.remove('active');
+    }
+  }
+
+  document.getElementById('materialCount').textContent = `已填 ${materialCards.length}/5`;
+  const boost = getMaterialBoost();
+  document.getElementById('materialBoost').textContent = '+' + boost + '%';
+
+  if (getTotalFill() >= 5) {
+    const btn = document.getElementById('btnEnhance');
+    if (btn) btn.disabled = true;
+  }
+
+  updateEnergyBar(); // 同步长条能量条
+}
+
+function clickSlot(n) {
+  const currentFilled = Math.round(getTotalFill());
+  if (currentFilled === n) {
+    materialCards = [];
+  } else {
+    materialCards = [];
+    const inp = document.getElementById('inpMaterialOvr');
+    const ovr = Math.max(40, Math.min(150, parseInt(inp.value) || baseOvr));
+    for (let i = 0; i < n; i++) {
+      materialCards.push({ ovr });
+    }
+  }
+  updateHexSlots();
+}
+
+function updateEnergyBar() {
+  const totalFill = getTotalFill();
+  const fullSlots = Math.floor(totalFill);
+  const partialFill = totalFill - fullSlots;
+
+  for (let i = 0; i < 5; i++) {
+    const slot = document.querySelector(`.energy-slot[data-slot="${i+1}"]`);
+    if (!slot) continue;
+    const oldFill = slot.querySelector('.fill');
+    if (oldFill) oldFill.remove();
+
+    if (i < fullSlots) {
+      slot.classList.add('filled');
+      const fill = document.createElement('div');
+      fill.className = 'fill';
+      fill.style.width = '100%';
+      slot.appendChild(fill);
+    } else if (i === fullSlots && partialFill > 0) {
+      slot.classList.add('filled');
+      const fill = document.createElement('div');
+      fill.className = 'fill';
+      fill.style.width = (partialFill * 100) + '%';
+      slot.appendChild(fill);
+    } else {
+      slot.classList.remove('filled');
+    }
+  }
+}
+
+function getFinalRate(baseRate) {
+  const boost = getMaterialBoost() / 100;
+  return Math.min(1, baseRate + boost);
+}
+
+
+// ============================================================
+//  Helpers
+// ============================================================
+function data(lv) { return TABLE.find(d => d.level === lv) || TABLE[0]; }
+function curOvr() { return baseOvr + data(currentLevel).bonus; }
+function canEnhance() { return currentLevel < 13; }
+
+// ============================================================
+//  UI Update
+// ============================================================
+function refreshAll() {
+  const d = data(currentLevel);
+  const ovr = curOvr();
+  const nextLv = currentLevel + 1;
+  const canUp = canEnhance();
+  const nextD = canUp ? data(nextLv) : null;
+
+  // Player card
+  document.getElementById('playerOvr').textContent = ovr;
+  const enhanceIcon = document.getElementById('infoEnhanceIcon');
+  enhanceIcon.src = `images/enhance/+${currentLevel}.png`;
+  enhanceIcon.alt = '+' + currentLevel;
+  document.getElementById('playerName').textContent = playerName;
+  document.getElementById('playerMeta').textContent = playerPos;
+
+  // Season icon
+  const seasonIcon = document.getElementById('infoSeasonIcon');
+  if (playerSeason === '25ucl') {
+    seasonIcon.src = 'images/25ucl_badge.png';
+    seasonIcon.style.display = '';
+  } else {
+    seasonIcon.style.display = 'none';
+  }
+
+  // Avatar — Mbappe uses level-specific images, others use PLAYER_IMAGES
+  const avatar = document.getElementById('playerAvatar');
+  avatar.classList.remove('elite','legend','ultimate','has-img');
+  let imgUrl = null;
+  if (playerName === '姆巴佩') {
+    imgUrl = `images/mbappe/mbappe_${currentLevel}.png`;
+  } else if (typeof PLAYER_IMAGES !== 'undefined' && PLAYER_IMAGES[playerName]) {
+    imgUrl = PLAYER_IMAGES[playerName];
+  }
+  if (imgUrl) {
+    avatar.textContent = '';
+    avatar.innerHTML = `<img src="${imgUrl}" alt="${playerName}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+    avatar.classList.add('has-img');
+  } else {
+    avatar.innerHTML = '';
+    avatar.textContent = '⚽';
+  }
+  if (currentLevel >= 12) avatar.classList.add('ultimate');
+  else if (currentLevel >= 8) avatar.classList.add('legend');
+  else if (currentLevel >= 5) avatar.classList.add('elite');
+
+  // Trait slots count
+  const traitCount = currentLevel >= 12 ? 7 : currentLevel >= 9 ? 6 : currentLevel >= 6 ? 5 : currentLevel >= 3 ? 4 : 3;
+  document.getElementById('infoTraitCount').textContent = traitCount;
+
+  // Skill moves stars
+  const skillMoves = PLAYER_SKILL[playerName] || 3;
+  const starsStr = '★'.repeat(skillMoves) + '☆'.repeat(5 - skillMoves);
+  document.getElementById('infoSkillStars').textContent = starsStr;
+
+  // Progress bar
+  renderProgress();
+
+  // Rate info
+  if (!canUp) {
+    document.getElementById('rateInfo').innerHTML = '<strong style="color:#f0b90b;">已满级 MAX +13</strong>';
+    document.getElementById('btnEnhance').disabled = true;
+    document.getElementById('btnEnhance').textContent = '已满级';
+  } else {
+    const effectiveRate = getFinalRate(nextD.rate);
+    const r = (effectiveRate * 100);
+    const rStr = r >= 1 ? r.toFixed(0) + '%' : r.toFixed(1) + '%';
+    const boost = getMaterialBoost();
+    const boostStr = boost > 0 ? ` <span style="color:#2979ff;font-size:11px;">(含材料+${boost}%)</span>` : '';
+    document.getElementById('rateInfo').innerHTML = `+${currentLevel} → +${nextLv} 成功率 <strong>${rStr}</strong>${boostStr}`;
+    document.getElementById('btnEnhance').disabled = false;
+    document.getElementById('btnEnhance').textContent = '强 化';
+  }
+
+  // Info chips
+  document.getElementById('infoNextLevel').textContent = canUp ? '+' + nextLv : 'MAX';
+  document.getElementById('infoRate').textContent = canUp ? ((getFinalRate(nextD.rate)*100) >= 1 ? (getFinalRate(nextD.rate)*100).toFixed(0)+'%' : (getFinalRate(nextD.rate)*100).toFixed(1)+'%') : '-';
+  document.getElementById('infoOvrGain').textContent = canUp ? ('+' + nextD.gain) : '-';
+  document.getElementById('infoTargetOvr').textContent = canUp ? (baseOvr + nextD.bonus) : (baseOvr + d.bonus);
+
+  // Protection slider: only available at +8 and above
+  const slider = document.getElementById('protectSlider');
+  const protectBadge = document.getElementById('protectBadge');
+  if (slider) {
+    if (currentLevel < 8) {
+      slider.disabled = true;
+      slider.value = 0;
+      protectCount = 0;
+      document.getElementById('protectCount').textContent = '0';
+      if (protectBadge) protectBadge.style.display = 'none';
+      if (slider.parentElement) slider.parentElement.style.opacity = '0.35';
+    } else {
+      slider.disabled = false;
+      if (slider.parentElement) slider.parentElement.style.opacity = '1';
+      if (protectBadge) {
+        if (protectCount === 0) {
+          protectBadge.style.display = 'inline';
+          protectBadge.textContent = '推荐开启';
+        } else {
+          protectBadge.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  // Stats (with safety null checks)
+  const sAttempts = document.getElementById('sAttempts');
+  const sSuccess = document.getElementById('sSuccess');
+  const sFail = document.getElementById('sFail');
+  const stopLevelDisplay = document.getElementById('stopLevelDisplay');
+  if (sAttempts) sAttempts.textContent = totalAttempts;
+  if (sSuccess) sSuccess.textContent = totalSuccess;
+  if (sFail) sFail.textContent = totalAttempts - totalSuccess;
+  if (stopLevelDisplay) stopLevelDisplay.textContent = '+' + ((stopLevel > 13) ? 13 : stopLevel);
+
+  // Button state
+  if (!canUp) {
+    document.getElementById('btnEnhance').disabled = true;
+    if (autoMode) stopAuto();
+  }
+
+  renderHistory();
+}
+
+function renderProgress() {
+  const bar = document.getElementById('progressBar');
+  if (!bar) return;
+  let html = '';
+  for (let i = 0; i <= 13; i++) {
+    if (i > 0) html += '<span class="progress-arrow">›</span>';
+    let cls = 'progress-step';
+    if (i < currentLevel) cls += ' reached';
+    if (i === currentLevel) cls += ' current';
+    html += `<div class="${cls}" title="+${i}: OVR ${baseOvr + data(i).bonus}">+${i}</div>`;
+  }
+  bar.innerHTML = html;
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!list) return;
+  if (history.length === 0) {
+    list.innerHTML = '<li class="hist-empty">等待首次强化...</li>';
+    return;
+  }
+  list.innerHTML = history.map(h => {
+    let tagCls, tagText;
+    if (h.result === 'success') { tagCls = 'win'; tagText = '成功'; }
+    else { tagCls = 'lose'; tagText = '失败'; }
+    return `<li class="history-item">
+      <span class="hist-num">#${h.num}</span>
+      <span class="hist-tag ${tagCls}">${tagText}</span>
+      <span class="hist-detail">${h.desc}</span>
+    </li>`;
+  }).join('');
+}
+
+// ============================================================
+//  Actions
+// ============================================================
+function onProtectSlider() {
+  const slider = document.getElementById('protectSlider');
+  protectCount = parseInt(slider.value) || 0;
+  document.getElementById('protectCount').textContent = protectCount;
+}
+function hasProtection() { return currentLevel >= 8 && protectCount > 0; }
+
+function toggleAuto() {
+  if (autoMode) { stopAuto(); } else { startAuto(); }
+}
+
+function startAuto() {
+  if (!canEnhance()) return;
+  autoMode = true;
+  const btn = document.getElementById('btnAuto');
+  btn.textContent = '停止';
+  btn.classList.add('active');
+  doAutoStep();
+}
+
+function stopAuto() {
+  autoMode = false;
+  const btn = document.getElementById('btnAuto');
+  btn.textContent = '自动';
+  btn.classList.remove('active');
+  if (autoTimer) clearTimeout(autoTimer);
+  if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
+}
+
+function doAutoStep() {
+  if (!autoMode || !canEnhance()) { stopAuto(); return; }
+  if (currentLevel >= stopLevel) { stopAuto(); return; }
+  if (!isEnhancing) startEnhance();
+  autoTimer = setTimeout(() => doAutoStep(), 1800);
+}
+
+function resetCard() {
+  if (isEnhancing) return;
+  if (autoMode) stopAuto();
+  currentLevel = 0;
+  totalAttempts = 0;
+  totalSuccess = 0;
+  history = [];
+  stopLevel = 13;
+  document.getElementById('inpStopLevel').value = 13;
+  protectCount = 0;
+  document.getElementById('protectSlider').value = 0;
+  document.getElementById('protectCount').textContent = '0';
+  clearMaterials();
+  document.getElementById('inpMaterialOvr').value = baseOvr;
+  refreshAll();
+}
+
+function startEnhance() {
+  if (isEnhancing || !canEnhance()) return;
+  isEnhancing = true;
+
+  const btn = document.getElementById('btnEnhance');
+  btn.textContent = '强化中...';
+  btn.disabled = true;
+
+  showBurstOverlay();
+}
+
+function executeEnhance() {
+  const nextLv = currentLevel + 1;
+  const nextD = data(nextLv);
+  const rate = getFinalRate(nextD.rate);
+  const roll = Math.random();
+  const success = roll < rate;
+
+  totalAttempts++;
+
+  if (success) {
+    const oldOvr = curOvr();
+    currentLevel = nextLv;
+    totalSuccess++;
+    const newOvr = curOvr();
+
+    addHistory('success', '+' + (nextLv - 1) + ' → +' + nextLv + '  |  OVR ' + oldOvr + ' → ' + newOvr + '  |  第' + totalAttempts + '次成功');
+    refreshAll();
+    showBurstSuccess(nextLv, oldOvr, newOvr);
+
+    if (currentLevel >= stopLevel && autoMode) stopAuto();
+  } else {
+    const oldOvr = curOvr();
+    const oldLevel = currentLevel;
+
+    let dropTo;
+    if (!hasProtection()) {
+      if (currentLevel === 2) {
+        dropTo = 1;
+      } else if (currentLevel === 3) {
+        dropTo = Math.random() < 0.5 ? 1 : 2;
+      } else if (currentLevel >= 4 && currentLevel <= 7) {
+        dropTo = 1;
+      } else {
+        dropTo = Math.floor(Math.random() * 6) + 1;
+      }
+      const dropOvr = baseOvr + data(dropTo).bonus;
+      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  降至 +' + dropTo + '  (OVR ' + dropOvr + ')');
+      currentLevel = dropTo;
+    } else {
+      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  强化等级保护生效，保持 +' + oldLevel);
+      dropTo = oldLevel;
+    }
+
+    refreshAll();
+    showBurstFail(oldLevel, oldOvr, nextLv, dropTo);
+  }
+}
+
+function addHistory(result, desc) {
+  history.unshift({ result, desc, num: totalAttempts });
+  if (history.length > 500) history.length = 500;
+}
+
+// ============================================================
+//  Modal
+// ============================================================
+// ============================================================
+//  Burst Animation (强化过程动画)
+// ============================================================
+let burstTimer = null;
+let burstShakeTimer = null;
+let burstShakeTimeout = null;
+let burstRafId = null;
+
+function getCardImgUrl() {
+  const avatar = document.getElementById('playerAvatar');
+  const img = avatar.querySelector('img');
+  return img ? img.src : '';
+}
+
+function showBurstOverlay() {
+  // Clear any stale timers from previous runs
+  if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
+  if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
+  if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+  if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
+
+  var overlay = document.getElementById('burstOverlay');
+  var burstCard = document.getElementById('burstCard');
+  var burstCardWrap = burstCard.parentElement; // .burst-card-wrap
+  var cardImg = document.getElementById('burstCardImg');
+  var rain = document.getElementById('burstRain');
+  var particles = document.getElementById('burstParticles');
+  var shatter = document.getElementById('shatterEffect');
+
+  // Reset
+  overlay.classList.add('show');
+  burstCardWrap.classList.remove('zoom-in');
+  void burstCardWrap.offsetWidth;
+  burstCardWrap.classList.add('zoom-in');
+  burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'purple-shadow');
+  burstCard.style.filter = 'brightness(1)';
+  shatter.classList.remove('animate');
+  shatter.style.display = 'none';
+  rain.innerHTML = '';
+  particles.innerHTML = '';
+
+  // Set card image
+  cardImg.src = getCardImgUrl();
+
+  // Spotlight + glow at 60%, beams at 40%
+  document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) {
+    el.classList.add('on');
+    el.style.opacity = '0.6';
+  });
+  document.querySelectorAll('.burst-beam').forEach(function(el) {
+    el.classList.add('on');
+    el.style.opacity = '0.4';
+  });
+
+  // Rain particles
+  startRain(rain, 30);
+
+  // Shake + brightness via requestAnimationFrame (synced to refresh rate)
+  var shakeStartTime = null;
+  var shakeDuration = 2100; // shake runs for 2100ms
+  var spotShown = false;
+  var lastClass = '';
+  var finished = false;
+
+  burstShakeTimeout = setTimeout(function() {
+    burstShakeTimeout = null;
+    shakeStartTime = performance.now();
+
+    function tick(now) {
+      // Safety: stop if overlay was hidden externally
+      if (finished || !overlay.classList.contains('show')) {
+        burstRafId = null;
+        return;
+      }
+
+      var elapsed = now - shakeStartTime;
+      var t = Math.min(elapsed / shakeDuration, 1);
+
+      // CSS class switching for shake speed (GPU-composited, smooth)
+      var newClass;
+      if (t < 0.25) { newClass = 'shake-s1'; }
+      else if (t < 0.55) { newClass = 'shake-s2'; }
+      else if (t < 0.80) { newClass = 'shake-s3'; }
+      else { newClass = 'shake-s4'; }
+      if (newClass !== lastClass) {
+        burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4');
+        burstCard.classList.add(newClass);
+        lastClass = newClass;
+      }
+
+      // Brightness buildup: cubic curve for dramatic end flash
+      var bv = 1 + t * t * t * 3.5;
+      var ct = 1 + t * t * 0.2;
+      var sat = 1 + t * t * 0.4;
+      var glowSize = t * t * 35;
+      var glowAlpha = Math.min(t * t * 1.3, 0.9);
+      burstCard.style.filter = 'brightness(' + bv.toFixed(2) + ') contrast(' + ct.toFixed(2) + ') saturate(' + sat.toFixed(2) + ') drop-shadow(0 0 ' + glowSize.toFixed(0) + 'px rgba(255,255,255,' + glowAlpha.toFixed(2) + '))';
+
+      // Spotlight + beams at 50%, particles at 50%, purple at 65%
+      if (t >= 0.5 && !spotShown) {
+        spotShown = true;
+        document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '1'; });
+        document.querySelectorAll('.burst-beam').forEach(function(el) { el.style.opacity = '1'; });
+        startBurstParticles(particles, burstCard);
+      }
+      if (t >= 0.65) {
+        burstCard.classList.add('purple-shadow');
+      }
+
+      if (t < 1) {
+        burstRafId = requestAnimationFrame(tick);
+      } else {
+        // Animation complete — call finishBurstOverlay from here, no race condition
+        burstRafId = null;
+        finished = true;
+        finishBurstOverlay();
+      }
+    }
+
+    burstRafId = requestAnimationFrame(tick);
+  }, 300);
+}
+
+function finishBurstOverlay() {
+  if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
+  if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
+  if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+  if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
+
+  var burstCard = document.getElementById('burstCard');
+  var rain = document.getElementById('burstRain');
+  var particles = document.getElementById('burstParticles');
+
+  // Fade out lights
+  document.querySelectorAll('.burst-spotlight, .burst-spot-glow').forEach(function(el) { el.style.opacity = '0'; });
+  document.querySelectorAll('.burst-beam').forEach(function(el) { el.style.opacity = '0'; });
+
+  // Force-stop CSS animation before removing classes (prevents infinite-animation stuck bug)
+  burstCard.classList.add('anim-stop');
+  void burstCard.offsetWidth; // force reflow to apply anim-stop
+  burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'purple-shadow', 'anim-stop');
+  rain.innerHTML = '';
+  particles.innerHTML = '';
+
+  // Keep burst overlay visible during transition to result
+  try { executeEnhance(); }
+  catch(e) {
+    console.error('Enhance error:', e);
+    burstCard.style.filter = '';
+    document.getElementById('burstOverlay').classList.remove('show');
+    if (isEnhancing) { hideAllOverlays(); resetEnhanceBtn(); }
+  }
+}
+
+function skipBurst() {
+  if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
+  if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
+  if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
+  if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
+  finishBurstOverlay();
+}
+
+function startRain(container, count) {
+  for (var i = 0; i < count; i++) {
+    var drop = document.createElement('div');
+    drop.className = 'rain-particle';
+    var h = 30 + Math.random() * 50;
+    drop.style.height = h + 'px';
+    drop.style.left = Math.random() * 100 + '%';
+    drop.style.top = '-' + h + 'px';
+    drop.style.opacity = (0.3 + Math.random() * 0.5);
+    drop.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+    drop.style.animationDelay = Math.random() * 0.4 + 's';
+    container.appendChild(drop);
+    setTimeout(function() { drop.remove(); }, 2500);
+  }
+}
+
+function startBurstParticles(container, cardEl) {
+  var rect = cardEl.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top + rect.height / 2;
+  var count = 40;
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'burst-particle';
+    var size = 2 + Math.random() * 6;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    var angle = Math.random() * Math.PI * 2;
+    var dist = 30 + Math.random() * 140;
+    p.style.setProperty('--bx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--by', Math.sin(angle) * dist + 'px');
+    p.style.animationDuration = (0.5 + Math.random() * 0.8) + 's';
+    p.style.animationDelay = (Math.random() * 0.3) + 's';
+    container.appendChild(p);
+    setTimeout(function() { p.remove(); }, 1500);
+  }
+}
+
+function startSmoke(container, cardEl) {
+  var rect = cardEl.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top + rect.height / 2;
+  var count = 18;
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'smoke-particle';
+    var size = 10 + Math.random() * 30;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = cx + 'px';
+    p.style.top = cy + 'px';
+    p.style.setProperty('--sx', (Math.random() - 0.5) * 120 + 'px');
+    p.style.setProperty('--sy', -(40 + Math.random() * 100) + 'px');
+    p.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
+    p.style.animationDelay = (Math.random() * 0.5) + 's';
+    container.appendChild(p);
+    setTimeout(function() { p.remove(); }, 2000);
+  }
+}
+
+// ============================================================
+//  Result Display
+// ============================================================
+function showBurstSuccess(level, oldOvr, newOvr) {
+  var resultOverlay = document.getElementById('resultOverlay');
+  var resultCardImg = document.getElementById('resultCardImg');
+  var title = document.getElementById('resultTitle');
+  var subtitle = document.getElementById('resultSubtitle');
+  var stats = document.getElementById('resultStats');
+  var textWrap = document.getElementById('resultTextWrap');
+
+  resultOverlay.className = 'result-overlay success';
+  resultCardImg.src = getCardImgUrl();
+  stats.classList.remove('fade-in');
+  textWrap.classList.remove('expand');
+
+  title.textContent = '强化成功！';
+  subtitle.textContent = '球员提升至 +' + level;
+
+  var ovrGain = newOvr - oldOvr;
+  stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化等级</span><span class="rs-value">+' + level + '</span></div>' +
+    '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + newOvr + ' (+' + ovrGain + ')</span></div>' +
+    '<div class="rs-row"><span class="rs-label">累计成功</span><span class="rs-value">' + totalSuccess + ' / ' + totalAttempts + ' 次</span></div>';
+
+  resultOverlay.classList.add('show');
+  // Hide burst overlay after result card starts rising
+  setTimeout(function() {
+    document.getElementById('burstOverlay').classList.remove('show');
+    document.getElementById('burstCard').style.filter = '';
+  }, 400);
+  setTimeout(function() { textWrap.classList.add('expand'); }, 800);
+  setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
+
+  if (autoMode) {
+    if (autoCloseTimer) clearTimeout(autoCloseTimer);
+    autoCloseTimer = setTimeout(function() {
+      autoCloseTimer = null;
+      document.getElementById('resultConfirmBtn').click();
+    }, 1800);
+  }
+}
+
+function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
+  var resultOverlay = document.getElementById('resultOverlay');
+  var resultCardImg = document.getElementById('resultCardImg');
+  var title = document.getElementById('resultTitle');
+  var subtitle = document.getElementById('resultSubtitle');
+  var stats = document.getElementById('resultStats');
+  var textWrap = document.getElementById('resultTextWrap');
+  var shatter = document.getElementById('shatterEffect');
+  var burstCard = document.getElementById('burstCard');
+  var particles = document.getElementById('burstParticles');
+
+  resultOverlay.className = 'result-overlay fail';
+  resultCardImg.src = getCardImgUrl();
+  stats.classList.remove('fade-in');
+  textWrap.classList.remove('expand');
+
+  // Shatter + smoke on burst card
+  shatter.style.display = 'none';
+  shatter.classList.remove('animate');
+  void shatter.offsetWidth;
+  shatter.style.display = 'block';
+  shatter.classList.add('animate');
+
+  startSmoke(particles, burstCard);
+
+  // After shatter (800ms), show result
+  setTimeout(function() {
+    document.getElementById('burstOverlay').classList.remove('show');
+    burstCard.style.filter = '';
+    burstCard.classList.add('anim-stop');
+    void burstCard.offsetWidth;
+    burstCard.classList.remove('shake-s1', 'shake-s2', 'shake-s3', 'shake-s4', 'anim-stop');
+    shatter.classList.remove('animate');
+    shatter.style.display = 'none';
+
+    resultOverlay.classList.add('show');
+
+    var dropOvr = baseOvr + data(dropTo).bonus;
+    var lostLevels = oldLevel - dropTo;
+
+    if (dropTo === oldLevel) {
+      title.textContent = '强化保护生效！';
+      subtitle.textContent = '强化失败，但等级保持不变';
+      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+        '<div class="rs-row"><span class="rs-label">保护效果</span><span class="rs-value" style="color:#f0b90b;">保持 +' + oldLevel + '</span></div>' +
+        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' (不变)</span></div>';
+    } else {
+      title.textContent = '强化失败';
+      subtitle.textContent = '球员降至 +' + dropTo + '，掉了 ' + lostLevels + ' 级';
+      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value" style="color:#e74c3c;">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
+        '<div class="rs-row"><span class="rs-label">降至</span><span class="rs-value" style="color:#e74c3c;">+' + dropTo + ' (掉' + lostLevels + '级)</span></div>' +
+        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
+    }
+
+    setTimeout(function() { textWrap.classList.add('expand'); }, 800);
+    setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
+
+    if (autoMode) {
+      if (autoCloseTimer) clearTimeout(autoCloseTimer);
+      autoCloseTimer = setTimeout(function() {
+        autoCloseTimer = null;
+        document.getElementById('resultConfirmBtn').click();
+      }, 1800);
+    }
+  }, 800);
+}
+
+function closeResult(isConfirm) {
+  if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
+  hideAllOverlays();
+  resetEnhanceBtn();
+  if (autoMode) {
+    if (autoTimer) clearTimeout(autoTimer);
+    autoTimer = setTimeout(function() { doAutoStep(); }, 800);
+  }
+}
+
+function hideAllOverlays() {
+  document.getElementById('burstOverlay').classList.remove('show');
+  document.getElementById('resultOverlay').classList.remove('show');
+}
+
+function resetEnhanceBtn() {
+  isEnhancing = false;
+  var btn = document.getElementById('btnEnhance');
+  btn.disabled = false;
+  btn.textContent = '强 化';
+  btn.classList.remove('charging');
+}
+
+function closeModal() { closeResult(true); }
+function showModal() {}
+
+// ============================================================
+//  Rate help tooltip
+// ============================================================
+let rateTooltipEl = null;
+
+function ensureTooltip() {
+  if (!rateTooltipEl) {
+    rateTooltipEl = document.createElement('div');
+    rateTooltipEl.className = 'rate-tooltip';
+    document.body.appendChild(rateTooltipEl);
+  }
+  return rateTooltipEl;
+}
+
+function toggleRateHelp(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const icon = document.getElementById('rateHelpIcon');
+  const tip = ensureTooltip();
+  const isShowing = tip.classList.contains('show');
+
+  // Close all rate tooltips first
+  tip.classList.remove('show');
+
+  if (!isShowing) {
+    tip.textContent = icon.getAttribute('title');
+    const rect = icon.getBoundingClientRect();
+    tip.style.position = 'fixed';
+    tip.style.bottom = 'auto';
+    tip.style.right = 'auto';
+    tip.style.top = (rect.top - 10) + 'px';
+    tip.style.left = Math.max(10, rect.right - 300) + 'px';
+    tip.classList.add('show');
+    setTimeout(() => {
+      const closeHandler = function(ev) {
+        if (!tip.contains(ev.target) && ev.target !== icon) {
+          tip.classList.remove('show');
+          document.removeEventListener('click', closeHandler);
+          document.removeEventListener('touchstart', closeHandler);
+        }
+      };
+      document.addEventListener('click', closeHandler);
+      document.addEventListener('touchstart', closeHandler);
+    }, 10);
+  }
+}
+
+// ============================================================
+//  Success stat tooltip — scrollable list, all records
+// ============================================================
+let successTipEl = null;
+
+function toggleSuccessTip(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const box = document.getElementById('statSuccessBox');
+  const successes = history.filter(h => h.result === 'success');
+  if (successes.length === 0) return;
+
+  if (!successTipEl) {
+    successTipEl = document.createElement('div');
+    successTipEl.className = 'success-tooltip';
+    document.body.appendChild(successTipEl);
+  }
+
+  const isShowing = successTipEl.classList.contains('show');
+  successTipEl.classList.remove('show');
+
+  if (!isShowing) {
+    let html = '<div class="st-list">';
+    successes.forEach(s => {
+      html += `<div class="st-item">${s.desc}</div>`;
+    });
+    html += '</div>';
+    successTipEl.innerHTML = html;
+    const rect = box.getBoundingClientRect();
+    successTipEl.style.top = Math.max(10, rect.top - 10) + 'px';
+    successTipEl.style.left = Math.max(10, rect.right - 220) + 'px';
+    successTipEl.classList.add('show');
+    setTimeout(() => {
+      const closeHandler = function(ev) {
+        if (!successTipEl.contains(ev.target) && ev.target !== box) {
+          successTipEl.classList.remove('show');
+          document.removeEventListener('click', closeHandler);
+          document.removeEventListener('touchstart', closeHandler);
+        }
+      };
+      document.addEventListener('click', closeHandler);
+      document.addEventListener('touchstart', closeHandler);
+    }, 10);
+  }
+}
+
+// ============================================================
+//  Particles
+// ============================================================
+function spawnParticles(type) {
+  const layer = document.getElementById('particleLayer');
+  const card = document.getElementById('playerCard');
+  const rect = card.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const isMobile = window.innerWidth < 480;
+  const count = type === 'success' ? (isMobile ? 14 : 28) : (isMobile ? 6 : 12);
+  const icons = type === 'success'
+    ? ['⭐','✨','🔥','💪','⚡','🏆','💎']
+    : ['❌','😢','💨'];
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'pt';
+    el.textContent = icons[Math.floor(Math.random() * icons.length)];
+    el.style.left = cx + 'px';
+    el.style.top = cy + 'px';
+    const a = Math.random() * Math.PI * 2;
+    const d = 50 + Math.random() * 140;
+    el.style.setProperty('--dx', Math.cos(a) * d + 'px');
+    el.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    el.style.animationDuration = (0.3 + Math.random() * 0.5) + 's';
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
+}
+
+// ============================================================
+//  Settings
+// ============================================================
+
+// Sync the player select dropdown with current player
+function syncPlayerSelect() {
+  const sel = document.getElementById('inpPlayerSelect');
+  const match = PLAYER_DB.find(p => p.name === playerName);
+  if (match) {
+    sel.value = match.name;
+  } else {
+    sel.value = '';
+  }
+}
+
+function openSettings() {
+  document.getElementById('settingsOverlay').classList.add('show');
+}
+
+function closeSettings(e) {
+  if (e && e.target !== document.getElementById('settingsOverlay')) return;
+  document.getElementById('settingsOverlay').classList.remove('show');
+}
+
+function closeSettingsDirect() {
+  document.getElementById('settingsOverlay').classList.remove('show');
+}
+
+function applySettings() {
+  const name = document.getElementById('inpName').value.trim() || 'Unknown Player';
+  const season = document.getElementById('inpSeason').value;
+  const pos = document.getElementById('inpPos').value.trim() || 'ST';
+  const ovr = parseInt(document.getElementById('inpOvr').value) || 89;
+  const lv = parseInt(document.getElementById('inpLevel').value) || 0;
+
+  playerName = name;
+  playerSeason = season;
+  playerPos = pos;
+  baseOvr = Math.max(40, Math.min(150, ovr));
+  currentLevel = Math.max(1, Math.min(13, lv));
+
+  // Reset stats when changing player
+  totalAttempts = 0;
+  totalSuccess = 0;
+  history = [];
+  if (autoMode) stopAuto();
+
+  // Update form fields
+  document.getElementById('inpName').value = playerName;
+  document.getElementById('inpSeason').value = playerSeason;
+  document.getElementById('inpPos').value = playerPos;
+  document.getElementById('inpOvr').value = baseOvr;
+  document.getElementById('inpLevel').value = currentLevel;
+  document.getElementById('inpStopLevel').value = stopLevel;
+  document.getElementById('inpMaterialOvr').value = baseOvr;
+  clearMaterials();
+  // Sync player select dropdown
+  syncPlayerSelect();
+
+  // Close settings modal
+  closeSettingsDirect();
+
+  refreshAll();
+}
+
+// ============================================================
+//  Stop Level Select
+// ============================================================
+document.getElementById('inpStopLevel').addEventListener('change', function() {
+  stopLevel = parseInt(this.value) || 13;
+  document.getElementById('stopLevelDisplay').textContent = '+' + stopLevel;
+});
+
+//  Keyboard
+// ============================================================
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!isEnhancing && canEnhance()) startEnhance();
+  }
+  if (e.code === 'KeyA') {
+    e.preventDefault();
+    toggleAuto();
+  }
+});
+
+populatePlayerSelect();
+// ============================================================
+//  Init
+// ============================================================
+refreshAll();
+
+</script>
+</body>
+</html>
