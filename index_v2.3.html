@@ -1040,7 +1040,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
       </div>
       <div class="info-row-item">
         <span class="info-label">强化等级</span>
-        <img class="info-enhance-icon" id="infoEnhanceIcon" src="images/enhance/+1.png" alt="+1">
+        <img class="info-enhance-icon" id="infoEnhanceIcon" src="images/enhance/1.png" alt="+1">
       </div>
       <div class="info-row-item">
         <span class="info-label">位置</span>
@@ -1870,7 +1870,7 @@ function refreshAll() {
   // Player card
   document.getElementById('playerOvr').textContent = ovr;
   const enhanceIcon = document.getElementById('infoEnhanceIcon');
-  enhanceIcon.src = `images/enhance/+${currentLevel}.png`;
+  enhanceIcon.src = `images/enhance/${currentLevel}.png`;
   enhanceIcon.alt = '+' + currentLevel;
   document.getElementById('playerName').textContent = playerName;
   document.getElementById('playerMeta').textContent = playerPos;

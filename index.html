@@ -187,39 +187,77 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 .progress-section { margin-bottom: 6px; }
 .progress-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 4px; font-size: 11px;
+  margin-bottom: 8px; font-size: 11px;
 }
-.progress-title { color: var(--text2); font-weight: 600; }
-.progress-rate { color: var(--text3); }
-.progress-rate strong { color: #fff; }
-.progress-bar {
-  display: flex; align-items: center; gap: 2px; overflow: hidden;
-}
-.progress-step {
-  width: 26px; height: 26px; min-width: 16px;
-  border-radius: 5px;
-  background: rgba(20,30,50,0.5);
-  border: 1px solid rgba(255,255,255,0.08);
+.progress-title { color: #9aa3b5; font-weight: 500; letter-spacing: 0.04em; }
+.progress-rate { color: #6b7590; }
+.progress-rate strong { color: #e2e6ec; }
+
+.ptrack { display: flex; gap: 2px; align-items: center; }
+.pnode {
+  position: relative; flex: 1; min-width: 16px; height: 26px; border-radius: 5px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; color: #5a6070;
-  transition: all 0.35s; flex-shrink: 1;
+  font-size: 8px; font-weight: 500; border: 1px solid transparent;
+  transition: all 0.18s ease; overflow: hidden; flex-shrink: 1;
 }
-.progress-step.reached {
-  background: rgba(0,200,83,0.15); border-color: rgba(0,200,83,0.3);
-  color: #6aaa70;
+.pnode span { position: relative; z-index: 2; }
+.pnode .ndot {
+  width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: 0.7;
+  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 2;
 }
-.progress-step.current {
-  background: linear-gradient(135deg,#6a3808,#4a2804);
-  border-color: #f0b90b; color: #fff;
-  box-shadow: 0 0 10px rgba(240,185,11,0.35);
-  animation: stepPulse 0.6s ease-in-out infinite;
-  transform: scale(1.1); z-index: 1;
+.pconn { width: 2px; height: 1.5px; background: #2a3048; flex-shrink: 0; }
+.pconn.pass { background: #2e4838; }
+
+.ppips { display: flex; gap: 2px; margin-top: 5px; }
+.ppip { flex: 1; min-width: 16px; height: 2px; border-radius: 1px; background: #1e2435; flex-shrink: 1; }
+.ppip.pass { background: #2e5238; }
+.ppip.cur { background: #4a9060; }
+
+/* Tier: Gray (+1) */
+.pt-gray { background: #2a3040; border-color: #3d4558; color: #9ca3af; }
+.pt-gray.prev { background: #1f2432; border-color: #374151; color: #6b7280; }
+.pt-gray.active { background: #3b4458; border-color: #5b6880; color: #e2e6ec; box-shadow: 0 0 0 2px rgba(180,190,210,0.15); }
+
+/* Tier: Brown (+2~+4) */
+.pt-brown { background: #8a6048; border-color: #b88468; color: #4a2a18; }
+.pt-brown.prev { background: #6a4030; border-color: #9a6850; color: #2a1508; }
+.pt-brown.active { background: #d99a6c; border-color: #e8b088; color: #1f1008; box-shadow: 0 0 0 2px rgba(217,154,108,0.25); }
+
+/* Tier: Silver (+5~+7) */
+.pt-silver { background: #99a0a8; border-color: #b8bec4; color: #3a4048; }
+.pt-silver.prev { background: #707880; border-color: #9098a0; color: #252830; }
+.pt-silver.active { background: #eef0f2; border-color: #d8dce0; color: #15181d; box-shadow: 0 0 0 2px rgba(200,208,216,0.3); }
+
+/* Tier: Gold (+8~+10) */
+.pt-gold { background: #c8a020; border-color: #e0c840; color: #3a2800; }
+.pt-gold.prev { background: #a08010; border-color: #c8b030; color: #2a1800; }
+.pt-gold.active { background: #f9d342; border-color: #ffe880; color: #1a1000; box-shadow: 0 0 0 2px rgba(249,211,66,0.35); }
+
+/* Tier: Rainbow (+11~+13) */
+.pt-color { background: #18103a; border-color: #302868; color: #fff; }
+.pt-color::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; border-radius: 4px;
+  background: linear-gradient(90deg,
+    #ff3a3a 0%, #ff5a3a 6%, #ff8840 12%, #ffb830 20%,
+    #ffdd28 28%, #fff280 36%, #ffffee 44%, #f2e4f8 52%,
+    #d8ecff 60%, #a6f0ff 68%, #5ee6ff 76%, #2ec4ff 84%,
+    #3b90ee 92%, #3568cc 100%
+  );
+  opacity: 0.75;
 }
-@keyframes stepPulse {
-  0%,100% { box-shadow: 0 0 10px rgba(240,185,11,0.35); }
-  50% { box-shadow: 0 0 18px rgba(240,185,11,0.55); }
+.pt-color::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; border-radius: 4px;
+  background: radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(0,0,0,0.3) 100%);
 }
-.progress-arrow { font-size: 10px; color: rgba(255,255,255,0.1); flex-shrink: 0; margin: 0 1px; }
+.pt-color.prev::before { opacity: 0.3; }
+.pt-color.prev::after { background: radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(0,0,0,0.5) 100%); }
+.pt-color.active {
+  border-color: rgba(200,180,255,0.6); color: #0a0500;
+  box-shadow: 0 0 6px rgba(255,130,80,0.3), 0 0 10px rgba(100,200,255,0.3);
+}
+.pt-color.active::before { opacity: 1; }
+.pt-color.active::after { background: radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(0,0,0,0.18) 100%); }
+.pt-color.active span { text-shadow: 0 0 4px rgba(255,255,255,0.5); }
 /* ===== Info Chips ===== */
 .info-row { display: flex; gap: 6px; margin-bottom: 6px; }
 .info-chip { flex: 1; text-align: center; padding: 6px 4px; }
@@ -854,9 +892,9 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   .info-value.stars { font-size: 13px; letter-spacing: 1px; }
   #playerOvr { font-size: 30px; }
 
-  .progress-bar { gap: 0; }
-  .progress-step { width: 16px; height: 16px; min-width: 12px; font-size: 6px; border-radius: 3px; }
-  .progress-arrow { font-size: 6px; flex-shrink: 1; margin: 0; }
+  .ptrack { gap: 1px; }
+  .pnode { height: 20px; min-width: 11px; font-size: 6px; border-radius: 3px; }
+  .ppips { gap: 1px; margin-top: 4px; }
 
   .info-row { gap: 3px; }
   .info-chip { padding: 4px 2px; }
@@ -1040,7 +1078,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
       </div>
       <div class="info-row-item">
         <span class="info-label">强化等级</span>
-        <img class="info-enhance-icon" id="infoEnhanceIcon" src="images/enhance/+1.png" alt="+1">
+        <img class="info-enhance-icon" id="infoEnhanceIcon" src="images/enhance/1.png" alt="+1">
       </div>
       <div class="info-row-item">
         <span class="info-label">位置</span>
@@ -1069,7 +1107,8 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
       <span class="progress-title">强化进度</span>
       <span class="progress-rate" id="rateInfo">点击强化按钮开始</span>
     </div>
-    <div class="progress-bar" id="progressBar"></div>
+    <div class="ptrack" id="progressTrack"></div>
+    <div class="ppips" id="progressPips"></div>
   </div>
 
   <!-- Info Chips -->
@@ -1238,7 +1277,13 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
     </div>
     <div class="mat-input-row">
       <span style="font-size:10px;color:var(--text3);flex-shrink:0;">添加材料 OVR</span>
-      <input type="number" id="inpMaterialOvr" value="122" min="40" max="150">
+      <div class="hex-input-row" style="display:inline-flex;width:auto;flex-shrink:0;">
+        <input type="number" id="inpMaterialOvr" value="122" min="40" max="150">
+        <div class="hex-arrows" style="position:static;margin-right:0;margin-left:2px;">
+          <button onclick="stepMaterialOvr(1)">▲</button>
+          <button onclick="stepMaterialOvr(-1)">▼</button>
+        </div>
+      </div>
       <button class="mat-btn" onclick="addMaterial()">添加</button>
       <button class="mat-btn" onclick="clearMaterials()">清空</button>
       <span style="font-size:10px;color:var(--text3);flex:1;text-align:right;" id="materialCount">已填 0/5</span>
@@ -1668,6 +1713,13 @@ let materialCards = []; // {ovr: number}
 //  Material Card — 六边形卡槽
 // ============================================================
 
+function stepMaterialOvr(delta) {
+  const inp = document.getElementById('inpMaterialOvr');
+  let val = (parseInt(inp.value) || baseOvr) + delta;
+  val = Math.max(40, Math.min(150, val));
+  inp.value = val;
+}
+
 function addMaterial() {
   let idx = -1;
   for (let i = 0; i < 5; i++) {
@@ -1786,8 +1838,8 @@ function updateHexSlots() {
   }
   var enhBtn = document.getElementById('btnEnhance');
   if (enhBtn) {
-    if (count === 0) { enhBtn.style.background = '#444'; enhBtn.style.color = '#888'; enhBtn.style.boxShadow = 'none'; }
-    else { enhBtn.style.background = ''; enhBtn.style.color = ''; enhBtn.style.boxShadow = ''; }
+    if (count === 0) { enhBtn.style.background = '#444'; enhBtn.style.color = '#888'; enhBtn.style.boxShadow = 'none'; enhBtn.disabled = true; }
+    else { enhBtn.style.background = ''; enhBtn.style.color = ''; enhBtn.style.boxShadow = ''; enhBtn.disabled = false; }
   }
 }
 
@@ -1870,7 +1922,7 @@ function refreshAll() {
   // Player card
   document.getElementById('playerOvr').textContent = ovr;
   const enhanceIcon = document.getElementById('infoEnhanceIcon');
-  enhanceIcon.src = `images/enhance/+${currentLevel}.png`;
+  enhanceIcon.src = `images/enhance/${currentLevel}.png`;
   enhanceIcon.alt = '+' + currentLevel;
   document.getElementById('playerName').textContent = playerName;
   document.getElementById('playerMeta').textContent = playerPos;
@@ -1970,17 +2022,45 @@ function refreshAll() {
 }
 
 function renderProgress() {
-  const bar = document.getElementById('progressBar');
-  if (!bar) return;
-  let html = '';
-  for (let i = 0; i <= 13; i++) {
-    if (i > 0) html += '<span class="progress-arrow">›</span>';
-    let cls = 'progress-step';
-    if (i < currentLevel) cls += ' reached';
-    if (i === currentLevel) cls += ' current';
-    html += `<div class="${cls}" title="+${i}: OVR ${baseOvr + data(i).bonus}">+${i}</div>`;
+  const track = document.getElementById('progressTrack');
+  const pips = document.getElementById('progressPips');
+  if (!track || !pips) return;
+
+  function tier(lv) {
+    if (lv <= 1) return 'pt-gray';
+    if (lv <= 4) return 'pt-brown';
+    if (lv <= 7) return 'pt-silver';
+    if (lv <= 10) return 'pt-gold';
+    return 'pt-color';
   }
-  bar.innerHTML = html;
+  var pipColors = { 'pt-gray': '#5b6880', 'pt-brown': '#d99a6c', 'pt-silver': '#d8dce0', 'pt-gold': '#f9d342', 'pt-color': '#5ee6ff' };
+
+  var trackHtml = '', pipsHtml = '';
+  for (var i = 1; i <= 13; i++) {
+    if (i > 1) {
+      trackHtml += '<div class="pconn' + (i <= currentLevel ? ' pass' : '') + '"></div>';
+    }
+    var t = tier(i);
+    var cls = 'pnode ' + t;
+    if (i < currentLevel) cls += ' prev';
+    else if (i === currentLevel) cls += ' active';
+
+    trackHtml += '<div class="' + cls + '" title="+' + i + ': OVR ' + (baseOvr + data(i).bonus) + '">';
+    trackHtml += '<span>+' + i + '</span>';
+    if (i === currentLevel) trackHtml += '<div class="ndot"></div>';
+    trackHtml += '</div>';
+
+    var pipCls = 'ppip';
+    if (i < currentLevel) pipCls += ' pass';
+    else if (i === currentLevel) { pipCls += ' cur'; }
+    if (i === currentLevel) {
+      pipsHtml += '<div class="' + pipCls + '" style="background:' + pipColors[t] + '"></div>';
+    } else {
+      pipsHtml += '<div class="' + pipCls + '"></div>';
+    }
+  }
+  track.innerHTML = trackHtml;
+  pips.innerHTML = pipsHtml;
 }
 
 function renderHistory() {
