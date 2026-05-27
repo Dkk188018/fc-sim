@@ -1009,7 +1009,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 <div class="app">
   <!-- Header -->
   <div class="header">
-    <h1>FC Online 4 强化模拟器 <span style="font-size:9px;color:#ff6d00;vertical-align:super;">v2.7</span></h1>
+    <h1>FC Online 4 强化模拟器 <span style="font-size:9px;color:#ff6d00;vertical-align:super;">v2.6</span></h1>
   </div>
 
   <!-- Settings Trigger -->
@@ -1656,56 +1656,21 @@ const PLAYER_SKILL = {
   'A.卢克曼':4,'P.伯格':2,'阿利松':1,'杰拉德·马丁':2,'J.斯坦尼希奇':2,'于帕梅卡诺':2
 };
 
-// Shared player cards from card generator (IndexedDB)
-var sharedPlayerCards = null; // [{name, ovr, position, ...}]
-
-function loadSharedPlayers() {
-  return new Promise(function(resolve) {
-    var req = indexedDB.open('fc-shared-data', 1);
-    req.onupgradeneeded = function(e) {
-      var db = e.target.result;
-      if (!db.objectStoreNames.contains('playerCards')) {
-        db.createObjectStore('playerCards', {keyPath: 'name'});
-      }
-    };
-    req.onsuccess = function(e) {
-      var db = e.target.result;
-      if (!db.objectStoreNames.contains('playerCards')) { db.close(); resolve([]); return; }
-      var tx = db.transaction('playerCards', 'readonly');
-      var store = tx.objectStore('playerCards');
-      var getAll = store.getAll();
-      getAll.onsuccess = function() { db.close(); resolve(getAll.result || []); };
-      getAll.onerror = function() { db.close(); resolve([]); };
-    };
-    req.onerror = function() { resolve([]); };
-  });
-}
-
-function hasCardImage(playerName) {
-  // Only check IndexedDB shared cards (from card generator export)
-  if (sharedPlayerCards) {
-    for (var i = 0; i < sharedPlayerCards.length; i++) {
-      if (sharedPlayerCards[i].name === playerName) return true;
-    }
-  }
-  return false;
-}
-
 function populatePlayerSelect() {
-  var sel = document.getElementById('inpPlayerSelect');
+  const sel = document.getElementById('inpPlayerSelect');
+  // Keep the first "custom" option
   sel.innerHTML = '<option value="">— 自定义球员 —</option>';
   // Group by position
-  var positions = [...new Set(PLAYER_DB.map(function(p) { return p.position; }))];
+  const positions = [...new Set(PLAYER_DB.map(p => p.position))];
   positions.sort();
-  positions.forEach(function(pos) {
-    var group = document.createElement('optgroup');
+  positions.forEach(pos => {
+    const group = document.createElement('optgroup');
     group.label = pos;
-    var players = PLAYER_DB.filter(function(p) { return p.position === pos; });
-    players.forEach(function(p) {
-      var opt = document.createElement('option');
+    const players = PLAYER_DB.filter(p => p.position === pos);
+    players.forEach(p => {
+      const opt = document.createElement('option');
       opt.value = p.name;
-      var dot = hasCardImage(p.name) ? '🟢 ' : '';
-      opt.textContent = dot + p.name + ' · OVR ' + p.ovr;
+      opt.textContent = p.name + ' · OVR ' + p.ovr;
       opt.dataset.position = p.position;
       opt.dataset.ovr = p.ovr;
       opt.dataset.enhance = p.enhance;
@@ -2896,15 +2861,12 @@ document.addEventListener('keydown', e => {
   }
 });
 
+populatePlayerSelect();
 // ============================================================
-//  Init — load shared card data first, then populate
+//  Init
 // ============================================================
-loadSharedPlayers().then(function(players) {
-  sharedPlayerCards = players;
-  populatePlayerSelect();
-  refreshAll();
-  updateHexSlots();
-});
+refreshAll();
+updateHexSlots();
 
 </script>
 </body>
