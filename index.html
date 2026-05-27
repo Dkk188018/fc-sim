@@ -1705,7 +1705,6 @@ function loadCardManifest() {
 function hasCardImage(playerName) {
   // 1. Check card manifest (deployed card images, available on all devices)
   if (window.__cardManifest && window.__cardManifest.players && window.__cardManifest.players[playerName]) {
-  if (window.__cardManifest && window.__cardManifest.players && window.__cardManifest.players[playerName]) {
     return true;
   }
   // 2. Check IndexedDB shared cards (from card generator export, local browser only)
@@ -2001,7 +2000,7 @@ function refreshAll() {
     seasonIcon.style.display = 'none';
   }
 
-  // Avatar — IndexedDB first, then card manifest (server per-level), then legacy fallbacks
+  // Avatar — IndexedDB first, then legacy fallbacks, then card manifest
   const avatar = document.getElementById('playerAvatar');
   avatar.classList.remove('elite','legend','ultimate','has-img');
   let imgUrl = null;
@@ -2010,22 +2009,22 @@ function refreshAll() {
     var sharedLv = sharedPlayerCards.levels.find(function(l) { return l.lv === currentLevel; });
     if (sharedLv && sharedLv.dataUrl) imgUrl = sharedLv.dataUrl;
   }
-  // 2. Check card manifest (server-deployed per-level PNGs, available on all devices)
+  // 2. Legacy per-level images (always on server)
+  if (!imgUrl && playerName === '姆巴佩') {
+    imgUrl = `images/mbappe/mbappe_${currentLevel}.png`;
+  } else if (!imgUrl && playerName === '哈里·凯恩') {
+    imgUrl = `images/players/kane/Lv${currentLevel}.png`;
+  }
+  // 3. Card manifest (server per-level PNGs, works after images deployed)
   if (!imgUrl && window.__cardManifest && window.__cardManifest.players) {
     var manEntry = window.__cardManifest.players[playerName];
     if (manEntry && manEntry.source && manEntry.levels.indexOf(currentLevel) !== -1) {
       imgUrl = manEntry.source.replace('{level}', String(currentLevel));
     }
   }
-  // 3. Legacy fallbacks (in case manifest fails to load)
-  if (!imgUrl && playerName === '姆巴佩') {
-    imgUrl = `images/mbappe/mbappe_${currentLevel}.png`;
-  } else if (!imgUrl && playerName === '哈里·凯恩') {
-    imgUrl = `images/players/kane/Lv${currentLevel}.png`;
-  }
   if (imgUrl) {
     avatar.textContent = '';
-    avatar.innerHTML = `<img src="${imgUrl}" alt="${playerName}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+    avatar.innerHTML = `<img src="${imgUrl}" alt="${playerName}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="var av=document.getElementById('playerAvatar');av.innerHTML='';av.textContent='⚽';">`;
     avatar.classList.add('has-img');
   } else {
     avatar.innerHTML = '';
