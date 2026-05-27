@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>FC Online 4 - 球员强化模拟器</title>
+<title>FC Online 4 - 球员强化模拟器 v2.5</title>
 <style>
 :root {
   --gold: #f0b90b;
@@ -905,7 +905,6 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   .protect-row { font-size: 12px; gap: 4px; }
   .protect-slider-wrap { gap: 3px; }
   .protect-track-container { width: 90px; height: 16px; transform: none; }
-  .protect-handle { width: 14px; height: 14px; }
   .protect-arrow { font-size: 11px; padding: 0 2px; }
   .protect-pct { font-size: 16px; width: 38px; }
   .protect-divider { margin: 8px 0; }
@@ -1654,19 +1653,61 @@ const PLAYER_SKILL = {
   'A.卢克曼':4,'P.伯格':2,'阿利松':1,'杰拉德·马丁':2
 };
 
-function populatePlayerSelect() {
-  const sel = document.getElementById('inpPlayerSelect');
-  // Keep the first "custom" option
+var sharedPlayerCards = null; // {name, ovr, position, season, nationality, league, club, levels: [{lv, dataUrl}]}
+
+function loadSharedPlayers() {
+  return new Promise(function(resolve) {
+    var req = indexedDB.open('fc-shared-data', 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('playerCards')) {
+        db.createObjectStore('playerCards', {keyPath: 'name'});
+      }
+    };
+    req.onsuccess = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('playerCards')) { db.close(); resolve([]); return; }
+      var tx = db.transaction('playerCards', 'readonly');
+      var store = tx.objectStore('playerCards');
+      var getAll = store.getAll();
+      getAll.onsuccess = function() { db.close(); resolve(getAll.result || []); };
+      getAll.onerror = function() { db.close(); resolve([]); };
+    };
+    req.onerror = function() { resolve([]); };
+  });
+}
+
+function populatePlayerSelect(sharedPlayers) {
+  sharedPlayers = sharedPlayers || [];
+  var sel = document.getElementById('inpPlayerSelect');
   sel.innerHTML = '<option value="">— 自定义球员 —</option>';
-  // Group by position
-  const positions = [...new Set(PLAYER_DB.map(p => p.position))];
+
+  // Add shared-DB players first (from card generator)
+  if (sharedPlayers.length > 0) {
+    var sharedGroup = document.createElement('optgroup');
+    sharedGroup.label = '📦 已生成卡图的球员';
+    sharedPlayers.forEach(function(p) {
+      var opt = document.createElement('option');
+      opt.value = p.name;
+      opt.textContent = p.name + ' · OVR ' + p.ovr;
+      opt.dataset.position = p.position;
+      opt.dataset.ovr = p.ovr;
+      opt.dataset.enhance = '1';
+      opt.dataset.shared = '1';
+      sharedGroup.appendChild(opt);
+    });
+    sel.appendChild(sharedGroup);
+  }
+
+  // Group built-in DB by position
+  var positions = [...new Set(PLAYER_DB.map(p => p.position))];
   positions.sort();
-  positions.forEach(pos => {
-    const group = document.createElement('optgroup');
+  positions.forEach(function(pos) {
+    var group = document.createElement('optgroup');
     group.label = pos;
-    const players = PLAYER_DB.filter(p => p.position === pos);
-    players.forEach(p => {
-      const opt = document.createElement('option');
+    var players = PLAYER_DB.filter(function(p) { return p.position === pos; });
+    players.forEach(function(p) {
+      var opt = document.createElement('option');
       opt.value = p.name;
       opt.textContent = p.name + ' · OVR ' + p.ovr;
       opt.dataset.position = p.position;
@@ -1679,16 +1720,15 @@ function populatePlayerSelect() {
 }
 
 function onPlayerSelect() {
-  const sel = document.getElementById('inpPlayerSelect');
-  const name = sel.value;
-  if (!name) return; // "自定义" option
-  const opt = sel.selectedOptions[0];
+  var sel = document.getElementById('inpPlayerSelect');
+  var name = sel.value;
+  if (!name) return;
+  var opt = sel.selectedOptions[0];
   document.getElementById('inpName').value = name;
   document.getElementById('inpPos').value = opt.dataset.position;
   document.getElementById('inpOvr').value = opt.dataset.ovr;
   document.getElementById('inpLevel').value = opt.dataset.enhance;
   document.getElementById('inpSeason').value = '25ucl';
-  // Don't auto-apply — user must click 应用设置
 }
 
 // ============================================================
@@ -1938,11 +1978,18 @@ function refreshAll() {
     seasonIcon.style.display = 'none';
   }
 
-  // Avatar — Mbappe uses level-specific images, others use PLAYER_IMAGES
+  // Avatar — shared DB cards first, then Mbappe/Kane level images, then PLAYER_IMAGES
   const avatar = document.getElementById('playerAvatar');
   avatar.classList.remove('elite','legend','ultimate','has-img');
   let imgUrl = null;
-  if (playerName === '姆巴佩') {
+  // Check shared player cards from card generator
+  var sharedLv = null;
+  if (sharedPlayerCards && sharedPlayerCards.levels) {
+    sharedLv = sharedPlayerCards.levels.find(function(l) { return l.lv === currentLevel; });
+  }
+  if (sharedLv && sharedLv.dataUrl) {
+    imgUrl = sharedLv.dataUrl;
+  } else if (playerName === '姆巴佩') {
     imgUrl = `images/mbappe/mbappe_${currentLevel}.png`;
   } else if (playerName === '哈里·凯恩') {
     imgUrl = `images/players/kane/Lv${currentLevel}.png`;
@@ -2097,22 +2144,11 @@ function updateProtectUI(val) {
   document.getElementById('protectPctNum').textContent = val;
   var arrL = document.getElementById('protectArrL');
   var arrR = document.getElementById('protectArrR');
-  if (val === 0) {
-    arrL.style.color = '#666';
-    arrL.style.cursor = 'default';
-    arrR.style.color = '#ccc';
-    arrR.style.cursor = 'pointer';
-  } else if (val === 100) {
-    arrL.style.color = '#ccc';
-    arrL.style.cursor = 'pointer';
-    arrR.style.color = '#666';
-    arrR.style.cursor = 'default';
-  } else {
-    arrL.style.color = '#ccc';
-    arrL.style.cursor = 'pointer';
-    arrR.style.color = '#ccc';
-    arrR.style.cursor = 'pointer';
-  }
+  var active = '#aaa';
+  var inactive = '#555';
+  if (val === 0) { arrL.style.color = inactive; arrR.style.color = active; }
+  else if (val === 100) { arrL.style.color = active; arrR.style.color = inactive; }
+  else { arrL.style.color = active; arrR.style.color = active; }
 }
 
 function setProtectAnimated(on) {
@@ -2141,7 +2177,6 @@ function protectDragStart(e) {
 document.getElementById('protectArrL').onclick = function() {
   var wrap = document.getElementById('protectSliderWrap');
   if (wrap.classList.contains('disabled')) return;
-  if (protectCount <= 0) return;
   setProtectAnimated(true);
   updateProtectUI(protectCount - 1);
   requestAnimationFrame(function() { setProtectAnimated(false); });
@@ -2149,7 +2184,6 @@ document.getElementById('protectArrL').onclick = function() {
 document.getElementById('protectArrR').onclick = function() {
   var wrap = document.getElementById('protectSliderWrap');
   if (wrap.classList.contains('disabled')) return;
-  if (protectCount >= 100) return;
   setProtectAnimated(true);
   updateProtectUI(protectCount + 1);
   requestAnimationFrame(function() { setProtectAnimated(false); });
@@ -2778,10 +2812,12 @@ function spawnParticles(type) {
 
 // Sync the player select dropdown with current player
 function syncPlayerSelect() {
-  const sel = document.getElementById('inpPlayerSelect');
-  const match = PLAYER_DB.find(p => p.name === playerName);
+  var sel = document.getElementById('inpPlayerSelect');
+  var match = PLAYER_DB.find(function(p) { return p.name === playerName; });
   if (match) {
     sel.value = match.name;
+  } else if (allSharedPlayers && allSharedPlayers.find(function(p) { return p.name === playerName; })) {
+    sel.value = playerName;
   } else {
     sel.value = '';
   }
@@ -2801,17 +2837,24 @@ function closeSettingsDirect() {
 }
 
 function applySettings() {
-  const name = document.getElementById('inpName').value.trim() || 'Unknown Player';
-  const season = document.getElementById('inpSeason').value;
-  const pos = document.getElementById('inpPos').value.trim() || 'ST';
-  const ovr = parseInt(document.getElementById('inpOvr').value) || 89;
-  const lv = parseInt(document.getElementById('inpLevel').value) || 0;
+  var name = document.getElementById('inpName').value.trim() || 'Unknown Player';
+  var season = document.getElementById('inpSeason').value;
+  var pos = document.getElementById('inpPos').value.trim() || 'ST';
+  var ovr = parseInt(document.getElementById('inpOvr').value) || 89;
+  var lv = parseInt(document.getElementById('inpLevel').value) || 0;
 
   playerName = name;
   playerSeason = season;
   playerPos = pos;
   baseOvr = Math.max(40, Math.min(150, ovr));
   currentLevel = Math.max(1, Math.min(13, lv));
+
+  // Load shared player cards if available
+  sharedPlayerCards = null;
+  if (allSharedPlayers) {
+    var sp = allSharedPlayers.find(function(p) { return p.name === playerName; });
+    if (sp) sharedPlayerCards = sp;
+  }
 
   // Reset stats when changing player
   totalAttempts = 0;
@@ -2828,10 +2871,8 @@ function applySettings() {
   document.getElementById('inpStopLevel').value = stopLevel;
   document.getElementById('inpMaterialOvr').value = baseOvr;
   clearMaterials();
-  // Sync player select dropdown
   syncPlayerSelect();
 
-  // Close settings modal
   closeSettingsDirect();
 
   refreshAll();
@@ -2859,12 +2900,13 @@ document.addEventListener('keydown', e => {
   }
 });
 
-populatePlayerSelect();
-// ============================================================
-//  Init
-// ============================================================
-refreshAll();
-updateHexSlots();
+var allSharedPlayers = [];
+loadSharedPlayers().then(function(players) {
+  allSharedPlayers = players;
+  populatePlayerSelect(players);
+  refreshAll();
+  updateHexSlots();
+});
 
 </script>
 </body>

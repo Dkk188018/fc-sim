@@ -1,0 +1,2143 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FC球员卡批量生成器 v1.6</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0c0e14;color:#e8eaed;font-family:'Microsoft YaHei',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:20px;gap:12px;}
+h2{font-size:18px;letter-spacing:3px;color:#c9a84b;}
+.tip{font-size:11px;color:#555;text-align:center;max-width:520px;}
+.workspace{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+
+/* Card stage */
+.card-stage{background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;max-width:95vw;max-height:82vh;}
+#cardWrap{position:relative;display:inline-block;line-height:0;}
+#baseCardImg{display:block;max-width:min(1500px,90vw);height:auto;}
+
+/* ====== Shared place-box ====== */
+.place-box{
+  position:absolute;z-index:20;cursor:grab;user-select:none;
+  display:flex;align-items:center;justify-content:center;
+  /* border:2px dashed #aaa; */ /* BORDER-OFF confirm */
+  background:rgba(255,255,255,0.08);
+}
+.place-box:active{cursor:grabbing;}
+.place-box.dragging{z-index:30;}
+.place-box.ovr{
+  /* border-color:#4fc3f7; */ overflow:hidden; background:transparent; /* BORDER-OFF confirm */
+  /* box-shadow:0 0 10px rgba(79,195,247,0.3),inset 0 0 10px rgba(79,195,247,0.05); */
+}
+/* .place-box.ovr.dragging{border-color:#80deea;box-shadow:0 0 16px rgba(128,222,234,0.5);} */ /* BORDER-OFF confirm */
+.place-box.badge{
+  z-index:50; overflow:hidden;
+  /* border-color:#ff4444; */ /* BORDER-OFF confirm */
+  /* box-shadow:0 0 10px rgba(255,68,68,0.3),inset 0 0 10px rgba(255,68,68,0.05); */
+}
+/* .place-box.badge.dragging{border-color:#ff8800;box-shadow:0 0 16px rgba(255,136,0,0.5);} */ /* BORDER-OFF confirm */
+
+.box-label{
+  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  font-size:9px;white-space:nowrap;pointer-events:none;
+  background:rgba(0,0,0,0.9);padding:1px 5px;border-radius:3px;
+  font-family:'Microsoft YaHei',sans-serif;line-height:1.4;
+}
+.ovr .box-label{color:#4fc3f7;}
+.badge .box-label{color:#ff4444;}
+
+/* Resize handle */
+.rs-handle{
+  position:absolute;bottom:-8px;right:-8px;
+  width:20px;height:20px;
+  cursor:nwse-resize;z-index:35;border-radius:4px;
+  pointer-events:auto;border:2px solid #fff;
+}
+.ovr .rs-handle{background:#4fc3f7;box-shadow:0 0 8px rgba(79,195,247,0.7);}
+.badge .rs-handle{background:#ff4444;box-shadow:0 0 8px rgba(255,68,68,0.7);}
+
+/* Box content */
+.place-box img{width:100%;height:100%;object-fit:fill;display:block;}
+.ovr-text{
+  font-family:'Montserrat',sans-serif;font-weight:600;color:#fff;
+  text-shadow:0 2px 4px rgba(0,0,0,0.95);line-height:1;letter-spacing:0px;
+  transform:scaleX(0.9);display:inline-block;
+}
+
+/* Exporting */
+.place-box.exporting{border:none!important;box-shadow:none!important;}
+.place-box.exporting .box-label{display:none!important;}
+.place-box.exporting .rs-handle{display:none!important;}
+.place-box.badge.exporting{background:transparent!important;}
+
+/* ====== New element boxes ====== */
+.place-box.pos{ background:transparent; overflow:visible; }
+.place-box.hex{ background:transparent; overflow:visible; }
+.place-box.portrait{ overflow:hidden; background:rgba(128,0,255,0.12); }
+.place-box.name{ overflow:visible; background:transparent; justify-content:flex-start; align-items:flex-start; }
+.place-box.flag, .place-box.league, .place-box.club{ overflow:hidden; background:rgba(0,200,180,0.12); }
+/* Box label colors */
+.pos .box-label{color:#00e5ff;}
+.hex .box-label{color:#fff;}
+.portrait .box-label{color:#b388ff;}
+.name .box-label{color:#ff9800;}
+.flag .box-label, .league .box-label, .club .box-label{color:#64ffda;}
+/* Hexagon shape */
+.hex-shape{
+  width:100%; height:100%; position:relative; display:flex; align-items:center; justify-content:center;
+  background:transparent;
+}
+.hex-shape svg{ position:absolute; inset:0; width:100%; height:100%; }
+.hex-num{ position:relative; z-index:1; font-family:'Montserrat',sans-serif; font-weight:700; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.95); }
+/* Pos text */
+.pos-text{
+  font-family:'Montserrat',sans-serif; font-weight:700; color:#fff;
+  text-shadow:0 2px 4px rgba(0,0,0,0.95); line-height:1; letter-spacing:2px;
+  display:inline-block; text-transform:uppercase; white-space:nowrap;
+}
+/* Name text */
+.name-text{
+  font-family:'Microsoft YaHei',sans-serif; font-weight:700; color:#fff;
+  text-shadow:0 2px 6px rgba(0,0,0,0.95); line-height:1.2; text-align:left;
+  display:inline-block; white-space:nowrap;
+}
+/* Resize handle colors */
+.pos .rs-handle{background:#00e5ff;box-shadow:0 0 8px rgba(0,229,255,0.7);}
+.hex .rs-handle{background:#fff;box-shadow:0 0 8px rgba(255,255,255,0.7);}
+.portrait .rs-handle{background:#b388ff;box-shadow:0 0 8px rgba(179,136,255,0.7);}
+.name .rs-handle{background:#ff9800;box-shadow:0 0 8px rgba(255,152,0,0.7);}
+.flag .rs-handle, .league .rs-handle, .club .rs-handle{background:#64ffda;box-shadow:0 0 8px rgba(100,255,218,0.7);}
+.season .box-label{color:#ffab00;}
+.place-box.season{overflow:hidden;background:rgba(255,171,0,0.12);}
+.season .rs-handle{background:#ffab00;box-shadow:0 0 8px rgba(255,171,0,0.7);}
+
+/* Panel */
+.panel{background:#181c28;border-radius:12px;padding:20px;width:690px;border:1px solid rgba(255,255,255,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.5);display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.panel h3{font-size:13px;color:#c9a84b;margin-bottom:4px;letter-spacing:2px;grid-column:1/-1;}
+.ctrl-group{margin-bottom:8px;}
+.ctrl-group label{display:block;font-size:10px;color:#888;margin-bottom:3px;}
+.ctrl-group input[type="file"],.ctrl-group input[type="number"],.ctrl-group input[type="text"]{width:100%;padding:6px 8px;background:#11141e;border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#fff;font-size:11px;font-family:inherit;}
+.ctrl-group input:focus{outline:none;border-color:#c9a84b;}
+.inline-2{display:flex;gap:4px;}.inline-2>div{flex:1;}
+.ctrl-row{display:flex;align-items:center;gap:3px;margin-bottom:3px;font-size:10px;}
+.ctrl-row .lbl{width:18px;color:#888;text-align:right;flex-shrink:0;font-size:9px;}
+.ctrl-row input{width:48px;padding:4px 4px;background:#11141e;border:1px solid rgba(255,255,255,0.12);border-radius:3px;color:#fff;font-size:10px;font-family:inherit;text-align:center;}
+.ctrl-row input:focus{outline:none;}
+.ctrl-row .ovr-inp:focus{border-color:#4fc3f7;}
+.ctrl-row .badge-inp:focus{border-color:#ff4444;}
+
+/* Card-like section containers */
+.section-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+
+.section-title{font-size:11px;margin:14px 0 6px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);}
+.section-title.ovr{color:#4fc3f7;border-top-color:rgba(79,195,247,0.15);}
+.section-title.badge{color:#ff4444;border-top-color:rgba(255,68,68,0.15);}
+.section-title.pos{color:#00e5ff;border-top-color:rgba(0,229,255,0.15);}
+.section-title.hex{color:#fff;border-top-color:rgba(255,255,255,0.12);}
+.section-title.portrait{color:#b388ff;border-top-color:rgba(179,136,255,0.15);}
+.section-title.name{color:#ff9800;border-top-color:rgba(255,152,0,0.15);}
+.section-title.season{color:#ffab00;border-top-color:rgba(255,171,0,0.15);}
+.section-title.icon{color:#64ffda;border-top-color:rgba(100,255,218,0.15);}
+.section-title.asset{color:#c9a84b;border-top-color:rgba(201,168,75,0.2);}
+
+/* Level dots */
+.level-row{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px;}
+.level-row .lv-dot{width:22px;height:22px;border-radius:3px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#11141e;color:#888;font-family:'Montserrat',sans-serif;transition:all 0.15s;}
+.level-row .lv-dot:hover{border-color:#c9a84b;color:#fff;background:#1a1a2e;}
+.level-row .lv-dot.active{border-color:#c9a84b;background:#2a2040;color:#c9a84b;box-shadow:0 0 6px rgba(201,168,75,0.3);}
+
+/* Buttons */
+.btn-row{display:flex;gap:6px;margin-top:8px;}
+.btn{flex:1;padding:9px 4px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.btn-gold{background:linear-gradient(135deg,#c9a84b,#7a5518);color:#000;}
+.btn-gold:hover{background:linear-gradient(135deg,#e0c868,#a08030);}
+.btn-gray{background:rgba(255,255,255,0.04);color:#888;border:1px solid rgba(255,255,255,0.08);}
+.btn-gray:hover{background:rgba(255,255,255,0.08);color:#aaa;}
+.btn-green{background:#00c853;color:#000;}
+.btn-green:hover{background:#00e676;}
+.btn-blue{background:rgba(79,195,247,0.15);color:#4fc3f7;border:1px solid rgba(79,195,247,0.25);}
+.btn-blue:hover{background:rgba(79,195,247,0.25);}
+.btn-asset{flex:1;padding:9px 4px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;background:rgba(255,255,255,0.04);color:#888;border:1px solid rgba(255,255,255,0.08);}
+.btn-asset:hover{background:rgba(255,255,255,0.08);color:#aaa;}
+.btn-asset.active{background:linear-gradient(135deg,rgba(0,200,83,0.3),rgba(0,150,50,0.3));color:#00c853;border:1px solid rgba(0,200,83,0.5);box-shadow:0 0 12px rgba(0,200,83,0.3);}
+#statusMsg{margin-top:4px;font-size:11px;color:#666;text-align:center;line-height:1.5;padding:8px 10px;background:rgba(255,255,255,0.02);border-radius:6px;grid-column:1/-1;}
+
+#badgeUploads .up-row{display:flex;align-items:center;gap:4px;margin-bottom:2px;font-size:10px;}
+#badgeUploads .up-row span{width:20px;color:#888;text-align:right;}
+#badgeUploads .up-row input{flex:1;font-size:9px;padding:2px 3px;background:#11141e;border:1px solid rgba(255,255,255,0.08);border-radius:3px;color:#888;}
+#badgeUploads .up-row .ok{color:#4caf50;font-size:9px;}
+
+.pct-hint{font-size:9px;color:#555;margin-left:2px;}
+</style>
+</head>
+<body>
+
+<h2>FC 球员卡批量生成器 v1.5 — 5:8 画布 | 含国籍/联赛/俱乐部 | 秒换5图</h2>
+<div class="tip">
+  <b>步骤：</b>加载1级底图 → 拖拽各色框覆盖对应位置 → 上传头像/图标 → 批量导出13级PNG
+  <br>框色：<b style="color:#4fc3f7">OVR蓝</b> <b style="color:#ff4444">等级红</b> <b style="color:#00e5ff">位置青</b> <b style="color:#fff">六边白</b> <b style="color:#b388ff">头像紫</b> <b style="color:#ff9800">名字橙</b> <b style="color:#ffab00">赛季金</b> <b style="color:#64ffda">图标绿</b>
+</div>
+
+<div class="workspace">
+
+  <!-- Card Preview -->
+  <div class="card-stage">
+    <div id="cardWrap">
+      <img id="baseCardImg" src="" alt="请加载球员卡底图">
+
+      <!-- OVR Box -->
+      <div class="place-box ovr" id="ovrBox" data-id="ovr">
+        <span class="box-label">OVR</span>
+        <span class="ovr-text" id="ovrText">122</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Badge Box -->
+      <div class="place-box badge" id="badgeBox" data-id="badge">
+        <span class="box-label">等级</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Position Box -->
+      <div class="place-box pos" id="posBox" data-id="pos">
+        <span class="box-label">位置</span>
+        <span class="pos-text" id="posText">LM</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Hexagon Level Box -->
+      <div class="place-box hex" id="hexBox" data-id="hex">
+        <span class="box-label">工资</span>
+        <div class="hex-shape">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="50,3 97,27 97,73 50,97 3,73 3,27" fill="none" stroke="#fff" stroke-width="4" vector-effect="non-scaling-stroke"/></svg>
+          <span class="hex-num" id="hexNum">7</span>
+        </div>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Portrait Box -->
+      <div class="place-box portrait" id="portraitBox" data-id="portrait">
+        <span class="box-label">头像</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Name Box -->
+      <div class="place-box name" id="nameBox" data-id="name">
+        <span class="box-label">球员名</span>
+        <span class="name-text" id="nameText">姆巴佩</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Season Icon Box -->
+      <div class="place-box season" id="seasonBox" data-id="season">
+        <span class="box-label">赛季</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Flag Icon Box -->
+      <div class="place-box flag" id="flagBox" data-id="flag">
+        <span class="box-label">国旗</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- League Icon Box -->
+      <div class="place-box league" id="leagueBox" data-id="league">
+        <span class="box-label">联赛</span>
+        <div class="rs-handle"></div>
+      </div>
+
+      <!-- Club Icon Box -->
+      <div class="place-box club" id="clubBox" data-id="club">
+        <span class="box-label">俱乐部</span>
+        <div class="rs-handle"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Panel -->
+  <div class="panel" id="panel">
+    <h3>🎯 设置</h3>
+
+    <!-- ====== LEFT COLUMN ====== -->
+    <div class="panel-col">
+
+    <!-- 基础设置 -->
+    <div class="section-card">
+    <div class="ctrl-group"><label>球员卡底图（1级）</label><input type="file" id="cardInput" accept="image/*"><label style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:#888;cursor:pointer;margin-left:4px;"><input type="checkbox" id="saveCardEnabled" style="width:auto;"> 保存</label></div>
+
+    <div class="section-title" style="color:#c9a84b;margin-top:4px;padding-top:10px;">⚙ 归一化设置 <span class="pct-hint">— 自动裁剪对齐</span></div>
+    <div class="ctrl-row">
+      <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:#888;cursor:pointer;">
+        <input type="checkbox" id="normEnabled" checked style="width:auto;"> 启用自动裁剪对齐
+      </label>
+    </div>
+    <div class="ctrl-row" style="gap:2px;">
+      <span class="lbl">画布</span><input id="normPW" value="200" style="width:36px;">
+      <span style="color:#c9a84b;font-size:9px;">×</span><input id="normPH" value="320" style="width:36px;">
+      <span class="lbl">卡高</span><input id="normTH" value="290" style="width:36px;">
+      <span class="lbl">倍率</span><input id="normScale" value="3" style="width:36px;">
+    </div>
+    <div class="ctrl-row" style="gap:2px;margin-bottom:0;">
+      <span class="lbl">重心X</span><input id="normCX" value="100" style="width:36px;">
+      <span class="lbl">重心Y</span><input id="normCY" value="160" style="width:36px;">
+    </div>
+
+    <div class="inline-2" style="margin-top:8px;">
+      <div class="ctrl-group"><label>基础OVR</label><input type="number" id="baseOvrInput" value="122" min="40" max="150"></div>
+      <div class="ctrl-group"><label>球员名</label><input type="text" id="playerNameInput" value="姆巴佩" list="playerList" autocomplete="off"><datalist id="playerList"></datalist></div>
+    </div>
+
+    <div class="ctrl-group" style="margin-bottom:0;"><label>预览等级</label><div class="level-row" id="levelDots"></div></div>
+    </div>
+
+    <!-- OVR Controls -->
+    <div class="section-title ovr" style="margin-top:0;padding-top:6px;">🔢 OVR 框 <span class="pct-hint">— 百分比%</span></div>
+    <div class="ctrl-row">
+      <span class="lbl">左</span><input class="ovr-inp" id="ovrLeft" value="10.9" step="0.1">
+      <span class="lbl">上</span><input class="ovr-inp" id="ovrTop" value="17.2" step="0.1">
+      <span class="lbl">宽</span><input class="ovr-inp" id="ovrW" value="19.5" step="0.1">
+      <span class="lbl">高</span><input class="ovr-inp" id="ovrH" value="14.1" step="0.1">
+    </div>
+    <div class="ctrl-row">
+      <span class="lbl">字</span><input class="ovr-inp" id="ovrSize" value="58.3" step="0.1" style="width:42px;" title="字号 = 框高度 × 百分比">
+      <span class="lbl">粗</span><select id="ovrWeight" style="width:46px;padding:3px;background:#11141e;border:1px solid rgba(255,255,255,0.12);border-radius:3px;color:#fff;font-size:10px;">
+        <option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600" selected>600</option><option value="700">700</option><option value="900">900</option>
+      </select>
+    </div>
+
+    <!-- Badge Controls -->
+    <div class="section-title badge">🖼 等级图标框 <span class="pct-hint">— 百分比%</span></div>
+    <div class="ctrl-row">
+      <span class="lbl">左</span><input class="badge-inp" id="badgeLeft" value="9" step="0.1">
+      <span class="lbl">上</span><input class="badge-inp" id="badgeTop" value="57.9" step="0.1">
+      <span class="lbl">宽</span><input class="badge-inp" id="badgeW" value="21.7" step="0.1">
+      <span class="lbl">高</span><input class="badge-inp" id="badgeH" value="8.8" step="0.1">
+    </div>
+    <div class="ctrl-group" style="margin-top:6px;"><label>等级图标上传（每级一个）</label><div id="badgeUploads"></div></div>
+
+    <!-- Position + Hexagon in card -->
+    <div class="section-card">
+    <div class="section-title pos" style="margin-top:0;padding-top:0;border-top:none;">📍 位置缩写 <span class="pct-hint">— 百分比%</span></div>
+    <div class="ctrl-row">
+      <span class="lbl">左</span><input class="pos-inp" id="posLeft" value="12.2" step="0.1">
+      <span class="lbl">上</span><input class="pos-inp" id="posTop" value="30.9" step="0.1">
+      <span class="lbl">宽</span><input class="pos-inp" id="posW" value="12.8" step="0.1">
+      <span class="lbl">高</span><input class="pos-inp" id="posH" value="5.1" step="0.1">
+    </div>
+    <div class="ctrl-row">
+      <span class="lbl">字</span><input class="pos-inp" id="posSize" value="56.1" step="1">
+      <span class="lbl">粗</span><select id="posWeight" style="width:46px;padding:3px;background:#11141e;border:1px solid rgba(255,255,255,0.12);border-radius:3px;color:#fff;font-size:10px;">
+        <option value="300">300</option><option value="400">400</option><option value="500">500</option><option value="600">600</option><option value="700" selected>700</option><option value="900">900</option>
+      </select>
+    </div>
+    <div class="ctrl-group" style="margin-bottom:0;"><label>位置文本</label><input type="text" id="posInput" value="LM" maxlength="3"></div>
+
+    <div class="section-title hex">⬡ 六边形工资框 <span class="pct-hint">— 百分比%</span></div>
+    <div class="ctrl-row">
+      <span class="lbl">左</span><input class="hex-inp" id="hexLeft" value="14.4" step="0.1">
+      <span class="lbl">上</span><input class="hex-inp" id="hexTop" value="39.4" step="0.1">
+      <span class="lbl">宽</span><input class="hex-inp" id="hexW" value="9.8" step="0.1">
+      <span class="lbl">高</span><input class="hex-inp" id="hexH" value="7.1" step="0.1">
+    </div>
+    <div class="ctrl-group" style="margin-bottom:0;"><label>工资</label><input type="number" id="hexLvInput" value="31" min="0" max="200"></div>
+    </div>
+
+    </div><!-- /panel-col left -->
+
+    <!-- ====== RIGHT COLUMN ====== -->
+    <div class="panel-col">
+
+    <!-- Portrait + Name in card -->
+    <div class="section-card">
+    <div class="section-title portrait" style="margin-top:0;padding-top:0;border-top:none;">👤 球员头像 <span class="pct-hint">— 百分比%</span></div>
+    <div class="ctrl-row">
+      <span class="lbl">左</span><input class="portrait-inp" id="portraitLeft" value="23" step="0.1">
+      <span class="lbl">上</span><input class="portrait-inp" id="portraitTop" value="19.6" step="0.1">
+      <span class="lbl">宽</span><input class="portrait-inp" id="portraitW" value="68.2" step="0.1">
+      <span class="lbl">高</span><input class="portrait-inp" id="portraitH" value="47" step="0.1">
+    </div>
+    <div class="btn-row" style="margin-top:4px;">
+      <button class="btn btn-gray" id="btnPortraitFolder" onclick="pickPortraitFolder()" style="font-size:10px;">📁 头像文件夹</button>
+      <label id="portraitUploadLabel" onclick="openPortraitFile()" style="flex:1;cursor:pointer;background:rgba(255,255,255,0.04);padding:7px 6px;border-radius:6px;text-align:center;font-size:10px;color:#888;border:1px solid rgba(255,255,255,0.08);">上传头像<input type="file" id="portraitInput" accept="image/*" style="display:none;"></label>
+    </div>
+
+    <div class="section-title name">📝 球员名 <span class="pct-hint">— 百分比%</span></div>
+    <div class="ctrl-row">
+      <span class="lbl">左</span><input class="name-inp" id="nameLeft" value="31.2" step="0.1">
+      <span class="lbl">上</span><input class="name-inp" id="nameTop" value="69.5" step="0.1">
+      <span class="lbl">宽</span><input class="name-inp" id="nameW" value="39.7" step="0.1">
+      <span class="lbl">高</span><input class="name-inp" id="nameH" value="8.2" step="0.1">
+    </div>
+    <div class="ctrl-row" style="margin-bottom:0;">
+      <span class="lbl">字</span><input class="name-inp" id="nameSize" value="58.4" step="1">
+      <span class="lbl">中</span><input class="name-inp" id="nameMid" value="27" step="0.01" style="background:#1a1a22;color:#ffab00;">
+    </div>
+    <div class="btn-row" style="margin-top:6px;"><button class="btn btn-asset" id="btnCenter" onclick="toggleCenter()">📐 居中</button></div>
+    </div>
+
+    <!-- Season + Icons in card -->
+    <div class="section-card">
+    <div class="section-title season" style="margin-top:0;padding-top:0;border-top:none;">🏆 赛季图标 <span class="pct-hint">— 百分比%</span></div>
+    <div class="ctrl-row">
+      <span class="lbl">左</span><input class="season-inp" id="seasonLeft" value="16.9" step="0.1">
+      <span class="lbl">上</span><input class="season-inp" id="seasonTop" value="69.8" step="0.1">
+      <span class="lbl">宽</span><input class="season-inp" id="seasonW" value="11.3" step="0.1">
+      <span class="lbl">高</span><input class="season-inp" id="seasonH" value="5.2" step="0.1">
+    </div>
+    <div class="ctrl-group"><label>上传赛季图标</label><input type="file" id="seasonInput" accept="image/*"><label style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:#888;cursor:pointer;margin-left:4px;"><input type="checkbox" id="saveSeasonEnabled" style="width:auto;"> 保存</label></div>
+    <div class="btn-row" style="margin-top:0;"><button id="btnAutoFixSeason" style="background:#ffab00;color:#000;font-weight:700;width:100%;border:none;border-radius:6px;padding:8px;cursor:pointer;font-size:11px;letter-spacing:1px;">自动修正赛季位置</button></div>
+
+    <!-- Resource Library -->
+    <div class="section-title asset">📚 资源库</div>
+    <div class="btn-row"><button class="btn btn-asset" id="btnAssetLib" onclick="loadAssetLibrary()">📁 加载资源库</button></div>
+    <div class="ctrl-row" style="gap:8px;margin-top:6px;margin-bottom:0;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:3px;font-size:9px;color:#888;cursor:pointer;"><input type="checkbox" id="saveFlagEnabled" style="width:auto;"> 锁定国旗</label>
+      <label style="display:flex;align-items:center;gap:3px;font-size:9px;color:#888;cursor:pointer;"><input type="checkbox" id="saveLeagueEnabled" style="width:auto;"> 锁定联赛</label>
+      <label style="display:flex;align-items:center;gap:3px;font-size:9px;color:#888;cursor:pointer;"><input type="checkbox" id="saveClubEnabled" style="width:auto;"> 锁定队徽</label>
+      <label style="display:flex;align-items:center;gap:3px;font-size:9px;color:#888;cursor:pointer;"><input type="checkbox" id="savePortraitEnabled" style="width:auto;"> 锁定头像</label>
+    </div>
+
+    <div class="section-title icon">🏷 底部图标 <span class="pct-hint">— 百分比%</span></div>
+    <div class="inline-2">
+      <div class="ctrl-group"><label>国旗</label><input type="file" id="flagInput" accept="image/*"></div>
+      <div class="ctrl-group"><label>联赛</label><input type="file" id="leagueInput" accept="image/*"></div>
+      <div class="ctrl-group"><label>俱乐部</label><input type="file" id="clubInput" accept="image/*"></div>
+    </div>
+    <div class="ctrl-row" style="color:#64ffda;">🇫🇷 国旗
+      <span class="lbl">左</span><input class="icon-inp" id="flagLeft" value="28.4" step="0.1">
+      <span class="lbl">上</span><input class="icon-inp" id="flagTop" value="80.3" step="0.1">
+      <span class="lbl">宽</span><input class="icon-inp" id="flagW" value="10.7" step="0.1">
+      <span class="lbl">高</span><input class="icon-inp" id="flagH" value="3.5" step="0.1">
+    </div>
+    <div class="ctrl-row" style="color:#64ffda;">🏆 联赛
+      <span class="lbl">左</span><input class="icon-inp" id="leagueLeft" value="44.5" step="0.1">
+      <span class="lbl">上</span><input class="icon-inp" id="leagueTop" value="77.9" step="0.1">
+      <span class="lbl">宽</span><input class="icon-inp" id="leagueW" value="11.8" step="0.1">
+      <span class="lbl">高</span><input class="icon-inp" id="leagueH" value="7.7" step="0.1">
+    </div>
+    <div class="ctrl-row" style="color:#64ffda;margin-bottom:0;">⚽ 俱乐部
+      <span class="lbl">左</span><input class="icon-inp" id="clubLeft" value="60.5" step="0.1">
+      <span class="lbl">上</span><input class="icon-inp" id="clubTop" value="78.1" step="0.1">
+      <span class="lbl">宽</span><input class="icon-inp" id="clubW" value="11.3" step="0.1">
+      <span class="lbl">高</span><input class="icon-inp" id="clubH" value="6.6" step="0.1">
+    </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="btn-row">
+      <button class="btn btn-gray" onclick="doReset()">重置</button>
+      <button class="btn btn-blue" onclick="doCopy()">📋 复制坐标</button>
+      <button class="btn btn-gray" onclick="doImport()">📥 导入坐标</button><label style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:#888;cursor:pointer;margin-left:4px;"><input type="checkbox" id="saveImportEnabled" style="width:auto;"> 保存</label>
+    </div>
+    <div class="btn-row"><button class="btn btn-green" onclick="doExportOne()">导出当前预览</button></div>
+    <div class="btn-row"><button class="btn btn-asset" id="btnExportPath" onclick="pickExportFolder()">📁 导出路径</button></div>
+    <div class="btn-row"><button class="btn btn-gold" id="btnBatch" onclick="doExportBatch()">🚀 批量导出1~13级</button></div>
+
+    </div><!-- /panel-col right -->
+
+    <div id="statusMsg">v1.5 — 5:8画布 + 9元素框 + 98球员数据库 + 资源库秒换5图(国旗/联赛/队徽/赛季/头像)，等待加载底图...</div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// Data
+// ============================================================
+const LV_DATA = [
+  {lv:1,bonus:0},{lv:2,bonus:1},{lv:3,bonus:2},{lv:4,bonus:4},{lv:5,bonus:6},
+  {lv:6,bonus:8},{lv:7,bonus:11},{lv:8,bonus:15},{lv:9,bonus:17},{lv:10,bonus:19},
+  {lv:11,bonus:21},{lv:12,bonus:24},{lv:13,bonus:27}
+];
+
+const POSITION_ABBR = {
+  '中锋':'ST','左边锋':'LW','右边锋':'RW','中场':'CM','影锋':'CF',
+  '中后卫':'CB','守门员':'GK','前腰':'CAM','左后卫':'LB','后腰':'CDM',
+  '右后卫':'RB','左边卫':'LWB','右前卫':'RM','右边卫':'RWB'
+};
+
+const PLAYER_DB = [
+    {"position":"影锋","name":"K·阿德耶米","ovr":115,"salary":28,"nationality":"德国","league":"德国足球甲级联赛","club":"多特蒙德俱乐部"},
+    {"position":"中后卫","name":"A.巴斯托尼","ovr":117,"salary":28,"nationality":"意大利","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"前腰","name":"J.贝林厄姆","ovr":117,"salary":28,"nationality":"英格兰","league":"西班牙足球甲级联赛","club":"皇家马德里俱乐部"},
+    {"position":"中后卫","name":"Y.比塞克","ovr":115,"salary":27,"nationality":"德国","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"守门员","name":"阿利松","ovr":114,"salary":25,"nationality":"巴西","league":"英格兰足球超级联赛","club":"利物浦俱乐部"},
+    {"position":"中锋","name":"H.埃基蒂克","ovr":115,"salary":26,"nationality":"法国","league":"英格兰足球超级联赛","club":"利物浦俱乐部"},
+    {"position":"右边锋","name":"埃斯特旺","ovr":116,"salary":28,"nationality":"巴西","league":"英格兰足球超级联赛","club":"切尔西俱乐部"},
+    {"position":"前腰","name":"埃泽","ovr":115,"salary":26,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"中锋","name":"奥斯梅恩","ovr":119,"salary":30,"nationality":"尼日利亚","league":"土耳其足球超级联赛","club":"加拉塔萨雷俱乐部"},
+    {"position":"中场","name":"巴尔维德","ovr":115,"salary":27,"nationality":"乌拉圭","league":"西班牙足球甲级联赛","club":"皇家马德里俱乐部"},
+    {"position":"左边锋","name":"B.巴科拉","ovr":115,"salary":27,"nationality":"法国","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"守门员","name":"波普","ovr":116,"salary":26,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"纽卡斯尔联俱乐部"},
+    {"position":"后腰","name":"P.伯格","ovr":114,"salary":26,"nationality":"挪威","league":"挪威足球超级联赛","club":"博德闪耀俱乐部"},
+    {"position":"前腰","name":"布兰特","ovr":114,"salary":28,"nationality":"德国","league":"德国足球甲级联赛","club":"多特蒙德俱乐部"},
+    {"position":"中场","name":"布鲁诺·吉马良斯","ovr":115,"salary":27,"nationality":"巴西","league":"英格兰足球超级联赛","club":"纽卡斯尔联俱乐部"},
+    {"position":"后腰","name":"楚阿梅尼","ovr":118,"salary":28,"nationality":"法国","league":"西班牙足球甲级联赛","club":"皇家马德里俱乐部"},
+    {"position":"守门员","name":"大卫·拉亚","ovr":122,"salary":26,"nationality":"西班牙","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"中后卫","name":"丹·伯恩","ovr":114,"salary":27,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"纽卡斯尔联俱乐部"},
+    {"position":"前腰","name":"德凯特拉雷","ovr":118,"salary":29,"nationality":"比利时","league":"意大利足球甲级联赛","club":"亚特兰大俱乐部"},
+    {"position":"右边卫","name":"D.邓弗里斯","ovr":115,"salary":27,"nationality":"荷兰","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"左边卫","name":"F.迪马尔科","ovr":115,"salary":27,"nationality":"意大利","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"右边锋","name":"杜埃","ovr":117,"salary":27,"nationality":"法国","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"左边锋","name":"J.多库","ovr":119,"salary":28,"nationality":"比利时","league":"英格兰足球超级联赛","club":"曼彻斯特城俱乐部"},
+    {"position":"守门员","name":"多纳鲁马","ovr":116,"salary":25,"nationality":"意大利","league":"英格兰足球超级联赛","club":"曼彻斯特城俱乐部"},
+    {"position":"前腰","name":"厄德高","ovr":115,"salary":27,"nationality":"挪威","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"中场","name":"恩梅加","ovr":117,"salary":29,"nationality":"德国","league":"德国足球甲级联赛","club":"多特蒙德俱乐部"},
+    {"position":"中场","name":"法比安·鲁易斯","ovr":116,"salary":27,"nationality":"西班牙","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"中后卫","name":"范戴克","ovr":118,"salary":30,"nationality":"荷兰","league":"英格兰足球超级联赛","club":"利物浦俱乐部"},
+    {"position":"中后卫","name":"范德芬","ovr":115,"salary":28,"nationality":"荷兰","league":"英格兰足球超级联赛","club":"托特纳姆热刺俱乐部"},
+    {"position":"前腰","name":"费尔明","ovr":120,"salary":27,"nationality":"西班牙","league":"西班牙足球甲级联赛","club":"巴塞罗那俱乐部"},
+    {"position":"前腰","name":"福登","ovr":117,"salary":28,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"曼彻斯特城俱乐部"},
+    {"position":"左边锋","name":"A.戈登","ovr":118,"salary":29,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"纽卡斯尔联俱乐部"},
+    {"position":"左边卫","name":"格里马尔多","ovr":118,"salary":28,"nationality":"西班牙","league":"德国足球甲级联赛","club":"勒沃库森俱乐部"},
+    {"position":"影锋","name":"格列兹曼","ovr":118,"salary":27,"nationality":"法国","league":"西班牙足球甲级联赛","club":"马德里竞技俱乐部"},
+    {"position":"左边锋","name":"格纳布里","ovr":118,"salary":29,"nationality":"德国","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"中锋","name":"哈兰德","ovr":120,"salary":31,"nationality":"挪威","league":"英格兰足球超级联赛","club":"曼彻斯特城俱乐部"},
+    {"position":"中锋","name":"哈里·凯恩","ovr":123,"salary":31,"nationality":"英格兰","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"右边锋","name":"哈维·巴恩斯","ovr":118,"salary":29,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"纽卡斯尔联俱乐部"},
+    {"position":"左边锋","name":"J.海于格","ovr":118,"salary":28,"nationality":"挪威","league":"挪威足球超级联赛","club":"博德闪耀俱乐部"},
+    {"position":"后腰","name":"基米希","ovr":118,"salary":26,"nationality":"德国","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"中后卫","name":"J.格瓦迪奥尔","ovr":118,"salary":29,"nationality":"克罗地亚","league":"英格兰足球超级联赛","club":"曼彻斯特城俱乐部"},
+    {"position":"中锋","name":"吉拉西","ovr":115,"salary":28,"nationality":"几内亚","league":"德国足球甲级联赛","club":"多特蒙德俱乐部"},
+    {"position":"中后卫","name":"加布里埃尔","ovr":122,"salary":29,"nationality":"巴西","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"左边锋","name":"加克波","ovr":115,"salary":28,"nationality":"荷兰","league":"英格兰足球超级联赛","club":"利物浦俱乐部"},
+    {"position":"左后卫","name":"杰拉德·马丁","ovr":114,"salary":25,"nationality":"西班牙","league":"西班牙足球甲级联赛","club":"巴塞罗那俱乐部"},
+    {"position":"前腰","name":"居莱尔","ovr":118,"salary":26,"nationality":"土耳其","league":"西班牙足球甲级联赛","club":"皇家马德里俱乐部"},
+    {"position":"前腰","name":"L.卡尔","ovr":119,"salary":28,"nationality":"德国","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"守门员","name":"M.卡尔内塞基","ovr":117,"salary":26,"nationality":"意大利","league":"意大利足球甲级联赛","club":"亚特兰大俱乐部"},
+    {"position":"守门员","name":"U.卡科尔","ovr":119,"salary":25,"nationality":"土耳其","league":"土耳其足球超级联赛","club":"加拉塔萨雷俱乐部"},
+    {"position":"后腰","name":"M.凯塞多","ovr":118,"salary":28,"nationality":"厄瓜多尔","league":"英格兰足球超级联赛","club":"切尔西俱乐部"},
+    {"position":"守门员","name":"P.科恩","ovr":115,"salary":25,"nationality":"瑞士","league":"法国足球甲级联赛","club":"摩纳哥俱乐部"},
+    {"position":"守门员","name":"N.克海金","ovr":117,"salary":25,"nationality":"俄罗斯","league":"挪威足球超级联赛","club":"博德闪耀俱乐部"},
+    {"position":"左边锋","name":"克瓦拉茨赫利亚","ovr":123,"salary":30,"nationality":"格鲁吉亚","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"守门员","name":"库尔图瓦","ovr":120,"salary":26,"nationality":"比利时","league":"西班牙足球甲级联赛","club":"皇家马德里俱乐部"},
+    {"position":"右边锋","name":"拉明·亚马尔","ovr":122,"salary":29,"nationality":"西班牙","league":"西班牙足球甲级联赛","club":"巴塞罗那俱乐部"},
+    {"position":"左边锋","name":"拉什福德","ovr":118,"salary":30,"nationality":"英格兰","league":"西班牙足球甲级联赛","club":"巴塞罗那俱乐部"},
+    {"position":"右后卫","name":"莱默尔","ovr":114,"salary":27,"nationality":"奥地利","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"中场","name":"赖斯","ovr":123,"salary":28,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"中锋","name":"劳塔罗·马丁内斯","ovr":118,"salary":29,"nationality":"阿根廷","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"影锋","name":"A.卢克曼","ovr":114,"salary":26,"nationality":"尼日利亚","league":"西班牙足球甲级联赛","club":"马德里竞技俱乐部"},
+    {"position":"守门员","name":"鲁伊·席尔瓦","ovr":115,"salary":24,"nationality":"葡萄牙","league":"葡萄牙足球超级联赛","club":"葡萄牙体育俱乐部"},
+    {"position":"左边锋","name":"路易斯·迪亚斯","ovr":123,"salary":29,"nationality":"哥伦比亚","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"左后卫","name":"罗伯逊","ovr":115,"salary":27,"nationality":"苏格兰","league":"英格兰足球超级联赛","club":"利物浦俱乐部"},
+    {"position":"中后卫","name":"C.罗梅罗","ovr":116,"salary":28,"nationality":"阿根廷","league":"英格兰足球超级联赛","club":"托特纳姆热刺俱乐部"},
+    {"position":"左边锋","name":"G.马丁内利","ovr":118,"salary":30,"nationality":"巴西","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"右边锋","name":"N.马杜克","ovr":115,"salary":28,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"中后卫","name":"马尔基尼奥斯","ovr":115,"salary":27,"nationality":"巴西","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"右后卫","name":"马科斯·略伦特","ovr":118,"salary":29,"nationality":"西班牙","league":"西班牙足球甲级联赛","club":"马德里竞技俱乐部"},
+    {"position":"中锋","name":"马库斯·图拉姆","ovr":114,"salary":27,"nationality":"法国","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"中场","name":"迈克尔·梅里诺","ovr":114,"salary":27,"nationality":"西班牙","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"右前卫","name":"W.麦克凯尼","ovr":116,"salary":28,"nationality":"法国","league":"意大利足球甲级联赛","club":"尤文图斯俱乐部"},
+    {"position":"左后卫","name":"努诺·门德斯","ovr":119,"salary":28,"nationality":"葡萄牙","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"后腰","name":"A.帕夫洛维奇","ovr":116,"salary":25,"nationality":"德国","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"中后卫","name":"W.帕乔","ovr":119,"salary":27,"nationality":"厄瓜多尔","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"中场","name":"佩德里","ovr":118,"salary":29,"nationality":"西班牙","league":"西班牙足球甲级联赛","club":"巴塞罗那俱乐部"},
+    {"position":"右后卫","name":"佩德罗·波罗","ovr":118,"salary":27,"nationality":"西班牙","league":"英格兰足球超级联赛","club":"托特纳姆热刺俱乐部"},
+    {"position":"中锋","name":"姆巴佩","ovr":122,"salary":31,"nationality":"法国","league":"西班牙足球甲级联赛","club":"皇家马德里俱乐部"},
+    {"position":"后腰","name":"恰尔汗奥卢","ovr":117,"salary":29,"nationality":"土耳其","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"中场","name":"若昂·内维斯","ovr":122,"salary":27,"nationality":"葡萄牙","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"右边锋","name":"萨卡","ovr":120,"salary":28,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"中后卫","name":"W.萨利巴","ovr":119,"salary":27,"nationality":"法国","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"右边锋","name":"L.萨内","ovr":116,"salary":28,"nationality":"德国","league":"土耳其足球超级联赛","club":"加拉塔萨雷俱乐部"},
+    {"position":"后腰","name":"苏比门迪","ovr":119,"salary":28,"nationality":"西班牙","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"前腰","name":"D.索博斯洛伊","ovr":120,"salary":29,"nationality":"匈牙利","league":"英格兰足球超级联赛","club":"利物浦俱乐部"},
+    {"position":"守门员","name":"索默","ovr":115,"salary":25,"nationality":"瑞士","league":"意大利足球甲级联赛","club":"国际米兰俱乐部"},
+    {"position":"右后卫","name":"特里皮尔","ovr":114,"salary":28,"nationality":"英格兰","league":"英格兰足球超级联赛","club":"纽卡斯尔联俱乐部"},
+    {"position":"前腰","name":"特林康","ovr":118,"salary":28,"nationality":"葡萄牙","league":"葡萄牙足球超级联赛","club":"葡萄牙体育俱乐部"},
+    {"position":"左边锋","name":"特罗萨德","ovr":116,"salary":29,"nationality":"比利时","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"右后卫","name":"J.廷贝尔","ovr":115,"salary":28,"nationality":"荷兰","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"前腰","name":"H.瓦纳肯","ovr":116,"salary":28,"nationality":"比利时","league":"比利时足球甲级联赛","club":"布鲁日俱乐部"},
+    {"position":"中场","name":"维蒂尼亚","ovr":122,"salary":29,"nationality":"葡萄牙","league":"法国足球甲级联赛","club":"巴黎圣日耳曼俱乐部"},
+    {"position":"前腰","name":"F.维尔茨","ovr":119,"salary":29,"nationality":"德国","league":"英格兰足球超级联赛","club":"利物浦俱乐部"},
+    {"position":"守门员","name":"G.维卡里奥","ovr":116,"salary":26,"nationality":"意大利","league":"英格兰足球超级联赛","club":"托特纳姆热刺俱乐部"},
+    {"position":"左边锋","name":"维尼修斯","ovr":118,"salary":28,"nationality":"巴西","league":"西班牙足球甲级联赛","club":"皇家马德里俱乐部"},
+    {"position":"右边锋","name":"谢尔基","ovr":116,"salary":28,"nationality":"法国","league":"英格兰足球超级联赛","club":"曼彻斯特城俱乐部"},
+    {"position":"右边卫","name":"扬·科托","ovr":115,"salary":27,"nationality":"巴西","league":"德国足球甲级联赛","club":"多特蒙德俱乐部"},
+    {"position":"左边锋","name":"K.伊尔迪兹","ovr":117,"salary":29,"nationality":"土耳其","league":"意大利足球甲级联赛","club":"尤文图斯俱乐部"},
+    {"position":"中锋","name":"哲凯赖什","ovr":115,"salary":28,"nationality":"瑞典","league":"英格兰足球超级联赛","club":"阿森纳俱乐部"},
+    {"position":"影锋","name":"J. 阿尔瓦雷斯","ovr":122,"salary":30,"nationality":"阿根廷","league":"西班牙足球甲级联赛","club":"马德里竞技俱乐部"},
+    {"position":"右边锋","name":"奥利塞","ovr":122,"salary":29,"nationality":"法国","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"左后卫","name":"J.斯坦尼希奇","ovr":112,"salary":25,"nationality":"克罗地亚","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"},
+    {"position":"中后卫","name":"于帕梅卡诺","ovr":113,"salary":25,"nationality":"法国","league":"德国足球甲级联赛","club":"拜仁慕尼黑俱乐部"}
+];
+
+let state = {
+  baseOvr: 122,
+  curLv: 1,
+  badges: {},
+  cardNaturalW: 0,
+  cardNaturalH: 0,
+  portraitImg: null,
+  seasonIconImg: null,
+  seasonIconDataUrl: null,
+  flagImg: null,
+  leagueImg: null,
+  clubImg: null
+};
+
+// Normalization params (default: 200x320 canvas = 5:8 ratio, card height 290, centroid center, 3x scale)
+let norm = {
+  enabled: true,
+  PW: 200, PH: 320, TH: 290, CX: 100, CY: 160, scale: 3
+};
+
+const $ = id => document.getElementById(id);
+const ovrBox = $('ovrBox');
+const badgeBox = $('badgeBox');
+const posBox = $('posBox');
+const hexBox = $('hexBox');
+const portraitBox = $('portraitBox');
+const nameBox = $('nameBox');
+const flagBox = $('flagBox');
+const leagueBox = $('leagueBox');
+const clubBox = $('clubBox');
+const seasonBox = $('seasonBox');
+const ovrText = $('ovrText');
+const posText = $('posText');
+const hexNum = $('hexNum');
+const nameText = $('nameText');
+const cardWrap = $('cardWrap');
+const baseCardImg = $('baseCardImg');
+
+// ============================================================
+// Helpers
+// ============================================================
+function getCardDims() {
+  return { w: cardWrap.clientWidth, h: cardWrap.clientHeight };
+}
+
+function pct(v) { return parseFloat(v) || 0; }
+
+// ============================================================
+// Normalize image — crop bbox → scale → centroid align
+// ============================================================
+function normalizeImage(img) {
+  var s = norm.scale || 1;
+  var PW = norm.PW * s, PH = norm.PH * s, TH = norm.TH * s,
+      CX = norm.CX * s, CY = norm.CY * s;
+
+  var t = document.createElement('canvas'); t.width = img.width; t.height = img.height;
+  var ctx = t.getContext('2d'); ctx.drawImage(img, 0, 0);
+  var d = ctx.getImageData(0, 0, t.width, t.height).data;
+  var iw = t.width, ih = t.height;
+
+  var cmin = iw, cmax = 0, rmin = ih, rmax = 0;
+  var sumX = 0, sumY = 0, sumA = 0;
+  for (var y = 0; y < ih; y++) { for (var x = 0; x < iw; x++) {
+    var a = d[(y * iw + x) * 4 + 3];
+    if (a > 5) {
+      if (x < cmin) cmin = x; if (x > cmax) cmax = x; if (y < rmin) rmin = y; if (y > rmax) rmax = y;
+      sumX += x * a; sumY += y * a; sumA += a;
+    }
+  }}
+  if (!sumA) return null;
+  var centroidX = sumX / sumA, centroidY = sumY / sumA;
+
+  var P = 2, cl = Math.max(0, cmin - P), ct = Math.max(0, rmin - P),
+      cr = Math.min(iw, cmax + 1 + P), cb_ = Math.min(ih, rmax + 1 + P);
+  var cropW = cr - cl, cropH = cb_ - ct;
+
+  var cxCrop = centroidX - cl, cyCrop = centroidY - ct;
+
+  var scale = TH / cropH, nw = Math.round(cropW * scale), nh = TH;
+
+  var scx = Math.round(cxCrop * scale), scy = Math.round(cyCrop * scale);
+
+  var px = CX - scx, py = CY - scy;
+
+  var o = document.createElement('canvas'); o.width = PW; o.height = PH;
+  var octx = o.getContext('2d');
+  octx.imageSmoothingEnabled = true;
+  octx.imageSmoothingQuality = 'high';
+  octx.drawImage(t, cl, ct, cropW, cropH, px, py, nw, nh);
+  return o;
+}
+
+// ============================================================
+// Level dots
+// ============================================================
+function buildLevelDots() {
+  const row = $('levelDots');
+  row.innerHTML = '';
+  LV_DATA.forEach(d => {
+    const dot = document.createElement('div');
+    dot.className = 'lv-dot' + (d.lv === state.curLv ? ' active' : '');
+    dot.textContent = d.lv;
+    dot.onclick = () => { state.curLv = d.lv; refresh(); buildLevelDots(); buildBadgeUI(); };
+    row.appendChild(dot);
+  });
+}
+
+// ============================================================
+// Badge upload UI
+// ============================================================
+function buildBadgeUI() {
+  const container = $('badgeUploads');
+  container.innerHTML = '';
+  for (let i = 1; i <= 13; i++) {
+    const has = !!state.badges[i];
+    const div = document.createElement('div');
+    div.className = 'up-row';
+    div.innerHTML =
+      `<span>+${i}</span>` +
+      `<input type="file" accept="image/*" data-lv="${i}">` +
+      (has ? `<span class="ok">✓</span>` : `<span style="color:#555;font-size:9px;">-</span>`);
+    container.appendChild(div);
+    div.querySelector('input').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => { state.badges[i] = ev.target.result; refresh(); applyOvr(); applyBadge(); applyPos(); applyHex(); applyPortrait(); applyName(); applySeasonIcon(); applyIcons(); buildBadgeUI(); setMsg('✅ 等级 +' + i + ' 图标已加载'); };
+      r.readAsDataURL(file);
+    };
+  }
+}
+
+// ============================================================
+// Refresh preview
+// ============================================================
+function refresh() {
+  const d = LV_DATA.find(x => x.lv === state.curLv) || LV_DATA[0];
+  const ovr = state.baseOvr + d.bonus;
+  ovrText.textContent = ovr;
+
+  const icon = state.badges[state.curLv];
+  const oldImg = badgeBox.querySelector('img');
+  if (oldImg) oldImg.remove();
+  const label = badgeBox.querySelector('.box-label');
+
+  if (icon) {
+    const img = document.createElement('img');
+    img.src = icon;
+    badgeBox.insertBefore(img, badgeBox.firstChild);
+    label.style.display = 'none';
+  } else {
+    label.style.display = '';
+  }
+  label.textContent = '+' + state.curLv;
+
+  ovrBox.style.display = '';
+  badgeBox.style.display = '';
+  applyName(); applyIcons(); applyPos(); applyOvr(); applyBadge(); applyHex(); applyPortrait(); applySeasonIcon();
+}
+
+// ============================================================
+// Apply positions — percentage-based
+// ============================================================
+function applyOvr() {
+  ovrBox.style.left = $('ovrLeft').value + '%';
+  ovrBox.style.top = $('ovrTop').value + '%';
+  ovrBox.style.width = $('ovrW').value + '%';
+  ovrBox.style.height = $('ovrH').value + '%';
+  // Font size = % of box height → px
+  const dims = getCardDims();
+  const boxHPx = pct($('ovrH').value) / 100 * dims.h;
+  const fsPx = Math.round(pct($('ovrSize').value) / 100 * boxHPx);
+  ovrText.style.fontSize = Math.max(6, fsPx) + 'px';
+  ovrText.style.fontWeight = $('ovrWeight').value;
+  ovrBox.style.background = 'transparent';
+}
+
+function applyBadge() {
+  badgeBox.style.left = $('badgeLeft').value + '%';
+  badgeBox.style.top = $('badgeTop').value + '%';
+  badgeBox.style.width = $('badgeW').value + '%';
+  badgeBox.style.height = $('badgeH').value + '%';
+}
+
+function applyPos() {
+  posBox.style.left = $('posLeft').value + '%';
+  posBox.style.top = $('posTop').value + '%';
+  posBox.style.width = $('posW').value + '%';
+  posBox.style.height = $('posH').value + '%';
+  const dims = getCardDims();
+  const boxHPx = pct($('posH').value) / 100 * dims.h;
+  const fsPx = Math.round(pct($('posSize').value) / 100 * boxHPx);
+  posText.style.fontSize = Math.max(5, fsPx) + 'px';
+  posText.style.fontWeight = $('posWeight').value;
+}
+function applyHex() {
+  hexBox.style.left = $('hexLeft').value + '%';
+  hexBox.style.top = $('hexTop').value + '%';
+  hexBox.style.width = $('hexW').value + '%';
+  hexBox.style.height = $('hexH').value + '%';
+  const dims = getCardDims();
+  const boxHPx = pct($('hexH').value) / 100 * dims.h;
+  hexNum.style.fontSize = Math.max(5, boxHPx * 0.35) + 'px';
+}
+function applyPortrait() {
+  portraitBox.style.left = $('portraitLeft').value + '%';
+  portraitBox.style.top = $('portraitTop').value + '%';
+  portraitBox.style.width = $('portraitW').value + '%';
+  portraitBox.style.height = $('portraitH').value + '%';
+}
+function applyName(afterMeasure) {
+  var newLeft = parseFloat($('nameLeft').value);
+  var newTop = parseFloat($('nameTop').value);
+
+  nameBox.style.left = newLeft + '%';
+  nameBox.style.top = newTop + '%';
+  nameBox.style.width = 'auto';
+  nameBox.style.height = $('nameH').value + '%';
+  const dims = getCardDims();
+  const boxHPx = pct($('nameH').value) / 100 * dims.h;
+  const fsPx = Math.round(pct($('nameSize').value) / 100 * boxHPx);
+  nameText.style.fontSize = Math.max(5, fsPx) + 'px';
+  nameText.textContent = $('playerNameInput').value || ' ';
+
+  // Measure text width and update % input (wait one frame for layout)
+  requestAnimationFrame(function() {
+    if (!dims.w) return;
+    var wPct = Math.round(nameText.offsetWidth / dims.w * 1000) / 10;
+    $('nameW').value = Math.max(1, wPct);
+    var sL = parseFloat($('seasonLeft').value) || 0;
+    var nL = parseFloat($('nameLeft').value) || 0;
+    var gap = nL - sL;
+    var mid = ((wPct + gap) / 2).toFixed(2);
+    $('nameMid').value = mid;
+    if (afterMeasure) afterMeasure();
+    if (localStorage.getItem('fc-center-enabled')) centerNameGroup();
+  });
+}
+function applySeasonIcon() {
+  seasonBox.style.left = $('seasonLeft').value + '%';
+  seasonBox.style.top = $('seasonTop').value + '%';
+  seasonBox.style.width = $('seasonW').value + '%';
+  seasonBox.style.height = $('seasonH').value + '%';
+}
+function applyIcons() {
+  flagBox.style.left = $('flagLeft').value + '%'; flagBox.style.top = $('flagTop').value + '%';
+  flagBox.style.width = $('flagW').value + '%'; flagBox.style.height = $('flagH').value + '%';
+  leagueBox.style.left = $('leagueLeft').value + '%'; leagueBox.style.top = $('leagueTop').value + '%';
+  leagueBox.style.width = $('leagueW').value + '%'; leagueBox.style.height = $('leagueH').value + '%';
+  clubBox.style.left = $('clubLeft').value + '%'; clubBox.style.top = $('clubTop').value + '%';
+  clubBox.style.width = $('clubW').value + '%'; clubBox.style.height = $('clubH').value + '%';
+}
+
+// Bind inputs
+['ovrLeft','ovrTop','ovrW','ovrH','ovrSize'].forEach(id => $(id).oninput = applyOvr);
+$('ovrWeight').onchange = applyOvr;
+['badgeLeft','badgeTop','badgeW','badgeH'].forEach(id => $(id).oninput = applyBadge);
+['posLeft','posTop','posW','posH','posSize'].forEach(id => $(id).oninput = applyPos);
+$('posWeight').onchange = applyPos;
+$('posInput').oninput = function(){posText.textContent=this.value||' ';};
+['hexLeft','hexTop','hexW','hexH'].forEach(id => $(id).oninput = applyHex);
+$('hexLvInput').oninput = function(){hexNum.textContent=this.value;};
+['portraitLeft','portraitTop','portraitW','portraitH'].forEach(id => $(id).oninput = applyPortrait);
+['nameLeft','nameTop','nameW','nameH','nameSize'].forEach(id => $(id).oninput = applyName);
+$('playerNameInput').oninput = function(){
+  var val = this.value || ' ';
+  nameText.textContent = val;
+  applyName();
+  // Auto-lookup OVR, position, salary, nationality, league, club from player database
+  var found = PLAYER_DB.find(function(p) { return p.name === val; });
+  if (found) {
+    $('baseOvrInput').value = found.ovr;
+    state.baseOvr = found.ovr;
+    $('posInput').value = found.position;
+    posText.textContent = found.position;
+    $('hexLvInput').value = found.salary;
+    hexNum.textContent = found.salary;
+    refresh();
+    autoMatchIcons(found);
+    if (found.nationality) setMsg('已匹配: ' + val + ' | ' + found.nationality + ' | ' + found.league + ' | ' + found.club);
+  }
+};
+// Save checkbox: toggle saves/clears current image immediately
+$('saveCardEnabled').onchange = function() {
+  if (this.checked && baseCardImg.src && baseCardImg.src.indexOf('data:image') === 0) {
+    localStorage.setItem('fc-card-image', baseCardImg.src);
+    setMsg('✅ 底图已保存');
+  } else if (!this.checked) {
+    localStorage.removeItem('fc-card-image');
+    setMsg('已取消底图保存');
+  }
+};
+$('saveSeasonEnabled').onchange = function() {
+  if (this.checked && state.seasonIconDataUrl) {
+    localStorage.setItem('fc-season-icon', state.seasonIconDataUrl);
+    setMsg('✅ 赛季图标已保存');
+  } else if (!this.checked) {
+    localStorage.removeItem('fc-season-icon');
+    setMsg('已取消赛季图标保存');
+  }
+};
+['seasonLeft','seasonTop','seasonW','seasonH'].forEach(id => $(id).oninput = applySeasonIcon);
+$('btnAutoFixSeason').onclick = function() {
+  var nLeft = parseFloat($('nameLeft').value);
+  var nTop = parseFloat($('nameTop').value);
+  var sW = parseFloat($('seasonW').value);
+  // Fixed gap: season right edge → name left edge = 3.0%, vertical offset = 0.3%
+  $('seasonLeft').value = Math.round((nLeft - sW - 3.0) * 10) / 10;
+  $('seasonTop').value = Math.round((nTop + 0.3) * 10) / 10;
+  applySeasonIcon();
+  setMsg('✅ 赛季图标已修正 (间隙=3.0% 左=' + $('seasonLeft').value + ' 上=' + $('seasonTop').value + ')');
+};
+['flagLeft','flagTop','flagW','flagH','leagueLeft','leagueTop','leagueW','leagueH','clubLeft','clubTop','clubW','clubH'].forEach(id => $(id).oninput = applyIcons);
+
+// Normalization param inputs
+$('normEnabled').onchange = function() { norm.enabled = this.checked; };
+['normPW','normPH','normTH','normCX','normCY','normScale'].forEach(function(id) {
+  $(id).onchange = function() {
+    norm.PW = +$('normPW').value || 200;
+    norm.PH = +$('normPH').value || 320;
+    norm.TH = +$('normTH').value || 290;
+    norm.CX = +$('normCX').value || 100;
+    norm.CY = +$('normCY').value || 160;
+    norm.scale = +$('normScale').value || 3;
+  };
+});
+
+$('baseOvrInput').oninput = function() { state.baseOvr = Math.max(40,Math.min(150,parseInt(this.value)||122)); refresh(); };
+
+// Card image load
+$('cardInput').onchange = function(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    const img = new Image();
+    img.onload = function() {
+      var srcDataUrl = ev.target.result;
+      if (norm.enabled) {
+        var normalized = normalizeImage(img);
+        if (normalized) {
+          srcDataUrl = normalized.toDataURL('image/png');
+          state.cardNaturalW = norm.PW * (norm.scale || 1);
+          state.cardNaturalH = norm.PH * (norm.scale || 1);
+          setMsg('✅ 底图已加载并归一化 (' + state.cardNaturalW + '×' + state.cardNaturalH + ')，切到 +2 级，拖框覆盖原OVR和等级图标');
+        } else {
+          state.cardNaturalW = img.naturalWidth;
+          state.cardNaturalH = img.naturalHeight;
+          setMsg('⚠ 未检测到有效像素，使用原图 (' + img.naturalWidth + '×' + img.naturalHeight + ')');
+        }
+      } else {
+        state.cardNaturalW = img.naturalWidth;
+        state.cardNaturalH = img.naturalHeight;
+        setMsg('✅ 底图已加载 (' + state.cardNaturalW + '×' + state.cardNaturalH + ')。切到 +2 级，拖框覆盖原OVR和等级图标');
+      }
+      baseCardImg.src = srcDataUrl;
+      if ($('saveCardEnabled').checked) {
+        localStorage.setItem('fc-card-image', srcDataUrl);
+      }
+      setTimeout(function() { applyOvr(); applyBadge(); applyPos(); applyHex(); applyPortrait(); applyName(); applySeasonIcon(); applyIcons(); }, 50);
+    };
+    img.src = ev.target.result;
+  };
+  r.readAsDataURL(f);
+};
+
+// Upload: Portrait
+$('portraitInput').onchange = function(e) {
+  const f = e.target.files[0]; if (!f) return;
+  var blobUrl = URL.createObjectURL(f);
+  var img = new Image();
+  img.onload = function() {
+    state.portraitImg = blobUrl;
+    var old = portraitBox.querySelector('img'); if (old) old.remove();
+    var el = document.createElement('img'); el.src = blobUrl;
+    portraitBox.appendChild(el);
+    portraitBox.querySelector('.box-label').style.display = 'none';
+    setMsg('✅ 头像已加载');
+  };
+  img.src = blobUrl;
+};
+
+// Portrait folder picker — scans all images, caches data URLs, stores in IndexedDB
+var portraitFolderHandle = null;
+var exportFolderHandle = null;
+var portraitCache = {}; // { '姆巴佩': 'data:image/png;base64,...', ... }
+
+async function pickPortraitFolder() {
+  if (typeof showDirectoryPicker !== 'function') {
+    setMsg('⚠ 浏览器不支持文件夹选择，请使用Chrome或Edge');
+    return;
+  }
+  try {
+    portraitFolderHandle = await showDirectoryPicker({mode: 'read'});
+    setMsg('📁 正在扫描头像文件夹...');
+    $('btnPortraitFolder').textContent = '⏳ 扫描中...';
+
+    // Scan all images in the folder
+    var count = 0;
+    portraitCache = {};
+    for await (var entry of portraitFolderHandle.values()) {
+      if (entry.kind === 'file' && /\.(png|jpg|jpeg|webp)$/i.test(entry.name)) {
+        var file = await entry.getFile();
+        var dataUrl = await new Promise(function(resolve) {
+          var reader = new FileReader();
+          reader.onload = function() { resolve(reader.result); };
+          reader.readAsDataURL(file);
+        });
+        var name = entry.name.replace(/\.(png|jpg|jpeg|webp)$/i, '');
+        portraitCache[name] = dataUrl;
+        count++;
+      }
+    }
+
+    // Store handle and cache to IndexedDB
+    try {
+      if (!assetDB) { await openAssetDB(); }
+      var tx = assetDB.transaction('assets', 'readwrite');
+      var store = tx.objectStore('assets');
+      store.put({id:'portraitFolder', handle: portraitFolderHandle});
+      store.put({id:'portraitCache', data: portraitCache});
+      await new Promise(function(resolve, reject) {
+        tx.oncomplete = resolve;
+        tx.onerror = function() { reject(tx.error); };
+      });
+    } catch(dbErr) { /* DB not available */ }
+
+    localStorage.setItem('fc-portrait-folder-stored', '1');
+    $('btnPortraitFolder').textContent = '✅ 头像已缓存 (' + count + '张)';
+    $('btnPortraitFolder').style.color = '#00c853';
+
+    // Auto-match current player immediately
+    var curName = $('playerNameInput').value;
+    var curFound = PLAYER_DB.find(function(p) { return p.name === curName; });
+    if (curFound) { autoMatchIcons(curFound); }
+
+    setMsg('✅ 扫描到 ' + count + ' 张头像，输入球员名即可自动匹配');
+  } catch(e) {
+    $('btnPortraitFolder').textContent = '📁 头像文件夹';
+    $('btnPortraitFolder').style.color = '';
+    if (e.name !== 'AbortError') { setMsg('❌ 设置头像文件夹失败: ' + e.message); }
+  }
+}
+
+// Open portrait file — uses stored folder handle if available, falls back to file input
+async function openPortraitFile() {
+  if (portraitFolderHandle && typeof showOpenFilePicker === 'function') {
+    try {
+      // Verify permission
+      var perm = await portraitFolderHandle.queryPermission({mode: 'read'});
+      if (perm !== 'granted') {
+        perm = await portraitFolderHandle.requestPermission({mode: 'read'});
+      }
+      if (perm !== 'granted') {
+        // Fall back to regular file input
+        $('portraitInput').click();
+        return;
+      }
+      var fileHandles = await showOpenFilePicker({
+        startIn: portraitFolderHandle,
+        types: [{description: 'Images', accept: {'image/*': ['.png', '.jpg', '.jpeg', '.webp']}}],
+        multiple: false
+      });
+      if (fileHandles && fileHandles[0]) {
+        var file = await fileHandles[0].getFile();
+        var blobUrl = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function() {
+          state.portraitImg = blobUrl;
+          var old = portraitBox.querySelector('img'); if (old) old.remove();
+          var el = document.createElement('img'); el.src = blobUrl;
+          portraitBox.appendChild(el);
+          portraitBox.querySelector('.box-label').style.display = 'none';
+          setMsg('✅ 头像已加载');
+        };
+        img.src = blobUrl;
+      }
+    } catch(e) {
+      if (e.name !== 'AbortError') {
+        // Fall back to regular file input on error
+        $('portraitInput').click();
+      }
+    }
+  } else {
+    // No stored folder handle, use regular file input
+    $('portraitInput').click();
+  }
+}
+// Upload: Season icon
+$('seasonInput').onchange = function(e) {
+  const f = e.target.files[0]; if (!f) return;
+  var blobUrl = URL.createObjectURL(f);
+  var img = new Image();
+  img.onload = function() {
+    state.seasonIconImg = blobUrl;
+    var old = seasonBox.querySelector('img'); if (old) old.remove();
+    var el = document.createElement('img'); el.src = blobUrl;
+    seasonBox.appendChild(el);
+    seasonBox.querySelector('.box-label').style.display = 'none';
+    setMsg('✅ 赛季图标已加载');
+  };
+  img.src = blobUrl;
+  // Always read as data URL for save support
+  var rr = new FileReader();
+  rr.onload = function(ev) {
+    state.seasonIconDataUrl = ev.target.result;
+    if ($('saveSeasonEnabled').checked) {
+      localStorage.setItem('fc-season-icon', ev.target.result);
+    }
+  };
+  rr.readAsDataURL(f);
+};
+// Upload: Flag
+$('flagInput').onchange = function(e) {
+  const f = e.target.files[0]; if (!f) return;
+  var blobUrl = URL.createObjectURL(f);
+  var img = new Image();
+  img.onload = function() {
+    state.flagImg = blobUrl;
+    var old = flagBox.querySelector('img'); if (old) old.remove();
+    var el = document.createElement('img'); el.src = blobUrl; flagBox.appendChild(el);
+    flagBox.querySelector('.box-label').style.display = 'none';
+    setMsg('✅ 国旗已加载');
+  };
+  img.src = blobUrl;
+};
+// Upload: League
+$('leagueInput').onchange = function(e) {
+  const f = e.target.files[0]; if (!f) return;
+  var blobUrl = URL.createObjectURL(f);
+  var img = new Image();
+  img.onload = function() {
+    state.leagueImg = blobUrl;
+    var old = leagueBox.querySelector('img'); if (old) old.remove();
+    var el = document.createElement('img'); el.src = blobUrl; leagueBox.appendChild(el);
+    leagueBox.querySelector('.box-label').style.display = 'none';
+    setMsg('✅ 联赛图标已加载');
+  };
+  img.src = blobUrl;
+};
+// Upload: Club
+$('clubInput').onchange = function(e) {
+  const f = e.target.files[0]; if (!f) return;
+  var blobUrl = URL.createObjectURL(f);
+  var img = new Image();
+  img.onload = function() {
+    state.clubImg = blobUrl;
+    var old = clubBox.querySelector('img'); if (old) old.remove();
+    var el = document.createElement('img'); el.src = blobUrl; clubBox.appendChild(el);
+    clubBox.querySelector('.box-label').style.display = 'none';
+    setMsg('✅ 俱乐部图标已加载');
+  };
+  img.src = blobUrl;
+};
+
+// Recalculate font size on resize
+window.addEventListener('resize', () => { applyOvr(); applyPos(); applyHex(); applyName(); applySeasonIcon(); applyPortrait(); applyIcons(); });
+
+// ============================================================
+// DRAG — percentage-based
+// ============================================================
+let dragTarget = null, origPctL, origPctT, dsX, dsY, seasonOrigL, seasonOrigT;
+
+function isHandle(el) { return el && el.classList.contains('rs-handle'); }
+
+const allBoxes = [ovrBox, badgeBox, posBox, hexBox, portraitBox, nameBox, seasonBox, flagBox, leagueBox, clubBox];
+allBoxes.forEach(box => {
+  box.addEventListener('mousedown', onDown);
+  box.addEventListener('touchstart', onDown, {passive:false});
+  box.querySelector('.rs-handle').addEventListener('mousedown', onResizeDown);
+  box.querySelector('.rs-handle').addEventListener('touchstart', onResizeDown, {passive:false});
+});
+
+function onDown(e) {
+  if (isHandle(e.target)) return;
+  dragTarget = e.target.closest('.place-box');
+  if (!dragTarget) return;
+  e.preventDefault();
+  dragTarget.classList.add('dragging');
+  dsX = e.touches ? e.touches[0].clientX : e.clientX;
+  dsY = e.touches ? e.touches[0].clientY : e.clientY;
+  origPctL = pct(dragTarget.style.left);
+  origPctT = pct(dragTarget.style.top);
+  if (dragTarget === nameBox) {
+    seasonOrigL = pct(seasonBox.style.left);
+    seasonOrigT = pct(seasonBox.style.top);
+  }
+}
+
+document.addEventListener('mousemove', function(e) {
+  if (!dragTarget) return;
+  e.preventDefault();
+  const dims = getCardDims();
+  if (!dims.w || !dims.h) return;
+  const dxPct = (e.clientX - dsX) / dims.w * 100;
+  const dyPct = (e.clientY - dsY) / dims.h * 100;
+  const nl = Math.round((origPctL + dxPct) * 10) / 10;
+  const nt = Math.round((origPctT + dyPct) * 10) / 10;
+  dragTarget.style.left = nl + '%';
+  dragTarget.style.top = nt + '%';
+  syncInputs(dragTarget, nl, nt);
+  if (dragTarget === nameBox) moveSeasonWithName(dxPct, dyPct);
+});
+document.addEventListener('touchmove', function(e) {
+  if (!dragTarget) return;
+  e.preventDefault();
+  const dims = getCardDims();
+  if (!dims.w || !dims.h) return;
+  const dxPct = (e.touches[0].clientX - dsX) / dims.w * 100;
+  const dyPct = (e.touches[0].clientY - dsY) / dims.h * 100;
+  const nl = Math.round((origPctL + dxPct) * 10) / 10;
+  const nt = Math.round((origPctT + dyPct) * 10) / 10;
+  dragTarget.style.left = nl + '%';
+  dragTarget.style.top = nt + '%';
+  syncInputs(dragTarget, nl, nt);
+  if (dragTarget === nameBox) moveSeasonWithName(dxPct, dyPct);
+}, {passive:false});
+document.addEventListener('mouseup', function() { if(dragTarget){dragTarget.classList.remove('dragging');dragTarget=null;} });
+document.addEventListener('touchend', function() { if(dragTarget){dragTarget.classList.remove('dragging');dragTarget=null;} });
+
+function moveSeasonWithName(dxPct, dyPct) {
+  var sLeft = Math.round((seasonOrigL + dxPct) * 10) / 10;
+  var sTop = Math.round((seasonOrigT + dyPct) * 10) / 10;
+  seasonBox.style.left = sLeft + '%';
+  seasonBox.style.top = sTop + '%';
+  $('seasonLeft').value = sLeft;
+  $('seasonTop').value = sTop;
+}
+
+function syncInputs(el, l, t) {
+  if (el.id === 'ovrBox') { $('ovrLeft').value = l; $('ovrTop').value = t; applyOvr(); }
+  else if (el.id === 'badgeBox') { $('badgeLeft').value = l; $('badgeTop').value = t; }
+  else if (el.id === 'posBox') { $('posLeft').value = l; $('posTop').value = t; applyPos(); }
+  else if (el.id === 'hexBox') { $('hexLeft').value = l; $('hexTop').value = t; applyHex(); }
+  else if (el.id === 'portraitBox') { $('portraitLeft').value = l; $('portraitTop').value = t; applyPortrait(); }
+  else if (el.id === 'nameBox') { $('nameLeft').value = l; $('nameTop').value = t; applyName(); }
+  else if (el.id === 'seasonBox') { $('seasonLeft').value = l; $('seasonTop').value = t; applySeasonIcon(); }
+  else if (el.id === 'flagBox') { $('flagLeft').value = l; $('flagTop').value = t; applyIcons(); }
+  else if (el.id === 'leagueBox') { $('leagueLeft').value = l; $('leagueTop').value = t; applyIcons(); }
+  else if (el.id === 'clubBox') { $('clubLeft').value = l; $('clubTop').value = t; applyIcons(); }
+}
+
+// ============================================================
+// RESIZE — percentage-based
+// ============================================================
+let rsTarget = null, rsSW, rsSH, rsSX, rsSY;
+
+function onResizeDown(e) {
+  e.preventDefault(); e.stopPropagation();
+  rsTarget = e.target.closest('.place-box');
+  if (!rsTarget) return;
+  rsSX = e.touches ? e.touches[0].clientX : e.clientX;
+  rsSY = e.touches ? e.touches[0].clientY : e.clientY;
+  rsSW = rsTarget.offsetWidth;
+  rsSH = rsTarget.offsetHeight;
+}
+
+document.addEventListener('mousemove', function(e) {
+  if (!rsTarget) return;
+  e.preventDefault();
+  const dims = getCardDims();
+  if (!dims.w || !dims.h) return;
+  const dwPct = (e.clientX - rsSX) / dims.w * 100;
+  const dhPct = (e.clientY - rsSY) / dims.h * 100;
+  const nw = Math.round(Math.max(2, (rsSW / dims.w * 100) + dwPct) * 10) / 10;
+  const nh = Math.round(Math.max(2, (rsSH / dims.h * 100) + dhPct) * 10) / 10;
+  rsTarget.style.width = nw + '%';
+  rsTarget.style.height = nh + '%';
+  syncDims(rsTarget, nw, nh);
+});
+document.addEventListener('touchmove', function(e) {
+  if (!rsTarget) return;
+  e.preventDefault();
+  const dims = getCardDims();
+  if (!dims.w || !dims.h) return;
+  const dwPct = (e.touches[0].clientX - rsSX) / dims.w * 100;
+  const dhPct = (e.touches[0].clientY - rsSY) / dims.h * 100;
+  const nw = Math.round(Math.max(2, (rsSW / dims.w * 100) + dwPct) * 10) / 10;
+  const nh = Math.round(Math.max(2, (rsSH / dims.h * 100) + dhPct) * 10) / 10;
+  rsTarget.style.width = nw + '%';
+  rsTarget.style.height = nh + '%';
+  syncDims(rsTarget, nw, nh);
+}, {passive:false});
+document.addEventListener('mouseup', function() { rsTarget = null; });
+document.addEventListener('touchend', function() { rsTarget = null; });
+
+function syncDims(el, w, h) {
+  if (el.id === 'ovrBox') {
+    const oldH = pct($('ovrH').value) || h;
+    $('ovrW').value = w;
+    $('ovrH').value = h;
+    if (oldH > 0) {
+      const curSize = pct($('ovrSize').value);
+      $('ovrSize').value = Math.round(Math.max(2, curSize * (h / oldH)) * 10) / 10;
+    }
+    applyOvr();
+  }
+  else if (el.id === 'badgeBox') { $('badgeW').value = w; $('badgeH').value = h; }
+  else if (el.id === 'posBox') {
+    const oldH = pct($('posH').value) || h;
+    $('posW').value = w; $('posH').value = h;
+    if (oldH > 0) { const cs = pct($('posSize').value); $('posSize').value = Math.round(Math.max(2, cs * (h / oldH)) * 10) / 10; }
+    applyPos();
+  }
+  else if (el.id === 'hexBox') { $('hexW').value = w; $('hexH').value = h; applyHex(); }
+  else if (el.id === 'portraitBox') { $('portraitW').value = w; $('portraitH').value = h; applyPortrait(); }
+  else if (el.id === 'nameBox') {
+    const oldH = pct($('nameH').value) || h;
+    $('nameH').value = h;
+    if (oldH > 0) { const cs = pct($('nameSize').value); $('nameSize').value = Math.round(Math.max(2, cs * (h / oldH)) * 10) / 10; }
+    applyName();
+  }
+  else if (el.id === 'seasonBox') { $('seasonW').value = w; $('seasonH').value = h; applySeasonIcon(); }
+  else if (el.id === 'flagBox') { $('flagW').value = w; $('flagH').value = h; applyIcons(); }
+  else if (el.id === 'leagueBox') { $('leagueW').value = w; $('leagueH').value = h; applyIcons(); }
+  else if (el.id === 'clubBox') { $('clubW').value = w; $('clubH').value = h; applyIcons(); }
+}
+
+// ============================================================
+// Export — direct canvas compositing at native resolution (lossless)
+// ============================================================
+function preExport() { allBoxes.forEach(b => b.classList.add('exporting')); }
+function postExport() { allBoxes.forEach(b => b.classList.remove('exporting')); }
+
+function renderCardToCanvas() {
+  const W = state.cardNaturalW, H = state.cardNaturalH;
+  if (!W || !H) return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // 1. Draw base card
+  ctx.drawImage(baseCardImg, 0, 0, W, H);
+
+  const d = LV_DATA.find(x => x.lv === state.curLv) || LV_DATA[0];
+  const ovr = state.baseOvr + d.bonus;
+
+  // 2. OVR text
+  var ol = pct($('ovrLeft').value), ot = pct($('ovrTop').value),
+      ow = pct($('ovrW').value), oh = pct($('ovrH').value);
+  var ox = ol / 100 * W, oy = ot / 100 * H,
+      osw = ow / 100 * W, osh = oh / 100 * H;
+  var fsPx = Math.round(pct($('ovrSize').value) / 100 * osh);
+  var fw = $('ovrWeight').value;
+  ctx.save();
+  ctx.font = fw + ' ' + Math.max(6, fsPx) + 'px Montserrat, sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.shadowBlur = Math.max(2, fsPx * 0.08);
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = Math.max(1, fsPx * 0.04);
+  ctx.scale(0.9, 1);
+  ctx.fillText(String(ovr), (ox + osw / 2) / 0.9, oy + osh / 2);
+  ctx.restore();
+
+  // 3. Position text
+  var pl = pct($('posLeft').value), pt_ = pct($('posTop').value),
+      pw = pct($('posW').value), ph = pct($('posH').value);
+  var pfsPx = Math.round(pct($('posSize').value) / 100 * (ph / 100 * H));
+  ctx.save();
+  ctx.font = ($('posWeight').value) + ' ' + Math.max(5, pfsPx) + 'px Montserrat, sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.shadowBlur = 3;
+  ctx.fillText(posText.textContent, pl / 100 * W + pw / 200 * W, pt_ / 100 * H + ph / 200 * H);
+  ctx.restore();
+
+  // 5. Hexagon with number (stretch to fill box, matching SVG preserveAspectRatio="none")
+  var hl = pct($('hexLeft').value), ht_ = pct($('hexTop').value),
+      hw = pct($('hexW').value), hh = pct($('hexH').value);
+  var hx = hl / 100 * W, hy = ht_ / 100 * H, hsw = hw / 100 * W, hsh = hh / 100 * H;
+  ctx.save();
+  ctx.beginPath();
+  // SVG vertices from viewBox 0 0 100 100, mapped to actual box dimensions
+  ctx.moveTo(hx + 0.50 * hsw, hy + 0.03 * hsh);
+  ctx.lineTo(hx + 0.97 * hsw, hy + 0.27 * hsh);
+  ctx.lineTo(hx + 0.97 * hsw, hy + 0.73 * hsh);
+  ctx.lineTo(hx + 0.50 * hsw, hy + 0.97 * hsh);
+  ctx.lineTo(hx + 0.03 * hsw, hy + 0.73 * hsh);
+  ctx.lineTo(hx + 0.03 * hsw, hy + 0.27 * hsh);
+  ctx.closePath();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = Math.max(1, Math.min(hsw, hsh) * 0.04);
+  ctx.stroke();
+  var hfs = Math.max(5, hsh * 0.35);
+  ctx.font = '700 ' + hfs + 'px Montserrat, sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  var hcx = hx + hsw / 2, hcy = hy + hsh / 2;
+  ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.shadowBlur = Math.max(2, hfs * 0.08);
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = Math.max(1, hfs * 0.04);
+  ctx.fillText(hexNum.textContent, hcx, hcy);
+  ctx.restore();
+
+  // 6. Portrait
+  if (state.portraitImg) {
+    var rl = pct($('portraitLeft').value), rt_ = pct($('portraitTop').value),
+        rw = pct($('portraitW').value), rh = pct($('portraitH').value);
+    var rx = rl / 100 * W, ry = rt_ / 100 * H, rsw = rw / 100 * W, rsh = rh / 100 * H;
+    var pImg = portraitBox.querySelector('img');
+    if (pImg) ctx.drawImage(pImg, rx, ry, rsw, rsh);
+  }
+
+  // 7. Name text
+  var _nl = pct($('nameLeft').value), _nt = pct($('nameTop').value),
+      _nw = pct($('nameW').value), _nh = pct($('nameH').value);
+  var nfsPx = Math.round(pct($('nameSize').value) / 100 * (_nh / 100 * H));
+  ctx.save();
+  ctx.font = '700 ' + Math.max(5, nfsPx) + 'px Microsoft YaHei, sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0,0,0,0.95)';
+  ctx.shadowBlur = 4;
+  ctx.fillText(nameText.textContent, _nl / 100 * W, _nt / 100 * H + _nh / 200 * H);
+  ctx.restore();
+
+  // 7b. Season icon
+  if (state.seasonIconImg) {
+    var si = seasonBox.querySelector('img');
+    if (si) {
+      var sl = pct(seasonBox.style.left), st_ = pct(seasonBox.style.top),
+          sw = pct(seasonBox.style.width), sh = pct(seasonBox.style.height);
+      ctx.drawImage(si, sl / 100 * W, (st_ + 1.0) / 100 * H, sw / 100 * W, sh / 100 * H);
+    }
+  }
+
+  // 8. Flag / League / Club icons
+  [flagBox, leagueBox, clubBox].forEach(function(box) {
+    var img = box.querySelector('img');
+    if (!img) return;
+    var boxL = pct(box.style.left), boxT = pct(box.style.top),
+        boxW = pct(box.style.width), boxH = pct(box.style.height);
+    ctx.drawImage(img, boxL / 100 * W, boxT / 100 * H, boxW / 100 * W, boxH / 100 * H);
+  });
+
+  // 9. Badge icon — rendered last, topmost layer
+  if (state.curLv >= 1) {
+    var iconSrc = state.badges[state.curLv];
+    if (iconSrc) {
+      var bl = pct($('badgeLeft').value), bt = pct($('badgeTop').value),
+          bw = pct($('badgeW').value), bh = pct($('badgeH').value);
+      var bx = bl / 100 * W, by = bt / 100 * H,
+          bsw = bw / 100 * W, bsh = bh / 100 * H;
+      var badgeImg = badgeBox.querySelector('img');
+      if (badgeImg) ctx.drawImage(badgeImg, bx, by, bsw, bsh);
+    }
+  }
+
+  return canvas;
+}
+
+async function doExportOne() {
+  preExport();
+  try {
+    var canvas = renderCardToCanvas();
+    if (!canvas) { postExport(); alert('请先加载底图'); return; }
+    postExport();
+    canvas.toBlob(function(blob) {
+      var a = document.createElement('a');
+      a.download = 'card_lv' + state.curLv + '.png';
+      a.href = URL.createObjectURL(blob);
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+    setMsg('✅ 已无损导出等级 +' + state.curLv + ' (' + canvas.width + '×' + canvas.height + ')');
+  } catch(e) { postExport(); alert('导出失败: ' + e.message); }
+}
+
+async function pickExportFolder() {
+  if (typeof showDirectoryPicker !== 'function') {
+    setMsg('⚠ 浏览器不支持文件夹选择，请使用Chrome或Edge');
+    return;
+  }
+  try {
+    exportFolderHandle = await showDirectoryPicker({mode: 'readwrite'});
+    // Store handle to IndexedDB
+    try {
+      if (!assetDB) { await openAssetDB(); }
+      var tx = assetDB.transaction('assets', 'readwrite');
+      var store = tx.objectStore('assets');
+      store.put({id:'exportFolder', handle: exportFolderHandle});
+      await new Promise(function(resolve, reject) {
+        tx.oncomplete = resolve;
+        tx.onerror = function() { reject(tx.error); };
+      });
+    } catch(dbErr) { /* DB not available */ }
+    localStorage.setItem('fc-export-folder-stored', '1');
+    $('btnExportPath').className = 'btn btn-asset active';
+    $('btnExportPath').textContent = '✅ 导出路径已设置';
+    setMsg('📁 导出路径已设置，后续批量导出将直接保存到此文件夹');
+  } catch(e) {
+    if (e.name !== 'AbortError') { setMsg('❌ 设置导出路径失败: ' + e.message); }
+  }
+}
+
+function updateExportPathButton() {
+  if (localStorage.getItem('fc-export-folder-stored')) {
+    $('btnExportPath').className = 'btn btn-asset active';
+    $('btnExportPath').textContent = '✅ 导出路径已设置';
+  }
+}
+
+async function doExportBatch() {
+  const btn = $('btnBatch');
+
+  // === Pre-export validation ===
+  var missing = [];
+  if (!state.portraitImg && !portraitBox.querySelector('img')) missing.push('球员头像');
+  if (!state.seasonIconImg && !seasonBox.querySelector('img')) missing.push('赛季图标');
+  if (!state.flagImg && !flagBox.querySelector('img')) missing.push('国旗');
+  if (!state.leagueImg && !leagueBox.querySelector('img')) missing.push('联赛');
+  if (!state.clubImg && !clubBox.querySelector('img')) missing.push('俱乐部');
+  if (missing.length) {
+    alert('❌ 导出前请检查以下内容缺失：\n\n' + missing.join('\n') + '\n\n请补全后再导出。');
+    return;
+  }
+
+  btn.textContent = '⏳ 生成中...'; btn.disabled = true;
+
+  // Resolve player name from DB or input
+  const inputName = $('playerNameInput').value || 'player';
+  const found = PLAYER_DB.find(function(p) { return p.name === inputName; });
+  const playerName = found ? found.name : inputName;
+
+  let ok = 0;
+  let dirHandle = null;
+
+  if (typeof showDirectoryPicker === 'function') {
+    // Try to reuse stored handle first
+    if (exportFolderHandle) {
+      try {
+        var perm = await exportFolderHandle.queryPermission({mode: 'readwrite'});
+        if (perm !== 'granted') {
+          perm = await exportFolderHandle.requestPermission({mode: 'readwrite'});
+        }
+        if (perm === 'granted') {
+          dirHandle = exportFolderHandle;
+          setMsg('📁 使用已设置的导出路径，生成中...');
+        }
+      } catch(e) { /* fall through to picker */ }
+    } else if (localStorage.getItem('fc-export-folder-stored')) {
+      // Try to restore handle from DB
+      try {
+        if (!assetDB) { await openAssetDB(); }
+        var tx = assetDB.transaction('assets', 'readonly');
+        var store = tx.objectStore('assets');
+        var req = store.get('exportFolder');
+        var result = await new Promise(function(resolve, reject) {
+          req.onsuccess = function() { resolve(req.result); };
+          req.onerror = function() { reject(req.error); };
+        });
+        if (result && result.handle) {
+          exportFolderHandle = result.handle;
+          var perm = await exportFolderHandle.queryPermission({mode: 'readwrite'});
+          if (perm !== 'granted') {
+            perm = await exportFolderHandle.requestPermission({mode: 'readwrite'});
+          }
+          if (perm === 'granted') {
+            dirHandle = exportFolderHandle;
+            updateExportPathButton();
+            setMsg('📁 使用已设置的导出路径，生成中...');
+          }
+        }
+      } catch(e) { /* fall through to picker */ }
+    }
+    // If no stored handle or permission denied, ask user
+    if (!dirHandle) {
+      try {
+        dirHandle = await showDirectoryPicker({mode: 'readwrite'});
+        setMsg('📁 已选择文件夹，生成中...');
+      } catch(e) {
+        if (e.name === 'AbortError') {
+          btn.textContent = '🚀 批量导出1~13级'; btn.disabled = false;
+          setMsg('已取消');
+          return;
+        }
+      }
+    }
+
+    // Create player subfolder inside export path
+    var subDir = dirHandle;
+    if (dirHandle) {
+      var safeName = playerName.replace(/[\\/:*?"<>|]/g, '');
+      try {
+        subDir = await dirHandle.getDirectoryHandle(safeName, {create: true});
+        setMsg('📁 已创建文件夹: ' + safeName + '，生成中...');
+      } catch(e) {
+        btn.textContent = '🚀 批量导出1~13级'; btn.disabled = false;
+        setMsg('❌ 创建文件夹失败: ' + e.message);
+        return;
+      }
+    }
+  }
+
+  var levelImages = [];
+  for (let lv = 1; lv <= 13; lv++) {
+    state.curLv = lv; refresh(); buildLevelDots(); applyOvr(); applyBadge(); applyPos(); applyHex(); applyPortrait(); applyName(); applySeasonIcon(); applyIcons();
+    await sleep(120);
+    preExport();
+    try {
+      var canvas = renderCardToCanvas();
+      if (!canvas) { postExport(); setMsg('❌ +' + lv + ' 失败: 无底图'); continue; }
+      postExport();
+      const fname = playerName + '_Lv' + lv + '.png';
+      const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      var dataUrl = canvas.toDataURL('image/png');
+      levelImages.push({lv: lv, dataUrl: dataUrl});
+
+      if (subDir) {
+        const fh = await subDir.getFileHandle(fname, {create:true});
+        const ws = await fh.createWritable();
+        await ws.write(blob);
+        await ws.close();
+      } else {
+        const a = document.createElement('a');
+        a.download = fname;
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      ok++;
+      setMsg('✅ +' + lv + ' (' + ok + '/13)');
+      await sleep(200);
+    } catch(e) { postExport(); setMsg('❌ +' + lv + ' 失败: ' + e.message); }
+  }
+  state.curLv = 1; refresh(); buildLevelDots();
+  btn.textContent = '🚀 批量导出1~13级'; btn.disabled = false;
+  if (subDir) {
+    setMsg('✅ 完成！' + ok + '/13 张已保存到 ' + playerName + '/ 文件夹');
+  } else {
+    setMsg('✅ 完成！成功 ' + ok + '/13 张（无损PNG）');
+  }
+  if (found && levelImages.length > 0) {
+    try {
+      await saveToSharedDB(playerName, found, levelImages);
+      setMsg('✅ 完成！' + ok + '/13 张 | 已同步到强化模拟器');
+    } catch(e) { console.error('共享DB写入失败:', e); }
+  }
+}
+
+async function saveToSharedDB(playerName, playerInfo, levelImages) {
+  return new Promise(function(resolve, reject) {
+    var req = indexedDB.open('fc-shared-data', 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('playerCards')) {
+        db.createObjectStore('playerCards', {keyPath: 'name'});
+      }
+    };
+    req.onsuccess = function(e) {
+      var db = e.target.result;
+      var tx = db.transaction('playerCards', 'readwrite');
+      var store = tx.objectStore('playerCards');
+      store.put({
+        name: playerName,
+        ovr: playerInfo.ovr,
+        position: playerInfo.position,
+        season: '25UCL',
+        nationality: playerInfo.nationality || '',
+        league: playerInfo.league || '',
+        club: playerInfo.club || '',
+        exportedAt: Date.now(),
+        levels: levelImages
+      });
+      tx.oncomplete = function() { db.close(); resolve(); };
+      tx.onerror = function() { db.close(); reject(tx.error); };
+    };
+    req.onerror = function(e) { reject(e.target.error); };
+  });
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ============================================================
+// Actions
+// ============================================================
+function doCopy() {
+  const t = 'OVR(%): left=' + $('ovrLeft').value + ' top=' + $('ovrTop').value + ' w=' + $('ovrW').value + ' h=' + $('ovrH').value + ' size=' + $('ovrSize').value + ' weight=' + $('ovrWeight').value + '\nBadge(%): left=' + $('badgeLeft').value + ' top=' + $('badgeTop').value + ' w=' + $('badgeW').value + ' h=' + $('badgeH').value + '\nPos(%): left=' + $('posLeft').value + ' top=' + $('posTop').value + ' w=' + $('posW').value + ' h=' + $('posH').value + ' size=' + $('posSize').value + '\nHex(%): left=' + $('hexLeft').value + ' top=' + $('hexTop').value + ' w=' + $('hexW').value + ' h=' + $('hexH').value + '\nPortrait(%): left=' + $('portraitLeft').value + ' top=' + $('portraitTop').value + ' w=' + $('portraitW').value + ' h=' + $('portraitH').value + '\nName(%): left=' + $('nameLeft').value + ' top=' + $('nameTop').value + ' w=' + $('nameW').value + ' h=' + $('nameH').value + ' size=' + $('nameSize').value + '\nSeason(%): left=' + $('seasonLeft').value + ' top=' + $('seasonTop').value + ' w=' + $('seasonW').value + ' h=' + $('seasonH').value + '\nFlag(%): left=' + $('flagLeft').value + ' top=' + $('flagTop').value + ' w=' + $('flagW').value + ' h=' + $('flagH').value + '\nLeague(%): left=' + $('leagueLeft').value + ' top=' + $('leagueTop').value + ' w=' + $('leagueW').value + ' h=' + $('leagueH').value + '\nClub(%): left=' + $('clubLeft').value + ' top=' + $('clubTop').value + ' w=' + $('clubW').value + ' h=' + $('clubH').value;
+  navigator.clipboard.writeText(t).then(() => setMsg('📋 坐标已复制'));
+}
+
+function doImport() {
+  var defVal = '';
+  if ($('saveImportEnabled').checked) {
+    var saved = localStorage.getItem('fc-editor-saved-coords');
+    if (saved) defVal = saved;
+  }
+  var raw = prompt('请粘贴之前复制的坐标文本：', defVal);
+  if (!raw) return;
+  if ($('saveImportEnabled').checked) {
+    localStorage.setItem('fc-editor-saved-coords', raw);
+  }
+  var map = {
+    OVR: {left:'ovrLeft',top:'ovrTop',w:'ovrW',h:'ovrH',size:'ovrSize',weight:'ovrWeight'},
+    Badge: {left:'badgeLeft',top:'badgeTop',w:'badgeW',h:'badgeH'},
+    Pos:   {left:'posLeft',top:'posTop',w:'posW',h:'posH',size:'posSize'},
+    Hex:   {left:'hexLeft',top:'hexTop',w:'hexW',h:'hexH'},
+    Portrait: {left:'portraitLeft',top:'portraitTop',w:'portraitW',h:'portraitH'},
+    Name:  {left:'nameLeft',top:'nameTop',w:'nameW',h:'nameH',size:'nameSize'},
+    Season:{left:'seasonLeft',top:'seasonTop',w:'seasonW',h:'seasonH'},
+    Flag:  {left:'flagLeft',top:'flagTop',w:'flagW',h:'flagH'},
+    League:{left:'leagueLeft',top:'leagueTop',w:'leagueW',h:'leagueH'},
+    Club:  {left:'clubLeft',top:'clubTop',w:'clubW',h:'clubH'}
+  };
+  var lines = raw.split(/\n/);
+  var cnt = 0;
+  lines.forEach(function(ln) {
+    var m = ln.match(/^(\w+)\(%\):\s*(.*)/);
+    if (!m) return;
+    var sec = m[1], rest = m[2];
+    var fields = map[sec];
+    if (!fields) return;
+    var pairs = rest.match(/(\w+)=([\d.]+)/g);
+    if (!pairs) return;
+    pairs.forEach(function(p) {
+      var kv = p.split('=');
+      var id = fields[kv[0]];
+      if (id && $(id)) { $(id).value = kv[1]; cnt++; }
+    });
+  });
+  applyOvr(); applyBadge(); applyPos(); applyHex(); applyPortrait(); applyName(); applySeasonIcon(); applyIcons();
+  setMsg('✅ 已导入 ' + cnt + ' 个坐标字段');
+}
+
+function doReset() {
+  ['ovrLeft','ovrTop','ovrW','ovrH'].forEach((id,i) => $(id).value = ['10.9','17.2','19.5','14.1'][i]);
+  $('ovrSize').value = '58.3'; $('ovrWeight').value = '600';
+  ['badgeLeft','badgeTop','badgeW','badgeH'].forEach((id,i) => $(id).value = ['9','57.9','21.7','8.8'][i]);
+  ['posLeft','posTop','posW','posH'].forEach((id,i) => $(id).value = ['12.2','30.9','12.8','5.1'][i]);
+  $('posSize').value = '56.1'; $('posWeight').value = '700'; $('posInput').value = 'LM'; posText.textContent = 'LM';
+  ['hexLeft','hexTop','hexW','hexH'].forEach((id,i) => $(id).value = ['14.4','39.4','9.8','7.1'][i]);
+  $('hexLvInput').value = '31'; hexNum.textContent = '31';
+  ['portraitLeft','portraitTop','portraitW','portraitH'].forEach((id,i) => $(id).value = ['23','19.6','68.2','47'][i]);
+  ['nameLeft','nameTop','nameW','nameH'].forEach((id,i) => $(id).value = ['31.2','69.5','39.7','8.2'][i]);
+  $('nameSize').value = '58.4'; $('playerNameInput').value = '姆巴佩'; nameText.textContent = '姆巴佩';
+  ['seasonLeft','seasonTop','seasonW','seasonH'].forEach((id,i) => $(id).value = ['16.9','69.8','11.3','5.2'][i]);
+  ['flagLeft','flagTop','flagW','flagH'].forEach((id,i) => $(id).value = ['28.4','80.3','10.7','3.5'][i]);
+  ['leagueLeft','leagueTop','leagueW','leagueH'].forEach((id,i) => $(id).value = ['44.5','77.9','11.8','7.7'][i]);
+  ['clubLeft','clubTop','clubW','clubH'].forEach((id,i) => $(id).value = ['60.5','78.1','11.3','6.6'][i]);
+  state.baseOvr = 122; $('baseOvrInput').value = 122;
+  state.curLv = 1; state.badges = {};
+  state.portraitImg = null; state.seasonIconImg = null; state.seasonIconDataUrl = null;
+  state.flagImg = null; state.leagueImg = null; state.clubImg = null;
+  // Clear uploaded images
+  [portraitBox, seasonBox, flagBox, leagueBox, clubBox].forEach(function(b) {
+    var imgs = b.querySelectorAll('img'); imgs.forEach(function(im) { im.remove(); });
+    var lb = b.querySelector('.box-label'); if (lb) lb.style.display = '';
+  });
+  if ($('saveCardEnabled').checked) { localStorage.removeItem('fc-card-image'); }
+  if ($('saveSeasonEnabled').checked) { localStorage.removeItem('fc-season-icon'); }
+  applyOvr(); applyBadge(); applyPos(); applyHex(); applyPortrait(); applyName(); applySeasonIcon(); applyIcons();
+  refresh(); buildLevelDots(); buildBadgeUI();
+  setMsg('已重置');
+}
+
+function setMsg(s) { $('statusMsg').innerHTML = s; }
+
+// ============================================================
+// Asset Library — IndexedDB + auto-match
+// ============================================================
+var assetLib = {flags:{}, leagues:{}, clubs:{}, seasons:{}};
+var assetLibraryLoaded = false;
+var assetDB = null;
+
+function openAssetDB() {
+  return new Promise(function(resolve, reject) {
+    var req = indexedDB.open('fc-card-assets', 1);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('assets')) {
+        db.createObjectStore('assets', {keyPath: 'id'});
+      }
+    };
+    req.onsuccess = function(e) { assetDB = e.target.result; resolve(assetDB); };
+    req.onerror = function(e) { reject(e); };
+  });
+}
+
+function storeAssetsToDB(assets) {
+  return new Promise(function(resolve, reject) {
+    if (!assetDB) { reject(new Error('DB not open')); return; }
+    var tx = assetDB.transaction('assets', 'readwrite');
+    var store = tx.objectStore('assets');
+    store.put({id:'flags', data: assets.flags});
+    store.put({id:'leagues', data: assets.leagues});
+    store.put({id:'clubs', data: assets.clubs});
+    store.put({id:'seasons', data: assets.seasons});
+    tx.oncomplete = function() { resolve(); };
+    tx.onerror = function() { reject(tx.error); };
+  });
+}
+
+function getAssetsFromDB() {
+  return new Promise(function(resolve, reject) {
+    if (!assetDB) { reject(new Error('DB not open')); return; }
+    var tx = assetDB.transaction('assets', 'readonly');
+    var store = tx.objectStore('assets');
+    var result = {};
+    var keys = ['flags', 'leagues', 'clubs', 'seasons'];
+    var count = 0;
+    keys.forEach(function(key) {
+      var req = store.get(key);
+      req.onsuccess = function() { result[key] = req.result ? req.result.data : {}; count++; if (count === keys.length) resolve(result); };
+      req.onerror = function() { reject(req.error); };
+    });
+  });
+}
+
+function centerNameGroup() {
+  var sL = parseFloat($('seasonLeft').value) || 0;
+  var nL = parseFloat($('nameLeft').value) || 0;
+  var nW = parseFloat($('nameW').value) || 0;
+  var gap = nL - sL;
+  var combinedMid = sL + (nW + gap) / 2;
+  var delta = 50 - combinedMid;
+  var newSeasonLeft = Math.round((sL + delta) * 10) / 10;
+  var newNameLeft = Math.round((nL + delta) * 10) / 10;
+  $('seasonLeft').value = newSeasonLeft;
+  $('nameLeft').value = newNameLeft;
+  seasonBox.style.left = newSeasonLeft + '%';
+  nameBox.style.left = newNameLeft + '%';
+}
+
+function toggleCenter() {
+  var btn = $('btnCenter');
+  if (localStorage.getItem('fc-center-enabled')) {
+    localStorage.removeItem('fc-center-enabled');
+    btn.className = 'btn btn-asset';
+    setMsg('球员名居中对齐已关闭');
+  } else {
+    localStorage.setItem('fc-center-enabled', '1');
+    btn.className = 'btn btn-asset active';
+    centerNameGroup();
+    setMsg('📐 赛季图标+球员名已居中');
+  }
+}
+
+function updateAssetButton() {
+  var btn = $('btnAssetLib');
+  if (assetLibraryLoaded) {
+    btn.className = 'btn btn-asset active';
+    btn.textContent = '✅ 资源库已加载';
+    btn.style.color = '';
+  } else {
+    btn.className = 'btn btn-asset';
+    btn.textContent = '📁 加载资源库';
+    btn.style.color = '#888';
+  }
+}
+
+async function loadAssetLibrary() {
+  if (assetLibraryLoaded) {
+    setMsg('✅ 资源库已加载，共 ' + Object.keys(assetLib.flags).length + ' 国旗, ' + Object.keys(assetLib.leagues).length + ' 联赛, ' + Object.keys(assetLib.clubs).length + ' 队徽, ' + Object.keys(assetLib.seasons).length + ' 赛季图标');
+    return;
+  }
+
+  // Check if we previously stored assets (synchronous flag, no await = preserves user gesture)
+  var wasStored = localStorage.getItem('fc-assets-stored');
+
+  if (wasStored) {
+    // Try restoring from IndexedDB
+    try {
+      await openAssetDB();
+      var stored = await getAssetsFromDB();
+      if (stored.flags && Object.keys(stored.flags).length > 0) {
+        assetLib = stored;
+        assetLibraryLoaded = true;
+        updateAssetButton();
+        setMsg('✅ 已恢复资源库: ' + Object.keys(assetLib.flags).length + ' 国旗, ' + Object.keys(assetLib.leagues).length + ' 联赛, ' + Object.keys(assetLib.clubs).length + ' 队徽, ' + Object.keys(assetLib.seasons).length + ' 赛季图标');
+        // Auto-match current player
+        var _cur = $('playerNameInput').value;
+        var _cf = PLAYER_DB.find(function(p) { return p.name === _cur; });
+        if (_cf) { autoMatchIcons(_cf); }
+        return;
+      }
+    } catch(e) { /* DB access failed */ }
+    // DB restore failed, clear flag so next click goes to picker
+    localStorage.removeItem('fc-assets-stored');
+    setMsg('⚠ 缓存失效，请再次点击按钮加载资源库');
+    return;
+  }
+
+  // First time: show folder picker NOW (direct from click, no await before this)
+  if (typeof showDirectoryPicker !== 'function') {
+    setMsg('⚠ 浏览器不支持文件夹选择，请使用Chrome或Edge');
+    return;
+  }
+
+  try {
+    var dirHandle = await showDirectoryPicker({mode: 'read'});
+    setMsg('📁 正在扫描资源库...');
+
+    var folders = {};
+    for await (var entry of dirHandle.values()) {
+      if (entry.kind === 'directory') { folders[entry.name] = entry; }
+    }
+
+    async function readFolderImages(folderHandle) {
+      var images = {};
+      for await (var _e of folderHandle.entries()) {
+        var name = _e[0], handle = _e[1];
+        if (handle.kind === 'file' && /\.(png|jpg|jpeg)$/i.test(name)) {
+          var file = await handle.getFile();
+          var dataUrl = await new Promise(function(resolve) {
+            var reader = new FileReader();
+            reader.onload = function() { resolve(reader.result); };
+            reader.readAsDataURL(file);
+          });
+          images[name.replace(/\.(png|jpg|jpeg)$/i, '')] = dataUrl;
+        }
+      }
+      return images;
+    }
+
+    if (folders['国旗']) assetLib.flags = await readFolderImages(folders['国旗']);
+    if (folders['俱乐部队徽']) assetLib.clubs = await readFolderImages(folders['俱乐部队徽']);
+    if (folders['联赛']) assetLib.leagues = await readFolderImages(folders['联赛']);
+    if (folders['赛季图标']) assetLib.seasons = await readFolderImages(folders['赛季图标']);
+
+    if (Object.keys(assetLib.flags).length === 0 && Object.keys(assetLib.clubs).length === 0) {
+      setMsg('⚠ 未找到资源子文件夹（国旗/俱乐部队徽/联赛/赛季图标），请确认选择了正确的父文件夹');
+      return;
+    }
+
+    await storeAssetsToDB(assetLib);
+    localStorage.setItem('fc-assets-stored', '1');
+    assetLibraryLoaded = true;
+    updateAssetButton();
+
+    // Auto-match current player immediately
+    var curName = $('playerNameInput').value;
+    var curFound = PLAYER_DB.find(function(p) { return p.name === curName; });
+    if (curFound) { autoMatchIcons(curFound); }
+
+    setMsg('✅ 资源库已加载: ' + Object.keys(assetLib.flags).length + ' 国旗, ' + Object.keys(assetLib.leagues).length + ' 联赛, ' + Object.keys(assetLib.clubs).length + ' 队徽, ' + Object.keys(assetLib.seasons).length + ' 赛季图标');
+
+  } catch(e) {
+    if (e.name !== 'AbortError') { setMsg('❌ 加载资源库失败: ' + e.message); }
+  }
+}
+
+function matchClubAsset(clubName) {
+  var dbName = clubName.replace('俱乐部', '');
+  if (assetLib.clubs[clubName]) return assetLib.clubs[clubName];
+  if (assetLib.clubs[dbName]) return assetLib.clubs[dbName];
+  if (dbName === '曼彻斯特城' && assetLib.clubs['曼城']) return assetLib.clubs['曼城'];
+  // Strip "足球俱乐部" from file keys for fuzzy match
+  for (var key in assetLib.clubs) {
+    if (key.replace('足球俱乐部', '') === dbName) return assetLib.clubs[key];
+  }
+  return null;
+}
+
+function applyAssetToBox(boxId, dataUrl, type) {
+  var box = document.getElementById(boxId);
+  if (!box) return;
+  var oldImg = box.querySelector('img');
+  if (oldImg) oldImg.remove();
+  var img = document.createElement('img');
+  img.src = dataUrl;
+  box.appendChild(img);
+  box.querySelector('.box-label').style.display = 'none';
+  if (type === 'flag') state.flagImg = dataUrl;
+  else if (type === 'league') state.leagueImg = dataUrl;
+  else if (type === 'club') state.clubImg = dataUrl;
+  else if (type === 'season') { state.seasonIconImg = dataUrl; state.seasonIconDataUrl = dataUrl; }
+  else if (type === 'portrait') { state.portraitImg = dataUrl; }
+}
+
+// Normalize player name for fuzzy matching (remove dots, spaces, middle-dots)
+function normalizeName(n) {
+  return (n||'').replace(/[·.\- ●]/g,'').toLowerCase();
+}
+
+function findPortraitUrl(playerName) {
+  if (!portraitCache || Object.keys(portraitCache).length === 0) return null;
+  // 1) Exact match
+  if (portraitCache[playerName]) return portraitCache[playerName];
+  // 2) Normalized match (handle 哈里·凯恩 ↔ 哈里凯恩, J.阿尔瓦雷斯 ↔ J阿尔瓦雷斯)
+  var norm = normalizeName(playerName);
+  for (var key in portraitCache) {
+    if (normalizeName(key) === norm) return portraitCache[key];
+  }
+  // 3) Substring match (handle 阿尔瓦雷斯 ↔ J.阿尔瓦雷斯)
+  for (var key in portraitCache) {
+    var nk = normalizeName(key);
+    if (nk.indexOf(norm) !== -1 || norm.indexOf(nk) !== -1) return portraitCache[key];
+  }
+  return null;
+}
+
+function autoMatchIcons(found) {
+  var matched = [];
+
+  // Portrait matching — independent of asset library, uses standalone portrait cache
+  if (!$('savePortraitEnabled').checked) {
+    var portraitUrl = findPortraitUrl(found.name);
+    if (portraitUrl) {
+      applyAssetToBox('portraitBox', portraitUrl, 'portrait');
+      matched.push('头像');
+    }
+  }
+
+  // Other icons require asset library
+  if (assetLibraryLoaded) {
+    if (!$('saveFlagEnabled').checked && found.nationality && assetLib.flags[found.nationality]) {
+      applyAssetToBox('flagBox', assetLib.flags[found.nationality], 'flag');
+      matched.push('国旗');
+    }
+    if (!$('saveLeagueEnabled').checked && found.league && assetLib.leagues[found.league]) {
+      applyAssetToBox('leagueBox', assetLib.leagues[found.league], 'league');
+      matched.push('联赛');
+    }
+    if (!$('saveClubEnabled').checked && found.club) {
+      var clubUrl = matchClubAsset(found.club);
+      if (clubUrl) { applyAssetToBox('clubBox', clubUrl, 'club'); matched.push('队徽'); }
+    }
+    if (!$('saveSeasonEnabled').checked && assetLib.seasons['25ucl']) {
+      applyAssetToBox('seasonBox', assetLib.seasons['25ucl'], 'season');
+      matched.push('赛季');
+    }
+  }
+
+  if (matched.length) setMsg('已匹配: ' + found.name + ' (' + matched.join('+') + ')');
+}
+
+// Save checkbox handlers for lock icons
+$('saveFlagEnabled').onchange = function() {
+  if (this.checked) { localStorage.setItem('fc-lock-flag', '1'); setMsg('🔒 国旗已锁定'); }
+  else { localStorage.removeItem('fc-lock-flag'); setMsg('国旗已解锁'); }
+};
+$('saveLeagueEnabled').onchange = function() {
+  if (this.checked) { localStorage.setItem('fc-lock-league', '1'); setMsg('🔒 联赛已锁定'); }
+  else { localStorage.removeItem('fc-lock-league'); setMsg('联赛已解锁'); }
+};
+$('saveClubEnabled').onchange = function() {
+  if (this.checked) { localStorage.setItem('fc-lock-club', '1'); setMsg('🔒 队徽已锁定'); }
+  else { localStorage.removeItem('fc-lock-club'); setMsg('队徽已解锁'); }
+};
+$('savePortraitEnabled').onchange = function() {
+  if (this.checked) { localStorage.setItem('fc-lock-portrait', '1'); setMsg('🔒 头像已锁定'); }
+  else { localStorage.removeItem('fc-lock-portrait'); setMsg('头像已解锁'); }
+};
+
+// ============================================================
+// Init
+// ============================================================
+// ==== Restore save checkbox state ====
+if (localStorage.getItem('fc-editor-saved-coords')) {
+  $('saveImportEnabled').checked = true;
+}
+// ==== Restore saved card image ====
+if (localStorage.getItem('fc-card-image')) {
+  $('saveCardEnabled').checked = true;
+  var cardImg = new Image();
+  cardImg.onload = function() {
+    baseCardImg.src = localStorage.getItem('fc-card-image');
+    state.cardNaturalW = cardImg.naturalWidth;
+    state.cardNaturalH = cardImg.naturalHeight;
+    applyOvr(); applyBadge(); applyPos(); applyHex(); applyPortrait(); applyName(); applySeasonIcon(); applyIcons();
+    setMsg('✅ 已恢复保存的底图 (' + cardImg.naturalWidth + '×' + cardImg.naturalHeight + ')');
+  };
+  cardImg.src = localStorage.getItem('fc-card-image');
+}
+// ==== Restore saved season icon ====
+if (localStorage.getItem('fc-season-icon')) {
+  $('saveSeasonEnabled').checked = true;
+  var seasonImg = new Image();
+  seasonImg.onload = function() {
+    var sUrl = localStorage.getItem('fc-season-icon');
+    state.seasonIconImg = sUrl;
+    state.seasonIconDataUrl = sUrl;
+    var old = seasonBox.querySelector('img'); if (old) old.remove();
+    var el = document.createElement('img'); el.src = sUrl;
+    seasonBox.appendChild(el);
+    seasonBox.querySelector('.box-label').style.display = 'none';
+    setMsg('✅ 已恢复保存的赛季图标');
+  };
+  seasonImg.src = localStorage.getItem('fc-season-icon');
+}
+// ==== Restore lock checkbox states ====
+if (localStorage.getItem('fc-lock-flag')) { $('saveFlagEnabled').checked = true; }
+if (localStorage.getItem('fc-lock-league')) { $('saveLeagueEnabled').checked = true; }
+if (localStorage.getItem('fc-lock-club')) { $('saveClubEnabled').checked = true; }
+if (localStorage.getItem('fc-lock-portrait')) { $('savePortraitEnabled').checked = true; }
+// ==== Restore center enabled state ====
+if (localStorage.getItem('fc-center-enabled')) {
+  $('btnCenter').className = 'btn btn-asset active';
+}
+// ==== Auto-restore asset library from IndexedDB ====
+(async function() {
+  try {
+    await openAssetDB();
+    var stored = await getAssetsFromDB();
+    if (stored.flags && Object.keys(stored.flags).length > 0) {
+      assetLib = stored;
+      assetLibraryLoaded = true;
+      updateAssetButton();
+      // Auto-match current player on init
+      var _ic = $('playerNameInput').value;
+      var _if = PLAYER_DB.find(function(p) { return p.name === _ic; });
+      if (_if) { autoMatchIcons(_if); }
+    }
+    // Restore export folder handle
+    try {
+      var tx3 = assetDB.transaction('assets', 'readonly');
+      var store3 = tx3.objectStore('assets');
+      var reqExp = store3.get('exportFolder');
+      reqExp.onsuccess = function() {
+        if (reqExp.result && reqExp.result.handle) {
+          exportFolderHandle = reqExp.result.handle;
+          updateExportPathButton();
+        }
+      };
+    } catch(e) {}
+    // Restore portrait folder handle + portrait cache
+    try {
+      var tx = assetDB.transaction('assets', 'readonly');
+      var store = tx.objectStore('assets');
+      var reqFolder = store.get('portraitFolder');
+      var reqCache = store.get('portraitCache');
+      reqFolder.onsuccess = function() {
+        if (reqFolder.result && reqFolder.result.handle) {
+          portraitFolderHandle = reqFolder.result.handle;
+          localStorage.setItem('fc-portrait-folder-stored', '1');
+        }
+      };
+      reqCache.onsuccess = function() {
+        if (reqCache.result && reqCache.result.data) {
+          portraitCache = reqCache.result.data;
+          var cnt = Object.keys(portraitCache).length;
+          $('btnPortraitFolder').textContent = '✅ 头像已缓存 (' + cnt + '张)';
+          $('btnPortraitFolder').style.color = '#00c853';
+        }
+      };
+    } catch(e) {}
+  } catch(e) { /* not available */ }
+})();
+// ==== Pre-embedded badge icons ====
+Object.assign(state.badges,{
+    1:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAAbCAYAAADlJ3ZtAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADkUlEQVRYhc2YfW/cRBDGf2v7mkt7FCgSIW2QSmmF1CLEZ0DiRXxxJKQiSgriGxSIkBLSpMmddx7+2LW99tp3l6RCTHQ533h29/HMPDNz577+7nuxThRfqUqirn2ncEHnzTcGSGGRV7JY8V/vPVybhBCpefjQKaqPH35CXa9GQbUHWF9lZqx83dfJWNkyLDGQGTLhVXYHK24kH8GqvWc4JPUhmEdhM8w8lWScn55jZgHUANiYCGFu+GTCtMXiVhw4114WYyZliZnH6hXyy3Gb/4uYeWSdA6r/5FSpyz+tp0h/Xf9jhdHmpTRiMVjVpLbJ43CAS+459vf3+ODePW7v7lLXNX/+9TdHR0dcXFyOI1irdTiKQLwWrCfm6ngukuSicDG1PaVKisIxm824tbODKyo+f/qUx58+5P333uXi4oLnP/3C2dnrBOy4SDngggJH5IjeQhrM53P29j7k4MF9Fu8sePL4EXdu715tky0z41pgHY5CgZvz+ZyDgwd8+cUzirJgvrMzgaQfoevIFmAdwuEQitcNYICyCAAXizvTW2gNsYYNh860z4htwAqgQPi04bSg31xe8urVHxy+vAXA/f2PuHt3wWw2G0LIt02bW9bpwOTanqRRsCMOcA7MukMDyUIanJye8+Ll77w4/A2Ab7/5is+ePBqAHfHBkFCxtKXe9BRYQ2hp2rPCCMF2UybRMOahK2KfnS5NdoUSOzzD+8sxsGr/whFuPS+ciw63CPy6iDaJqMznSNJxQpsOzxpJbp+S5iZS1b7GEm9meyZkShQJqKSVujxlGqAZvTb5YDiBAZVJGIZcmEE1iHlKprjLSLina+hYZwrJO4025LfAhTRswaZGzjmgyADTNwKKZDYdEOwGIoUhfEp6YKX1T9ybnGQBYLhxY15tAgpQmQ3CPtlpkvC3oNO1N0M7eW4ilfd1z6Ma1NWuazVhT70/0pVyGMmrecvXqSmBWWVpHBQ9K1lk34BMV5Cm6GcOkkL7SyPYGznBKDDKOHmkG8TZVTV4qDY6Px1CtiDTDz8+5+fDX6nKEjPx+vQfzs7OJx6wG4yKTXwBKpnW5+nIELKuwh8fn3B8fNIpzGc2qf/630HWS0awFowLM/rwu/vbaKe2ad6YkEqD/OlYH3NXtr7uJmuzCAk00gDGA5OXP3Ph94Xm/Mq7JEzp7wYKei+j9qsc2RC/DPllBmrpt50LliObJgdW8C/2+2wJyGhGjQAAAABJRU5ErkJggg==',
+    10:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAAaCAYAAAAue6XIAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAHgklEQVRYha2Y244bxxGGv+6e4XB2udxdaWVJsHWIEkmWLCUwotiIoYvAtzHyBnmLvIXfJDfJTS4MJHGQgxPBQGxBEWLHsizrrNVqD1yRc+quykUPh6R2jdxkgAHBZh/+qvqr/moa3flQ1U9QVQ5/DGiyMKKAtw6Xn8bYXjvaAz0ZV9gMTAraQP0ANKDqQRpAqIr7qNZxr1ATigdUsozg2gMC1E+oK0MIFrBgMxKVhnr3FhrKw7GGAE2zMCQINXU0pLNAIMR5Lj+HzV6PY/UeqCDlE0L5GFBqP0JU5kzXuLYba8dDCuLADSA/T9IdtDBxfs1hv4X2fXVeBCvlfaR+CqpQl/FTalAPKKohem9hfTh4jkp0iNbQbLEY3//To1KAFKgoL0eeSWHwwZD1EjZWm/+9wYENmylYyyycJr7zFqoCAUVpGsP9Z5ZHzx1C5Or50zXH1qcei/P3J4YXu44Xuwmbz2F/bGmCIc+Ek0crVpaFjdWKlaWGJFFQQdUQsQDEMYu0xgtBGxJI50ywoC6GjJhwIQSaqiEgbG47fvunnI8+We5W/OqXW7x/rUIVVCxFqXx5N+Xvt5a5+WXO9qiHzNnurHLl3IifXtnm6g/2ObZag4Q5sAbwIEqiHjAENTSNfYUGGuh21gZUebYl3PoqGvS3mylffNPj1UdVEBFQxx8+XeXPnw+4+yhDvS4ABQhi+Pe3KzzczHi0lfOL608Z9pvZmQDGgU1AFFQRhaJ2h3G2TZRQgzFsjxw3/pXy+Lnl2bZlUtiDS4Cistx7nPGP2wO+edynrAyZC6yuNFw4VdBLlacvUr5+uETdWHZCxq07A4b5Gh+8V2IMYGybqL5NOMeUoqocBjbyJc4xVLVhcyfl7qMUH+KwXahYkatFlfD5VwMePkuZlIZeIqwPG965vMXV79dkPXjwrEdihXtPl6hqy9OdnJtfr/LupeesD4U0aR0hZXQaBnCIGppgSLA5kastfJVWIGKBHizB+VNKLw2MC8OLHcvey3nTFAyUlePWnT6TymCNMFgKnD815ufv7XJsTXBOOfWao99r+PXvM6raUlaOzZ0+9zczlvoNadLWXDQCVQUElZjcCf1TIElbNgOqzVzBhvOnlQtvBLyU3HmY8Js/Dvj402yG1joEx8sSbt/NOo4eGXp+fHGf9ZWSNLGoKkdWKq7/sOR3fz3O9ihFFZpgebydc+7ECLIKjAHTBlwCiMcEIfGeAwQ0xmDtrJypBoJWWOuwxh1kjXh29wLfPnLMK3aeBY6tBxKXtAnoEfGoeF5/bcwgj8lU1o7b9waMKxeBqoL3B8/hUM6CqqIqMRwaQ6IdPV7pIVQITaBqzMKwNUrqBNsRPO6pEuglNc7GEIjApEoJMue3KejWehEoaz0INgJ9talRRD2KPRRsqwYswG0NVhWU1tDpUl00rBOjzlLLfJhUofZKEj0oB0AYM6WBoOqjnjOdOz/RkiSQp2HBFBFD3VhCCGBDBGssxlrq4BAxnRPzXsDZmTEdkta50++2ruu2XasAjzEG5xzGCKoNqhVITWIMFj0IVg2ry8Kp4x4z55yitmzuZog6Itviq5qwvdejqCP/+2ngwhv75L1YgVQtEqKY1AJVgLrteRYSTMTjfYn3JSJR6oxJsDZhylsO6XuNgTxTzp4syHrRmJ39lM++GvBiz+GDQVXZGTk+ubXG9ijDhwg2SYSTR0pS1xBCjQ8Vot+VYM32XLvWtm8dCENX8xYDNOfZSI+8H/jR+Qm7L1Oq2jIuEr68v8xHN9Z480zJSu55tt3j439uMJr0UIU0FdYHFWePj8mSOlYLwJrDVTLB7zAL7ZTo0ywUzFw/q2qjCCyiBRWW+55rl8bceZgxLvtMqhjuv9w8waOtMcMlz85+yhffDgGwVtkYFrx1docTa/soHlWDxWCMOzSKiaqZc5jFGjcLgwqiHtuJRMrBJxqX9xre+l7BTy7vMqmH3Huco5Kwt5/w2RerCyvSRFjqN1w9t8v7bz/B6hg1GdqKgaoiGtr6MkuE5GWVkwaDCeCwOE26zksxKIZAAxIQ0UM4q61dAdGCn71ds7FacuP2kJv/WWU06XWZD7FFvPDGHtcubHHl3A5rKwVicxBFQ0C68naQCon63VYAolrpHLkNJkJRAWs5fjTwwfUR71wet1eVwMUz07tbPGW573nz9ISN1YZ3L414vpewP+nhA/RTz4kjBWtLJRvDguFSTWotMu0HTNskKTPQ82Ctf94lmLYJphowZtqetV2YCIPccPGMcvG0xDWhvTSq6do7VWW47FlZajhzXNmfwKTq4YMlS2qODgsIoVPIeQHqSp/hQIUESEzYxUx/mVOdWW/QEj1UsSE2LgLrKrjE752ItABaEIMlGORl65D2oqit2LSXzmkFnz7f9a9Ags6KU5TFgLU9RGpEqhlw69p7v4/gJMzJp3SesNYSvI83Bwy4DGggFPG65GY3DWkdkbge2qpoG8TDwY4LAV2LUJt9QtV22JqiOKSp8OVLZk2NglbQjBZcICI0VdN5d+qEWmyM6bQxoprz3rSn8LOSOCevs73jyH8BLZzKKnoX+PIAAAAASUVORK5CYII=',
+    11:'data:image/png;base64,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',
+    12:'data:image/png;base64,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',
+    13:'data:image/png;base64,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',
+    2:'data:image/png;base64,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',
+    3:'data:image/png;base64,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',
+    4:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAAaCAYAAADBuc72AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAFSElEQVRYhb2XX4/exBXGf2fs3YUNJIEVJZWoBK16AUICPgISH5XPwQW9aYugygVqESQC1CTk3ya7Wb9/7Jnz9GJsz9i70Fwxq/f1emyPn3nOc55zXtt8+bmG7gWSuHKEAG2zmmzwcLSYkYt9P6zmnE3XIQkftvh+C4jdtsddKA14v8H3WxQNTwmPPT70pNQTEwzRiX2kVYo8/+l7Ur+/GugVw+X0qV/OOfT96kYJ0h6oSBDs9/tLxLgOEWEx1x4c0B4G+qanfWl0v8NQirgnMCM0hwibtxh+88nfcfgEUgKEPCH5fP2lGF2EScLlMK6hMg1ATM6Ds8ijztml/EIk3rlu/Ol6AKV6qfno7vM5ApcQjiSip/8PVBLysjOX456BanyJAB9PTruBr37ccPsxPOsLqM/ebfnjcYM8IoFZnk+e9Z18XMwMMLCGqDjmw3B16F3lU5Pp8gW7XoFMSeDO7fuJO88DF/3KRay8KqYMbklIJmAixULAsPn6bzI6ygWrQErCK7AaN7MdxJ3Hkf88ijzbjnRbtZZHpAw22BTuDBrAzMBKBN0d5yU0OgEQwiqQGmM9se2Cs51z9+nA33/e8UuX2LmQXVpxGR6W+ta8Mcsg3ZFp3mxL0xbBVCgnkEyahJHN0R7H424QPz+PfP3fLd89iYC4fmRgxuluCapOnknbNrKbQz7d4CDHxnuURMvR8QJoZswJlMRxX4Y6KYtfwMMu8e3Dnn8/jgg4buEvbzaYwT/vl2RiDLXI4V4aiUZrckJWAG2AOIyYh1UpqDN8nTgrwhHQR+dvdy/45v6Qsxb48A8t790IvNrYpWemDGcFMqU0ygqi58/6zVdq1NeaZKlJCWISX/zQcedUbAfx+qHx/kng41sHBINHm7has2T6Ukr5HQHAsj1PdlWDXQDVaOY1yBrg9H/XO3dPe759mDjb5UJ3GMTb1wzJebEXXb/0n/PeuHchGoM3DqHBR90KM2NW1+wyS+ZbCPgI0KvEmXSpqUpMCSA420Zu39txuk0kFwGRHJ50iacbZx/Fo+0yeA868a/HcP3Q+eQk8GrDXCKNkpz5XON3/nOcVhwwpIGY+pH3Vbgq3QYgubPrE082TpzLqHHewz8eFBrWGvulE8/34p3XnA9PGq6ZgTvuibK6Zc260zQNkUgiEYm/7qNT1alHSksHuHzHSwwpd0mW5uhB1q1XOTEVh2n8SjIVPdYFJluTuPmK8el7R5xvh7F5KLuS4GwnfjoXP5yVNf96Ez54w7h20HDc5ppuZhUwzSRM86qIWCYTyyYja1KYVF0Xx614/wTcw6JhmSzoYQd7XwK9dQwfnRRDNwwsIOX6XqzQZoYXQLVKFK+YmYClySTn3SdSGrCQq5o8L+mpZOulbkcqtuSJEEJJVHc019zCLFYIavd9zz4pNwfrZHJHrnnOfSptGZg84qOJ5w5quu9SWS9dCBBdKOXyJIRZm4vjFZUQcgvbrvNhYfIjiqrA5lCNzW8NqAZ248j45C3j3ddz4mDw5lH+negOwQJTYIv+ffTUQNNMOEozvdJoMfrSKU2hmcpcKdTrfnXaaIO4eShuHDjmRWlFhjbr0mzSZNaMWZVMteGnYVfRwoLNqUHBI/JlSax1XT+rlc2EAB7XTciUPBmMrbq3q8Lf7i+eZato2gxqfqbUY3mi7oLlyh09RXruIqVYAM8xclKsOnpB1FAy2kYpjGGWvDTm4yG50yYXx7f+DBJ9t2F3/iIzMd40bDs2z54udheHns3FeWESSClx0V1UtOX5oRfrGtF7T/mFmQnox21V+CAxb/x/XyU3EM/t20wAAAAASUVORK5CYII=',
+    5:'data:image/png;base64,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',
+    6:'data:image/png;base64,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',
+    7:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAZCAYAAACsGgdbAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAE+0lEQVRYhaWX2U8cRxDGf92zC6zDtZwGjDHYsaMERXmKIuW/j5SnvFiygmL5WgzGpxJgOXenq/JQ3XPtYltJSwM73dXVX1d9dYzr9V6qKqiCUg6NL1qbjXPOA9DOPN55cIBvCoGq1Hcr6LDULaJcDYaoDgBBgjIYBgDyPBBEkZDTCgJDsY2+olEERAUh1M4WVUKQEUANMVSVwWCAav2SV6EEmcakF7wzvQmkao4ihBBojZgpAmwqSjcXldGF/zkGw4BDxp4J0Ao6HlB1BBG8cyj6Rdn/MlR1xOLFmkgECbgKWG2SM044tScEoffqkJOTPsPBAOdARRvKlSABFNqTE3S7c2xsrOELluuNvFdA1KF4clFaxnrb0PSkiUkFrIEcXuf8/tsf7O09o3/ax7vPU6Db7bL70w+sbayRIeDMeok60oCpCkEzRGEY/HhOggWIVkJev4IWnxuqEASI1Bm3DuAceGemS2N84KjW7tYE6L3n7tYGk1MTXF8PsNwSZYGz/jlvj97TPz1GRJmYbNPpTNpe53EORAQRxXtXgKudl7DcFN00OdKwYJZ5vn24zZ3N29FlDsRceHFxyYsX++zvvyGIJ8s8i0sLbN5dH7EQWMZo6q+7XmmhI5hqwiNJHrPk2vqKRSUlLUSF/d4brq6uOTu7AGB5aZHt+1vc274DCBKtroDzDZCjLEBRWghwA++LHJ02S3mhRPoUAKJCCMLz5z2e/vXSznTw6NE29x9s0Wp5RHOCSnmesydo8XMUg0V3HVT1cP1C4q4FV4BXz17Te3nI8fEJ3jumOlPc29lkablrl0gAE5oA5BYoFvGmKmuU2JZj1NuqUk+uWnkKGS3kVJVhnvP48Z8cHLwlBGFycoLd3YcsLs3jM19WquZhrhI0EYw0bNNKt9J4sAFogKvdwKxtEW+cHAwHHB2+46B3yMXpKe0MZmdvsfvjI2bnpqNcXUcx4dOlI08d5I2y7O3NiKmRdK5quqoVI0DRevq9PL9i78lTLs/PcRrodNqs3u6yubXO1NRUKalQM4qAWmIgaDKSRu+UZ7bA2qTUbYlEPakCVUyvGMBc8ppVLs+vePJ4j4tzi+iZ2Rl2HuyAzyyBayUsvKAColG1gDjTbZ2NgM9AvC2ESheoFS6Mqy5mwQZPgeN/Tnj1Yp+z/hkSW7jZ2Wl27m+TZZnlGediVAo6plWzvjAClEoKiWNsMv+q8leAPOWgd0jIc1RhemaaldUVFhYWcN6Xgs7+jGuize9x3mc0k1Gzn651QkbmskRGxtSAnp70OTw8Kqbmu3MsryzRnmhH2lTcckPN1sRVF0O9UUFa1Yiu6lO1PFhtclUVkRSGkA9zjv8+5uP7T4XMzOw0c/Nz9lK0b+MSHWW6cdHisRUzDBYlZcWJ63lV3w16geJT4d3RBz5++FRbWlicZ3l1AdPmKwAS5+zVUSZxUV+kQPsqEIQcRRkyrFiyccMmQKkk7zQWF7r88uvPfPf9w6I6LS4vMj3zzY3JOzl8tIBY6vE+i0BDpJYaSFflymhwlcmbuoE7tzqs3+pwe32VIMOIwtUaWlKXFN3l0hE63lFFjqys1qN7jAUV+wxwLsVY7OSre4rLVOu9M1ergIaEoPiXqF1oTZcbl4JEBO89GhQJ9XWzSLCNxUH2Mx2impqSEIGmb20HZJDnVL9LRMsHUrtmH3sigqrgnLemTm3uX3s0ykl8XTGeAAAAAElFTkSuQmCC',
+    8:'data:image/png;base64,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',
+    9:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAAaCAYAAAAue6XIAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAHI0lEQVRYha2YW48cRxmGn6+qembPB6/X2HEcwJjEMZZFLiAWEnAHEhf8CX4NP4G7XHLBD4jEQUICFCCSZUUBY/kQx6dde73e9ezsTHdXfR8XVT0ze8gFCiWVpru6uuqtt97v/apHbPfXlkZbmCVOLQYce6QYUQTX30AklH4BbAUACeuIXwKL0GyBKZYOsHiAoTT1FqZtfs0i2ryiTRWGK2MliHs0jSOpA+lBtU4wS8ThIyyNTwebErTtMbCJhubYohRSbnP9i7jqbG5rDsAUbV6hzQ5g1HFwkpzU5P5H2iowD24R+DbhdIRfr2j9FK2fghk0Tf79OsVaaHf+/2AfPKkQgfWVxNrSV0jrfy3WQnxFgABIaXW5apzpqECDmiEimBlqii9CfrUHj557HjyeY2tnif2BAMZ8X9lYS1y9NOTKpUNWFvOYaikrUzp9GqqKmQA+Y7EEZQ5HftbGSMgdOmCzVfOFJXKEWeligCJq7Ow7Pv284tadOe4/7rG925vsuHPG4nzi8fPAyz3P9y4fcnFzRNIGp4pzHhFQy2NlsN3kDjA8WcPRhLb1x2WgMyCb8ptfEBG0u0ZoE9y+2+Pjvy1y78s5RKDyxvy8ImK0rTAcef7++TL3n/YZ1hU/X26pqkNMFXE+szsbaFZIkcJwR5BB3brTNKugDWg981JmwEwLVGgj/OnTOZ6+zEOEYGyu1/z4gxELc4kHTwKffLZI3Va82u9x++4859YXuXl9hJOEYVhs0TQDVnwmR9tse1SF5Vy+OsCkApGTdoJRt47t3VwPxgEzx7mVml/98jUXztZUAS6/5Viaa/nDPzcYN45nL/r854tFbl7fOTacYZryXOJArMRMJwlQFcZRCFRns5cpGZilyXZjhlhek1mDmSDiaFphexdGtZA0C6PXMy5fqlleaPHOMHNcOCs4lyccDANbLz11LfQrD6QMVAQTLfbmmGq2w2OZr7bFUZ05AtYsFpxWKkX8DhEHCIbhvOJ9JgRgPBbu3Bd29hx7A8f2buDJizlUc4c2CoOhsPcmS0hVUFzHXdartqApS09cXoBGRBtcGs4Iott9EZybNqslkjaIuElqXZyLvHtpzOZaolfl6XYGPT76+C0++WyRW3fm+OvtJf58a426nR2rYm9QkWJbtt1noNrm0Ohkl9LRRGL59oRmbeJ7ipnlMZxHNU3fFKGqHD+6cchgGPjieaCNjmc7fX77x28QUHohsbwQqZtAMplOqnGGQTKjvgeqHVvgCqsFcFIYjvUkszMcl20H04RaizHVcnCRD68N+On393nv0gF9H0GN4TDr7srFIb+4uUMIilp26hZI5jEJJeq7QJJcOzY7bc0UNQgpRaCrioggkj0uW1UEaxEMKQkBUxzC+Y3Eh9eHbCy3PNrq82q/AjPOnRnz7qUhZ5YjwRXdAz4Y66sJ7wuwI06T4wKznHgsk20GqawhxBiLp0XMsl2IdEATZgkh4SQAilkq/Txt9Gyutqy+f8iNK2OGI49ZZG1phHeJe09W6JTnvbE0H7lwpsHUwCTXGePP2szpXBBiARzLmgJMhWwWSWl69BPxOBcm25OB5sSgCrv78Hirx/OdisobP/vhIKdQ9Tzb6XH38QKpuMHyQmRjpcYm2gzgJOu3SC1pLEdHwbuTKSBQPy3MnixWUq8caxvXwovXFb/53TIvX/dI6llZjAjCO+cb2ij862Gfv9xembjB25tjrn3r4NR5ILuOmSK4nIpn0u0UrNYzjTmorGgpM5lwk/vsvd4p81XD2kriy23H/qBiMPT8/h+rrC5Fkgq7+4Ht3T6YsL7U8N23B7z/zptTGFHQGkFwxccFKeCPMdukgFfJSQGHI6BWvgyKe+ixYPBOWV1q+MkHB2Bw5yHsvgncezI/6eOc0Q+J8xst770z4MZ39ji7OiIHaAc0ZYexRHZRV+acnkOY2dcwqgO9BKLgEYI5pPiiEFCENGNZ3aksBOEHV/epXGR5PvLvhwu8GVY5+QBVSGyuN1y/csDNa7ucWxvl1Wu2uBzw2dZw/RxJWu4B7KSrBokvJsc0s4Rqe6xLWbnz2ci7s27xyeuXD7j6zSEHQ3j4vA8IasLyfOTi5iFCoup5wOfFul4+1WEIDieClpgRl0/XZtOccQSsiy+RI5+vhlmLSDXdAlNoanAhj+imph4kESqhtyrMzx2iJdq9g+BTyXxdNpomAkMnsXG8nJITCrM2ZiIi02IdbmJTZrE8LhOJK4HaTWSTCeZ6Ok3X3aeKhLwz1p1RO+yGkl3fSZhkx5ksexJsjIamXt6mmCCBSMCszWlWE5ZSNnCNZdkGqT6yV2ZGzOfFKVgElSqD1Dp7qgtZWaZo+TLwzuUd6U55hYeOjqbNV+FwpED+cyI2jlh3SaECKlIzoj0czqzP8sTN7pFVa1Ka0dH/EsygTsfdsj6Fs+Nxcnr5LwwmqgR3f9XnAAAAAElFTkSuQmCC'
+});
+// ==== Build player datalist (with nationality/club info) ====
+var dl = $('playerList');
+PLAYER_DB.forEach(function(p) {
+  var opt = document.createElement('option');
+  opt.value = p.name;
+  opt.textContent = p.name + ' (' + (p.nationality||'') + ' ' + (p.club||'') + ')';
+  dl.appendChild(opt);
+});
+buildBadgeUI(); refresh();
+
+applyOvr(); applyBadge(); applyPos(); applyHex(); applyPortrait(); applyName(); applySeasonIcon(); applyIcons();
+buildLevelDots(); buildBadgeUI(); refresh();
+</script>
+
+</body>
+</html>
