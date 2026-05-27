@@ -1657,7 +1657,8 @@ const PLAYER_SKILL = {
 };
 
 // Shared player cards from card generator (IndexedDB)
-var sharedPlayerCards = null; // [{name, ovr, position, ...}]
+var allSharedPlayers = null; // [{name, ovr, position, season, nationality, league, club, levels: [{lv, dataUrl}]}]
+var sharedPlayerCards = null; // current player's shared card data (with levels)
 
 function loadSharedPlayers() {
   return new Promise(function(resolve) {
@@ -1683,9 +1684,9 @@ function loadSharedPlayers() {
 
 function hasCardImage(playerName) {
   // Only check IndexedDB shared cards (from card generator export)
-  if (sharedPlayerCards) {
-    for (var i = 0; i < sharedPlayerCards.length; i++) {
-      if (sharedPlayerCards[i].name === playerName) return true;
+  if (allSharedPlayers) {
+    for (var i = 0; i < allSharedPlayers.length; i++) {
+      if (allSharedPlayers[i].name === playerName) return true;
     }
   }
   return false;
@@ -1975,15 +1976,20 @@ function refreshAll() {
     seasonIcon.style.display = 'none';
   }
 
-  // Avatar — Mbappe uses level-specific images, others use PLAYER_IMAGES
+  // Avatar — shared IndexedDB card first, then level-specific, then PLAYER_IMAGES
   const avatar = document.getElementById('playerAvatar');
   avatar.classList.remove('elite','legend','ultimate','has-img');
   let imgUrl = null;
-  if (playerName === '姆巴佩') {
+  // Check shared IndexedDB card (per-level dataUrl)
+  if (sharedPlayerCards && sharedPlayerCards.levels) {
+    var sharedLv = sharedPlayerCards.levels.find(function(l) { return l.lv === currentLevel; });
+    if (sharedLv && sharedLv.dataUrl) imgUrl = sharedLv.dataUrl;
+  }
+  if (!imgUrl && playerName === '姆巴佩') {
     imgUrl = `images/mbappe/mbappe_${currentLevel}.png`;
-  } else if (playerName === '哈里·凯恩') {
+  } else if (!imgUrl && playerName === '哈里·凯恩') {
     imgUrl = `images/players/kane/Lv${currentLevel}.png`;
-  } else if (typeof PLAYER_IMAGES !== 'undefined' && PLAYER_IMAGES[playerName]) {
+  } else if (!imgUrl && typeof PLAYER_IMAGES !== 'undefined' && PLAYER_IMAGES[playerName]) {
     imgUrl = PLAYER_IMAGES[playerName];
   }
   if (imgUrl) {
@@ -2850,6 +2856,13 @@ function applySettings() {
   baseOvr = Math.max(40, Math.min(150, ovr));
   currentLevel = Math.max(1, Math.min(13, lv));
 
+  // Look up shared IndexedDB card data for this player
+  sharedPlayerCards = null;
+  if (allSharedPlayers) {
+    var sp = allSharedPlayers.find(function(p) { return p.name === playerName; });
+    if (sp) sharedPlayerCards = sp;
+  }
+
   // Reset stats when changing player
   totalAttempts = 0;
   totalSuccess = 0;
@@ -2900,7 +2913,12 @@ document.addEventListener('keydown', e => {
 //  Init — load shared card data first, then populate
 // ============================================================
 loadSharedPlayers().then(function(players) {
-  sharedPlayerCards = players;
+  allSharedPlayers = players;
+  // Set initial player's shared card data (default: 姆巴佩)
+  if (allSharedPlayers) {
+    var sp = allSharedPlayers.find(function(p) { return p.name === playerName; });
+    if (sp) sharedPlayerCards = sp;
+  }
   populatePlayerSelect();
   refreshAll();
   updateHexSlots();
