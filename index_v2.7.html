@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -1705,7 +1705,7 @@ function populatePlayerSelect() {
     players.forEach(function(p) {
       var opt = document.createElement('option');
       opt.value = p.name;
-      var dot = hasCardImage(p.name) ? '🟢 ' : '';
+      var dot = hasCardImage(p.name) ? '● ' : '  ';
       opt.textContent = dot + p.name + ' · OVR ' + p.ovr;
       opt.dataset.position = p.position;
       opt.dataset.ovr = p.ovr;
