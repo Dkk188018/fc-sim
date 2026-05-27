@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FC球员卡批量生成器 v1.6</title>
+<title>FC球员卡批量生成器 v1.7</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -173,7 +173,7 @@ h2{font-size:18px;letter-spacing:3px;color:#c9a84b;}
 </head>
 <body>
 
-<h2>FC 球员卡批量生成器 v1.5 — 5:8 画布 | 含国籍/联赛/俱乐部 | 秒换5图</h2>
+<h2>FC 球员卡批量生成器 v1.7 — 5:8 画布 | 含国籍/联赛/俱乐部 | 导出自动更新清单</h2>
 <div class="tip">
   <b>步骤：</b>加载1级底图 → 拖拽各色框覆盖对应位置 → 上传头像/图标 → 批量导出13级PNG
   <br>框色：<b style="color:#4fc3f7">OVR蓝</b> <b style="color:#ff4444">等级红</b> <b style="color:#00e5ff">位置青</b> <b style="color:#fff">六边白</b> <b style="color:#b388ff">头像紫</b> <b style="color:#ff9800">名字橙</b> <b style="color:#ffab00">赛季金</b> <b style="color:#64ffda">图标绿</b>
@@ -434,10 +434,11 @@ h2{font-size:18px;letter-spacing:3px;color:#c9a84b;}
     <div class="btn-row"><button class="btn btn-green" onclick="doExportOne()">导出当前预览</button></div>
     <div class="btn-row"><button class="btn btn-asset" id="btnExportPath" onclick="pickExportFolder()">📁 导出路径</button></div>
     <div class="btn-row"><button class="btn btn-gold" id="btnBatch" onclick="doExportBatch()">🚀 批量导出1~13级</button></div>
+    <div class="btn-row"><button class="btn btn-asset" onclick="prepareDeploy()">📦 准备部署</button></div>
 
     </div><!-- /panel-col right -->
 
-    <div id="statusMsg">v1.5 — 5:8画布 + 9元素框 + 98球员数据库 + 资源库秒换5图(国旗/联赛/队徽/赛季/头像)，等待加载底图...</div>
+    <div id="statusMsg">v1.7 — 5:8画布 + 9元素框 + 84球员数据库 + 导出自动更新清单，等待加载底图...</div>
   </div>
 
 </div>
@@ -1606,8 +1607,85 @@ async function doExportBatch() {
   if (found && levelImages.length > 0) {
     try {
       await saveToSharedDB(playerName, found, levelImages);
-      setMsg('✅ 完成！' + ok + '/13 张 | 已同步到强化模拟器');
-    } catch(e) { console.error('共享DB写入失败:', e); }
+      await updateCardManifest(playerName, found, levelImages);
+      setMsg('✅ 完成！' + ok + '/13 张 | 已同步 + 清单已更新');
+    } catch(e) { console.error('导出后处理失败:', e); setMsg('✅ 完成！' + ok + '/13 张（清单更新失败，请检查导出路径）'); }
+  }
+}
+
+async function updateCardManifest(playerName, playerInfo, levelImages) {
+  var safeName = playerName.replace(/[\\/:*?"<>|]/g, '');
+  var levels = levelImages.map(function(l) { return l.lv; }).sort(function(a,b) { return a-b; });
+  var sourcePattern = 'images/cards/' + playerName + '/' + playerName + '_Lv{level}.png';
+
+  // Try to read + update manifest in export folder
+  if (exportFolderHandle) {
+    try {
+      var manifestHandle;
+      try { manifestHandle = await exportFolderHandle.getFileHandle('cards_manifest.json'); }
+      catch(e) { /* doesn't exist */ }
+
+      var manifest;
+      if (manifestHandle) {
+        var file = await manifestHandle.getFile();
+        manifest = JSON.parse(await file.text());
+      } else {
+        manifest = { version: 1, updatedAt: '', players: {} };
+      }
+      manifest.players[playerName] = {
+        source: sourcePattern,
+        levels: levels,
+        format: 'per-level',
+        updatedAt: new Date().toISOString()
+      };
+      manifest.updatedAt = new Date().toISOString().slice(0, 10);
+
+      var wh = await exportFolderHandle.getFileHandle('cards_manifest.json', {create: true});
+      var ws = await wh.createWritable();
+      await ws.write(JSON.stringify(manifest, null, 2));
+      await ws.close();
+      console.log('Card manifest updated: ' + playerName);
+      return;
+    } catch(e) { console.warn('Manifest update failed:', e); }
+  }
+
+  // Fallback: download manifest update JSON
+  var mini = {
+    version: 1,
+    updatedAt: new Date().toISOString().slice(0, 10),
+    players: {}
+  };
+  mini.players[playerName] = {
+    source: sourcePattern,
+    levels: levels,
+    format: 'per-level',
+    updatedAt: new Date().toISOString()
+  };
+  downloadJSON(mini, 'cards_manifest_update_' + safeName + '.json');
+}
+
+function downloadJSON(data, filename) {
+  var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  var a = document.createElement('a');
+  a.download = filename;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function prepareDeploy() {
+  if (!exportFolderHandle) {
+    setMsg('❌ 请先设置导出路径（点击"📁 导出路径"，选择 deploy 目录）');
+    return;
+  }
+  try {
+    var mh = await exportFolderHandle.getFileHandle('cards_manifest.json');
+    var file = await mh.getFile();
+    var manifest = JSON.parse(await file.text());
+    var names = Object.keys(manifest.players).sort();
+    setMsg('📦 清单就绪！' + names.length + ' 名球员已收录\n\n部署步骤：\n1. cd deploy\n2. git status 确认变更\n3. git add images/cards/ cards_manifest.json index.html\n4. git commit -m "v2.8: 卡片清单系统"\n5. git push');
+  } catch(e) {
+    setMsg('❌ 清单不存在，请先批量导出一个球员');
   }
 }
 
