@@ -1929,7 +1929,7 @@ let autoTimer = null;
 let autoCloseTimer = null;
 let _pendingSuccess = false;
 let _pendingMode = 'fail';
-let _debugAllSuccess = true; // TODO: 测试完改回 false
+let _debugAllSuccess = false; // 测试完改回 false
 let isEnhancing = false;
 let history = [];
 
@@ -2219,8 +2219,9 @@ if (currentLevel >= 12) avatar.classList.add('ultimate');
     const boost = getMaterialBoost();
     const boostStr = boost > 0 ? ` <span style="color:#2979ff;font-size:11px;">(含材料+${boost}%)</span>` : '';
     document.getElementById('rateInfo').innerHTML = `+${currentLevel} → +${nextLv} 成功率 <strong>${rStr}</strong>${boostStr}`;
-    document.getElementById('btnEnhance').disabled = false;
-    document.getElementById('btnEnhance').textContent = '强 化';
+    var hasMaterials = materialCards.some(function(m) { return !!m; });
+    document.getElementById('btnEnhance').disabled = !hasMaterials;
+    document.getElementById('btnEnhance').textContent = hasMaterials ? '强 化' : '需添加材料';
   }
 
   // Info chips
