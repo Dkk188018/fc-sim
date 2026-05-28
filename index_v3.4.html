@@ -1544,16 +1544,16 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 (function(){
   var ua = navigator.userAgent;
   if (!/Mobile|Android|iPhone/i.test(ua)) return;
+  // TEST: force padding on ALL mobile browsers to verify detection works
+  document.body.style.backgroundColor = '#ff0000'; // temp visual marker
+  setTimeout(function(){
+    var app = document.querySelector('.app');
+    if (app) { app.style.paddingTop = '300px'; console.log('PADDING APPLIED: 300px'); }
+    else { console.log('APP NOT FOUND'); }
+  }, 200);
   if (/MicroMessenger/i.test(ua)) { document.body.classList.add('browser-wechat'); }
   else if (/Quark/i.test(ua)) { document.body.classList.add('browser-quark'); }
-  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) {
-    document.body.classList.add('browser-chrome');
-    // Force inline padding — delay to ensure DOM ready
-    setTimeout(function(){
-      var app = document.querySelector('.app');
-      if (app) { app.style.paddingTop = '300px'; }
-    }, 100);
-  }
+  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) { document.body.classList.add('browser-chrome'); }
 })();
 
 const PLAYER_IMAGES = {
