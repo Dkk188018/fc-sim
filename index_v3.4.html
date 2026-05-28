@@ -1540,19 +1540,18 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 <!-- Particle Layer -->
 <div class="particle-layer" id="particleLayer"></div>
 <script>
-// Browser detection — set mobile top spacing per browser
+// Set mobile top spacing (inline style ensures it actually applies)
 (function(){
   var ua = navigator.userAgent;
   if (!/Mobile|Android|iPhone/i.test(ua)) return;
-  var pad;
-  if (/MicroMessenger/i.test(ua)) { pad = '120px'; }
-  else if (/Quark/i.test(ua)) { pad = '160px'; }
-  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) { pad = '200px'; }
-  else { pad = '140px'; }
+  var pad = '140px';
+  if (/MicroMessenger/i.test(ua)) pad = '120px';
+  if (/Quark/i.test(ua)) pad = '160px';
+  if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) pad = '200px';
   setTimeout(function(){
     var app = document.querySelector('.app');
-    if (app) app.style.paddingTop = pad;
-  }, 100);
+    if (app) { app.style.paddingTop = pad; console.log('MOBILE PADDING: ' + pad); }
+  }, 200);
 })();
 
 const PLAYER_IMAGES = {
