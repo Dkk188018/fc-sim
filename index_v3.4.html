@@ -1548,9 +1548,11 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   else if (/Quark/i.test(ua)) { document.body.classList.add('browser-quark'); }
   else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) {
     document.body.classList.add('browser-chrome');
-    // Force inline padding for Chrome (bypass CSS specificity issues)
-    var app = document.querySelector('.app');
-    if (app) { app.style.paddingTop = '200px'; }
+    // Force inline padding — delay to ensure DOM ready
+    setTimeout(function(){
+      var app = document.querySelector('.app');
+      if (app) { app.style.paddingTop = '300px'; }
+    }, 100);
   }
 })();
 
