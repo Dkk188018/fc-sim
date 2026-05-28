@@ -3,7 +3,7 @@
   "updatedAt": "2026-05-28",
   "players": {
     "A.卢克曼": {
-      "source": "images/cards/A.卢克曼/A.卢克曼_Lv{level}.png",
+      "source": "images/cards/A.卢克曼/A.卢克曼_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -22,7 +22,7 @@
       "format": "per-level"
     },
     "A.巴斯托尼": {
-      "source": "images/cards/A.巴斯托尼/A.巴斯托尼_Lv{level}.png",
+      "source": "images/cards/A.巴斯托尼/A.巴斯托尼_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -41,7 +41,7 @@
       "format": "per-level"
     },
     "A.帕夫洛维奇": {
-      "source": "images/cards/A.帕夫洛维奇/A.帕夫洛维奇_Lv{level}.png",
+      "source": "images/cards/A.帕夫洛维奇/A.帕夫洛维奇_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -60,7 +60,7 @@
       "format": "per-level"
     },
     "A.戈登": {
-      "source": "images/cards/A.戈登/A.戈登_Lv{level}.png",
+      "source": "images/cards/A.戈登/A.戈登_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -79,7 +79,7 @@
       "format": "per-level"
     },
     "B.巴科拉": {
-      "source": "images/cards/B.巴科拉/B.巴科拉_Lv{level}.png",
+      "source": "images/cards/B.巴科拉/B.巴科拉_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -98,7 +98,7 @@
       "format": "per-level"
     },
     "C.罗梅罗": {
-      "source": "images/cards/C.罗梅罗/C.罗梅罗_Lv{level}.png",
+      "source": "images/cards/C.罗梅罗/C.罗梅罗_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -117,7 +117,7 @@
       "format": "per-level"
     },
     "D.索博斯洛伊": {
-      "source": "images/cards/D.索博斯洛伊/D.索博斯洛伊_Lv{level}.png",
+      "source": "images/cards/D.索博斯洛伊/D.索博斯洛伊_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -136,7 +136,7 @@
       "format": "per-level"
     },
     "D.邓弗里斯": {
-      "source": "images/cards/D.邓弗里斯/D.邓弗里斯_Lv{level}.png",
+      "source": "images/cards/D.邓弗里斯/D.邓弗里斯_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -174,7 +174,7 @@
       "format": "per-level"
     },
     "F.迪马尔科": {
-      "source": "images/cards/F.迪马尔科/F.迪马尔科_Lv{level}.png",
+      "source": "images/cards/F.迪马尔科/F.迪马尔科_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -193,7 +193,7 @@
       "format": "per-level"
     },
     "G.维卡里奥": {
-      "source": "images/cards/G.维卡里奥/G.维卡里奥_Lv{level}.png",
+      "source": "images/cards/G.维卡里奥/G.维卡里奥_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -231,7 +231,7 @@
       "format": "per-level"
     },
     "H.埃基蒂克": {
-      "source": "images/cards/H.埃基蒂克/H.埃基蒂克_Lv{level}.png",
+      "source": "images/cards/H.埃基蒂克/H.埃基蒂克_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -288,7 +288,7 @@
       "format": "per-level"
     },
     "J.多库": {
-      "source": "images/cards/J.多库/J.多库_Lv{level}.png",
+      "source": "images/cards/J.多库/J.多库_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -307,7 +307,7 @@
       "format": "per-level"
     },
     "J.廷贝尔": {
-      "source": "images/cards/J.廷贝尔/J.廷贝尔_Lv{level}.png",
+      "source": "images/cards/J.廷贝尔/J.廷贝尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -345,7 +345,7 @@
       "format": "per-level"
     },
     "J.格瓦迪奥尔": {
-      "source": "images/cards/J.格瓦迪奥尔/J.格瓦迪奥尔_Lv{level}.png",
+      "source": "images/cards/J.格瓦迪奥尔/J.格瓦迪奥尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -364,7 +364,7 @@
       "format": "per-level"
     },
     "J.海于格": {
-      "source": "images/cards/J.海于格/J.海于格_Lv{level}.png",
+      "source": "images/cards/J.海于格/J.海于格_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -383,7 +383,7 @@
       "format": "per-level"
     },
     "J.贝林厄姆": {
-      "source": "images/cards/J.贝林厄姆/J.贝林厄姆_Lv{level}.png",
+      "source": "images/cards/J.贝林厄姆/J.贝林厄姆_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -402,7 +402,7 @@
       "format": "per-level"
     },
     "K.伊尔迪兹": {
-      "source": "images/cards/K.伊尔迪兹/K.伊尔迪兹_Lv{level}.png",
+      "source": "images/cards/K.伊尔迪兹/K.伊尔迪兹_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -421,7 +421,7 @@
       "format": "per-level"
     },
     "K·阿德耶米": {
-      "source": "images/cards/K·阿德耶米/K·阿德耶米_Lv{level}.png",
+      "source": "images/cards/K·阿德耶米/K·阿德耶米_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -440,7 +440,7 @@
       "format": "per-level"
     },
     "L.卡尔": {
-      "source": "images/cards/L.卡尔/L.卡尔_Lv{level}.png",
+      "source": "images/cards/L.卡尔/L.卡尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -459,7 +459,7 @@
       "format": "per-level"
     },
     "L.萨内": {
-      "source": "images/cards/L.萨内/L.萨内_Lv{level}.png",
+      "source": "images/cards/L.萨内/L.萨内_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -497,7 +497,7 @@
       "format": "per-level"
     },
     "M.卡尔内塞基": {
-      "source": "images/cards/M.卡尔内塞基/M.卡尔内塞基_Lv{level}.png",
+      "source": "images/cards/M.卡尔内塞基/M.卡尔内塞基_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -516,7 +516,7 @@
       "format": "per-level"
     },
     "N.克海金": {
-      "source": "images/cards/N.克海金/N.克海金_Lv{level}.png",
+      "source": "images/cards/N.克海金/N.克海金_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -535,7 +535,7 @@
       "format": "per-level"
     },
     "N.马杜克": {
-      "source": "images/cards/N.马杜克/N.马杜克_Lv{level}.png",
+      "source": "images/cards/N.马杜克/N.马杜克_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -554,7 +554,7 @@
       "format": "per-level"
     },
     "P.伯格": {
-      "source": "images/cards/P.伯格/P.伯格_Lv{level}.png",
+      "source": "images/cards/P.伯格/P.伯格_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -573,7 +573,7 @@
       "format": "per-level"
     },
     "P.科恩": {
-      "source": "images/cards/P.科恩/P.科恩_Lv{level}.png",
+      "source": "images/cards/P.科恩/P.科恩_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -592,7 +592,7 @@
       "format": "per-level"
     },
     "U.卡科尔": {
-      "source": "images/cards/U.卡科尔/U.卡科尔_Lv{level}.png",
+      "source": "images/cards/U.卡科尔/U.卡科尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -611,7 +611,7 @@
       "format": "per-level"
     },
     "W.帕乔": {
-      "source": "images/cards/W.帕乔/W.帕乔_Lv{level}.png",
+      "source": "images/cards/W.帕乔/W.帕乔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -630,7 +630,7 @@
       "format": "per-level"
     },
     "W.萨利巴": {
-      "source": "images/cards/W.萨利巴/W.萨利巴_Lv{level}.png",
+      "source": "images/cards/W.萨利巴/W.萨利巴_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -668,7 +668,7 @@
       "format": "per-level"
     },
     "Y.比塞克": {
-      "source": "images/cards/Y.比塞克/Y.比塞克_Lv{level}.png",
+      "source": "images/cards/Y.比塞克/Y.比塞克_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -687,7 +687,7 @@
       "format": "per-level"
     },
     "于帕梅卡诺": {
-      "source": "images/cards/于帕梅卡诺/于帕梅卡诺_Lv{level}.png",
+      "source": "images/cards/于帕梅卡诺/于帕梅卡诺_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -706,7 +706,7 @@
       "format": "per-level"
     },
     "佩德里": {
-      "source": "images/cards/佩德里/佩德里_Lv{level}.png",
+      "source": "images/cards/佩德里/佩德里_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -725,7 +725,7 @@
       "format": "per-level"
     },
     "克瓦拉茨赫利亚": {
-      "source": "images/cards/克瓦拉茨赫利亚/克瓦拉茨赫利亚_Lv{level}.png",
+      "source": "images/cards/克瓦拉茨赫利亚/克瓦拉茨赫利亚_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -744,7 +744,7 @@
       "format": "per-level"
     },
     "加克波": {
-      "source": "images/cards/加克波/加克波_Lv{level}.png",
+      "source": "images/cards/加克波/加克波_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -763,7 +763,7 @@
       "format": "per-level"
     },
     "加布里埃尔": {
-      "source": "images/cards/加布里埃尔/加布里埃尔_Lv{level}.png",
+      "source": "images/cards/加布里埃尔/加布里埃尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -782,7 +782,7 @@
       "format": "per-level"
     },
     "厄德高": {
-      "source": "images/cards/厄德高/厄德高_Lv{level}.png",
+      "source": "images/cards/厄德高/厄德高_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -801,7 +801,7 @@
       "format": "per-level"
     },
     "吉拉西": {
-      "source": "images/cards/吉拉西/吉拉西_Lv{level}.png",
+      "source": "images/cards/吉拉西/吉拉西_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -820,7 +820,7 @@
       "format": "per-level"
     },
     "哈兰德": {
-      "source": "images/cards/哈兰德/哈兰德_Lv{level}.png",
+      "source": "images/cards/哈兰德/哈兰德_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -858,7 +858,7 @@
       "format": "per-level"
     },
     "埃斯特旺": {
-      "source": "images/cards/埃斯特旺/埃斯特旺_Lv{level}.png",
+      "source": "images/cards/埃斯特旺/埃斯特旺_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -877,7 +877,7 @@
       "format": "per-level"
     },
     "埃泽": {
-      "source": "images/cards/埃泽/埃泽_Lv{level}.png",
+      "source": "images/cards/埃泽/埃泽_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -896,7 +896,7 @@
       "format": "per-level"
     },
     "基米希": {
-      "source": "images/cards/基米希/基米希_Lv{level}.png",
+      "source": "images/cards/基米希/基米希_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -915,7 +915,7 @@
       "format": "per-level"
     },
     "多纳鲁马": {
-      "source": "images/cards/多纳鲁马/多纳鲁马_Lv{level}.png",
+      "source": "images/cards/多纳鲁马/多纳鲁马_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -953,7 +953,7 @@
       "format": "per-level"
     },
     "奥斯梅恩": {
-      "source": "images/cards/奥斯梅恩/奥斯梅恩_Lv{level}.png",
+      "source": "images/cards/奥斯梅恩/奥斯梅恩_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -972,7 +972,7 @@
       "format": "per-level"
     },
     "姆巴佩": {
-      "source": "images/cards/姆巴佩/姆巴佩_Lv{level}.png",
+      "source": "images/cards/姆巴佩/姆巴佩_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -991,7 +991,7 @@
       "format": "per-level"
     },
     "居莱尔": {
-      "source": "images/cards/居莱尔/居莱尔_Lv{level}.png",
+      "source": "images/cards/居莱尔/居莱尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1029,7 +1029,7 @@
       "format": "per-level"
     },
     "布兰特": {
-      "source": "images/cards/布兰特/布兰特_Lv{level}.png",
+      "source": "images/cards/布兰特/布兰特_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1048,7 +1048,7 @@
       "format": "per-level"
     },
     "库尔图瓦": {
-      "source": "images/cards/库尔图瓦/库尔图瓦_Lv{level}.png",
+      "source": "images/cards/库尔图瓦/库尔图瓦_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1067,7 +1067,7 @@
       "format": "per-level"
     },
     "德凯特拉雷": {
-      "source": "images/cards/德凯特拉雷/德凯特拉雷_Lv{level}.png",
+      "source": "images/cards/德凯特拉雷/德凯特拉雷_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1086,7 +1086,7 @@
       "format": "per-level"
     },
     "恩梅加": {
-      "source": "images/cards/恩梅加/恩梅加_Lv{level}.png",
+      "source": "images/cards/恩梅加/恩梅加_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1105,7 +1105,7 @@
       "format": "per-level"
     },
     "恰尔汗奥卢": {
-      "source": "images/cards/恰尔汗奥卢/恰尔汗奥卢_Lv{level}.png",
+      "source": "images/cards/恰尔汗奥卢/恰尔汗奥卢_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1124,7 +1124,7 @@
       "format": "per-level"
     },
     "拉什福德": {
-      "source": "images/cards/拉什福德/拉什福德_Lv{level}.png",
+      "source": "images/cards/拉什福德/拉什福德_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1143,7 +1143,7 @@
       "format": "per-level"
     },
     "杜埃": {
-      "source": "images/cards/杜埃/杜埃_Lv{level}.png",
+      "source": "images/cards/杜埃/杜埃_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1162,7 +1162,7 @@
       "format": "per-level"
     },
     "格列兹曼": {
-      "source": "images/cards/格列兹曼/格列兹曼_Lv{level}.png",
+      "source": "images/cards/格列兹曼/格列兹曼_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1181,7 +1181,7 @@
       "format": "per-level"
     },
     "格纳布里": {
-      "source": "images/cards/格纳布里/格纳布里_Lv{level}.png",
+      "source": "images/cards/格纳布里/格纳布里_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1219,7 +1219,7 @@
       "format": "per-level"
     },
     "楚阿梅尼": {
-      "source": "images/cards/楚阿梅尼/楚阿梅尼_Lv{level}.png",
+      "source": "images/cards/楚阿梅尼/楚阿梅尼_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1238,7 +1238,7 @@
       "format": "per-level"
     },
     "波普": {
-      "source": "images/cards/波普/波普_Lv{level}.png",
+      "source": "images/cards/波普/波普_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1276,7 +1276,7 @@
       "format": "per-level"
     },
     "特罗萨德": {
-      "source": "images/cards/特罗萨德/特罗萨德_Lv{level}.png",
+      "source": "images/cards/特罗萨德/特罗萨德_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1295,7 +1295,7 @@
       "format": "per-level"
     },
     "特里皮尔": {
-      "source": "images/cards/特里皮尔/特里皮尔_Lv{level}.png",
+      "source": "images/cards/特里皮尔/特里皮尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1314,7 +1314,7 @@
       "format": "per-level"
     },
     "福登": {
-      "source": "images/cards/福登/福登_Lv{level}.png",
+      "source": "images/cards/福登/福登_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1333,7 +1333,7 @@
       "format": "per-level"
     },
     "索默": {
-      "source": "images/cards/索默/索默_Lv{level}.png",
+      "source": "images/cards/索默/索默_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1390,7 +1390,7 @@
       "format": "per-level"
     },
     "罗伯逊": {
-      "source": "images/cards/罗伯逊/罗伯逊_Lv{level}.png",
+      "source": "images/cards/罗伯逊/罗伯逊_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1409,7 +1409,7 @@
       "format": "per-level"
     },
     "苏比门迪": {
-      "source": "images/cards/苏比门迪/苏比门迪_Lv{level}.png",
+      "source": "images/cards/苏比门迪/苏比门迪_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1428,7 +1428,7 @@
       "format": "per-level"
     },
     "范德芬": {
-      "source": "images/cards/范德芬/范德芬_Lv{level}.png",
+      "source": "images/cards/范德芬/范德芬_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1466,7 +1466,7 @@
       "format": "per-level"
     },
     "莱默尔": {
-      "source": "images/cards/莱默尔/莱默尔_Lv{level}.png",
+      "source": "images/cards/莱默尔/莱默尔_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1485,7 +1485,7 @@
       "format": "per-level"
     },
     "萨卡": {
-      "source": "images/cards/萨卡/萨卡_Lv{level}.png",
+      "source": "images/cards/萨卡/萨卡_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1504,7 +1504,7 @@
       "format": "per-level"
     },
     "谢尔基": {
-      "source": "images/cards/谢尔基/谢尔基_Lv{level}.png",
+      "source": "images/cards/谢尔基/谢尔基_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1542,7 +1542,7 @@
       "format": "per-level"
     },
     "赖斯": {
-      "source": "images/cards/赖斯/赖斯_Lv{level}.png",
+      "source": "images/cards/赖斯/赖斯_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1561,7 +1561,7 @@
       "format": "per-level"
     },
     "阿利松": {
-      "source": "images/cards/阿利松/阿利松_Lv{level}.png",
+      "source": "images/cards/阿利松/阿利松_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1580,7 +1580,7 @@
       "format": "per-level"
     },
     "马尔基尼奥斯": {
-      "source": "images/cards/马尔基尼奥斯/马尔基尼奥斯_Lv{level}.png",
+      "source": "images/cards/马尔基尼奥斯/马尔基尼奥斯_Lv{level}.webp",
       "levels": [
         1,
         2,
