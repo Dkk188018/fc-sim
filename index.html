@@ -1909,6 +1909,7 @@ function onPlayerSelect() {
   document.getElementById('inpOvr').value = opt.dataset.ovr;
   document.getElementById('inpLevel').value = opt.dataset.enhance;
   document.getElementById('inpSeason').value = '25ucl';
+  document.getElementById('inpMaterialOvr').value = opt.dataset.ovr;
   // Don't auto-apply — user must click 应用设置
 }
 
@@ -2994,20 +2995,22 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
 
     var dropOvr = baseOvr + data(dropTo).bonus;
     var lostLevels = oldLevel - dropTo;
+    var oldTrait = oldLevel >= 12 ? 2 : 1;
+    var newTrait = dropTo >= 12 ? 2 : 1;
+    var lostOvr = oldOvr - dropOvr;
+    var lostTrait = oldTrait - newTrait;
 
     if (dropTo === oldLevel) {
       title.textContent = '强化保护生效！';
       subtitle.textContent = '强化失败，但等级保持不变';
-      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
-        '<div class="rs-row"><span class="rs-label">保护效果</span><span class="rs-value" style="color:#f0b90b;">保持 +' + oldLevel + '</span></div>' +
-        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' (不变)</span></div>';
     } else {
       title.textContent = '强化失败';
       subtitle.textContent = '球员降至 +' + dropTo + '，掉了 ' + lostLevels + ' 级';
-      stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化结果</span><span class="rs-value" style="color:#e74c3c;">+' + oldLevel + ' → +' + targetLv + ' 失败</span></div>' +
-        '<div class="rs-row"><span class="rs-label">降至</span><span class="rs-value" style="color:#e74c3c;">+' + dropTo + ' (掉' + lostLevels + '级)</span></div>' +
-        '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + dropOvr + '</span></div>';
     }
+    stats.innerHTML =
+      '<div class="rs-row"><span class="rs-label">强化等级</span><span class="rs-value"><img src="images/enhance/' + dropTo + '.png" alt="+' + dropTo + '" style="height:20px;vertical-align:middle;"> <span style="color:#e74c3c;font-size:0.8em;">-' + lostLevels + '</span></span></div>' +
+      '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + dropOvr + ' <span style="color:#e74c3c;font-size:0.8em;">-' + lostOvr + '</span></span></div>' +
+      '<div class="rs-row"><span class="rs-label">特性槽</span><span class="rs-value">' + newTrait + ' <span style="color:#e74c3c;font-size:0.8em;">-' + lostTrait + '</span></span></div>';
 
     setTimeout(function() { textWrap.classList.add('expand'); }, 800);
     setTimeout(function() { stats.classList.add('fade-in'); }, 1100);
