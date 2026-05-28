@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-27",
+  "updatedAt": "2026-05-28",
   "players": {
     "A.卢克曼": {
       "source": "images/cards/A.卢克曼/A.卢克曼_Lv{level}.png",
@@ -155,7 +155,7 @@
       "format": "per-level"
     },
     "F.维尔茨": {
-      "source": "images/cards/F.维尔茨/F.维尔茨_Lv{level}.png",
+      "source": "images/cards/F.维尔茨/F.维尔茨_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -212,7 +212,7 @@
       "format": "per-level"
     },
     "G.马丁内利": {
-      "source": "images/cards/G.马丁内利/G.马丁内利_Lv{level}.png",
+      "source": "images/cards/G.马丁内利/G.马丁内利_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -250,7 +250,7 @@
       "format": "per-level"
     },
     "H.瓦纳肯": {
-      "source": "images/cards/H.瓦纳肯/H.瓦纳肯_Lv{level}.png",
+      "source": "images/cards/H.瓦纳肯/H.瓦纳肯_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -269,7 +269,7 @@
       "format": "per-level"
     },
     "J. 阿尔瓦雷斯": {
-      "source": "images/cards/J. 阿尔瓦雷斯/J. 阿尔瓦雷斯_Lv{level}.png",
+      "source": "images/cards/J. 阿尔瓦雷斯/J. 阿尔瓦雷斯_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -326,7 +326,7 @@
       "format": "per-level"
     },
     "J.斯坦尼希奇": {
-      "source": "images/cards/J.斯坦尼希奇/J.斯坦尼希奇_Lv{level}.png",
+      "source": "images/cards/J.斯坦尼希奇/J.斯坦尼希奇_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -478,7 +478,7 @@
       "format": "per-level"
     },
     "M.凯塞多": {
-      "source": "images/cards/M.凯塞多/M.凯塞多_Lv{level}.png",
+      "source": "images/cards/M.凯塞多/M.凯塞多_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -649,7 +649,7 @@
       "format": "per-level"
     },
     "W.麦克凯尼": {
-      "source": "images/cards/W.麦克凯尼/W.麦克凯尼_Lv{level}.png",
+      "source": "images/cards/W.麦克凯尼/W.麦克凯尼_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -839,7 +839,7 @@
       "format": "per-level"
     },
     "哲凯赖什": {
-      "source": "images/cards/哲凯赖什/哲凯赖什_Lv{level}.png",
+      "source": "images/cards/哲凯赖什/哲凯赖什_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -934,7 +934,7 @@
       "format": "per-level"
     },
     "奥利塞": {
-      "source": "images/cards/奥利塞/奥利塞_Lv{level}.png",
+      "source": "images/cards/奥利塞/奥利塞_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1010,7 +1010,7 @@
       "format": "per-level"
     },
     "巴尔维德": {
-      "source": "images/cards/巴尔维德/巴尔维德_Lv{level}.png",
+      "source": "images/cards/巴尔维德/巴尔维德_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1200,7 +1200,7 @@
       "format": "per-level"
     },
     "格里马尔多": {
-      "source": "images/cards/格里马尔多/格里马尔多_Lv{level}.png",
+      "source": "images/cards/格里马尔多/格里马尔多_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1257,7 +1257,7 @@
       "format": "per-level"
     },
     "特林康": {
-      "source": "images/cards/特林康/特林康_Lv{level}.png",
+      "source": "images/cards/特林康/特林康_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1352,7 +1352,7 @@
       "format": "per-level"
     },
     "维尼修斯": {
-      "source": "images/cards/维尼修斯/维尼修斯_Lv{level}.png",
+      "source": "images/cards/维尼修斯/维尼修斯_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1371,7 +1371,7 @@
       "format": "per-level"
     },
     "维蒂尼亚": {
-      "source": "images/cards/维蒂尼亚/维蒂尼亚_Lv{level}.png",
+      "source": "images/cards/维蒂尼亚/维蒂尼亚_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1447,7 +1447,7 @@
       "format": "per-level"
     },
     "范戴克": {
-      "source": "images/cards/范戴克/范戴克_Lv{level}.png",
+      "source": "images/cards/范戴克/范戴克_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1523,7 +1523,7 @@
       "format": "per-level"
     },
     "费尔明": {
-      "source": "images/cards/费尔明/费尔明_Lv{level}.png",
+      "source": "images/cards/费尔明/费尔明_Lv{level}.webp",
       "levels": [
         1,
         2,
@@ -1597,6 +1597,82 @@
         13
       ],
       "format": "per-level"
+    },
+    "杰拉德·马丁": {
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level",
+      "source": "images/cards/杰拉德·马丁/杰拉德·马丁_Lv{level}.webp"
+    },
+    "努诺·门德斯": {
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level",
+      "source": "images/cards/努诺·门德斯/努诺·门德斯_Lv{level}.webp"
+    },
+    "哈里·凯恩": {
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level",
+      "source": "images/cards/哈里·凯恩/哈里·凯恩_Lv{level}.webp"
+    },
+    "拉明·亚马尔": {
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level",
+      "source": "images/cards/拉明·亚马尔/拉明·亚马尔_Lv{level}.webp"
     }
   }
 }
