@@ -3278,6 +3278,7 @@ Promise.all([loadSharedPlayers(), loadCardManifest()]).then(function(results) {
   }
   populatePlayerSelect();
   refreshAll();
+  document.getElementById('inpMaterialOvr').value = baseOvr;
   updateHexSlots();
 });
 
