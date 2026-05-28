@@ -420,25 +420,6 @@
       ],
       "format": "per-level"
     },
-    "K·阿德耶米": {
-      "source": "images/cards/K·阿德耶米/K·阿德耶米_Lv{level}.webp",
-      "levels": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13
-      ],
-      "format": "per-level"
-    },
     "L.卡尔": {
       "source": "images/cards/L.卡尔/L.卡尔_Lv{level}.webp",
       "levels": [
@@ -1673,6 +1654,25 @@
       ],
       "format": "per-level",
       "source": "images/cards/拉明·亚马尔/拉明·亚马尔_Lv{level}.webp"
+    },
+    "K.阿德耶米": {
+      "source": "images/cards/K.阿德耶米/K·阿德耶米_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
     }
   }
 }
