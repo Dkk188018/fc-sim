@@ -1019,8 +1019,9 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
     <div class="settings-modal" onclick="event.stopPropagation()">
       <div class="field">
-        <label>赛季 / 卡种</label>
+        <label>赛季</label>
         <select id="inpSeason">
+          <option value="25ucl" selected>25UCL 25欧冠</option>
           <option value="default">基础卡 (普通)</option>
           <option value="live">LIVE 实时</option>
           <option value="hot">HOT 焦点</option>
@@ -1029,8 +1030,6 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
           <option value="icon">ICON 传奇</option>
           <option value="icon-tm">ICON TM 传奇时刻</option>
           <option value="wc">WC 世界杯</option>
-          <option value="ucl">UCL 欧冠</option>
-          <option value="25ucl" selected>25UCL 25欧冠</option>
           <option value="ng">NG 新星</option>
           <option value="cap">CAP 队长</option>
         </select>
