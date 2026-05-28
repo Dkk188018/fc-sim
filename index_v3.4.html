@@ -666,7 +666,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
   width: 350px; height: 75%; z-index: 3; opacity: 0;
   background: linear-gradient(180deg, rgba(180,220,255,0.6) 0%, rgba(100,200,255,0.25) 25%, rgba(100,200,255,0.08) 50%, transparent 80%);
-  clip-path: polygon(35% 0%, 65% 0%, 90% 100%, 10% 100%); filter: blur(25px);
+  clip-path: polygon(35% 0%, 65% 0%, 90% 100%, 10% 100%); filter: blur(50px);
   transition: opacity 0.6s;
 }
 .burst-spotlight.on { opacity: 1; }
@@ -1892,6 +1892,7 @@ let autoTimer = null;
 let autoCloseTimer = null;
 let _pendingSuccess = false;
 let _pendingMode = 'fail';
+let _debugAllSuccess = true; // TODO: 测试完改回 false
 let isEnhancing = false;
 let history = [];
 
@@ -2085,6 +2086,7 @@ function updateEnergyBar() {
 }
 
 function getFinalRate(baseRate) {
+  if (_debugAllSuccess) return 1;
   const boost = getMaterialBoost() / 100;
   return Math.min(1, baseRate + boost);
 }
