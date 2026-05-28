@@ -1673,6 +1673,272 @@
         13
       ],
       "format": "per-level"
+    },
+    "路易斯·迪亚斯": {
+      "source": "images/cards/路易斯·迪亚斯/路易斯·迪亚斯_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "若昂·内维斯": {
+      "source": "images/cards/若昂·内维斯/若昂·内维斯_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "大卫·拉亚": {
+      "source": "images/cards/大卫·拉亚/大卫·拉亚_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "哈维·巴恩斯": {
+      "source": "images/cards/哈维·巴恩斯/哈维·巴恩斯_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "劳塔罗·马丁内斯": {
+      "source": "images/cards/劳塔罗·马丁内斯/劳塔罗·马丁内斯_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "马科斯·略伦特": {
+      "source": "images/cards/马科斯·略伦特/马科斯·略伦特_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "佩德罗·波罗": {
+      "source": "images/cards/佩德罗·波罗/佩德罗·波罗_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "法比安·鲁易斯": {
+      "source": "images/cards/法比安·鲁易斯/法比安·鲁易斯_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "扬·科托": {
+      "source": "images/cards/扬·科托/扬·科托_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "布鲁诺·吉马良斯": {
+      "source": "images/cards/布鲁诺·吉马良斯/布鲁诺·吉马良斯_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "鲁伊·席尔瓦": {
+      "source": "images/cards/鲁伊·席尔瓦/鲁伊·席尔瓦_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "马库斯·图拉姆": {
+      "source": "images/cards/马库斯·图拉姆/马库斯·图拉姆_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "迈克尔·梅里诺": {
+      "source": "images/cards/迈克尔·梅里诺/迈克尔·梅里诺_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
+    },
+    "丹·伯恩": {
+      "source": "images/cards/丹·伯恩/丹·伯恩_Lv{level}.webp",
+      "levels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "format": "per-level"
     }
   }
 }
