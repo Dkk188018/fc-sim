@@ -1540,20 +1540,19 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 <!-- Particle Layer -->
 <div class="particle-layer" id="particleLayer"></div>
 <script>
-// Browser detection for per-browser mobile CSS
+// Browser detection — set mobile top spacing per browser
 (function(){
   var ua = navigator.userAgent;
   if (!/Mobile|Android|iPhone/i.test(ua)) return;
-  // TEST: force padding on ALL mobile browsers to verify detection works
-  document.body.style.backgroundColor = '#ff0000'; // temp visual marker
+  var pad;
+  if (/MicroMessenger/i.test(ua)) { pad = '120px'; }
+  else if (/Quark/i.test(ua)) { pad = '160px'; }
+  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) { pad = '200px'; }
+  else { pad = '140px'; }
   setTimeout(function(){
     var app = document.querySelector('.app');
-    if (app) { app.style.paddingTop = '300px'; console.log('PADDING APPLIED: 300px'); }
-    else { console.log('APP NOT FOUND'); }
-  }, 200);
-  if (/MicroMessenger/i.test(ua)) { document.body.classList.add('browser-wechat'); }
-  else if (/Quark/i.test(ua)) { document.body.classList.add('browser-quark'); }
-  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) { document.body.classList.add('browser-chrome'); }
+    if (app) app.style.paddingTop = pad;
+  }, 100);
 })();
 
 const PLAYER_IMAGES = {
