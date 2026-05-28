@@ -3001,7 +3001,7 @@ function showBurstFail(oldLevel, oldOvr, targetLv, dropTo) {
     var lostTrait = oldTrait - newTrait;
 
     if (dropTo === oldLevel) {
-      title.textContent = '强化保护生效！';
+      title.textContent = '强化保护生效';
       subtitle.textContent = '强化失败，但等级保持不变';
     } else {
       title.textContent = '强化失败';
@@ -3191,6 +3191,7 @@ function syncPlayerSelect() {
 }
 
 function openSettings() {
+  document.getElementById('inpMaterialOvr').value = baseOvr;
   document.getElementById('settingsOverlay').classList.add('show');
 }
 
