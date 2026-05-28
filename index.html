@@ -2641,9 +2641,9 @@ function showBurstOverlay(mode) {
 
   // Shake + brightness via requestAnimationFrame (synced to refresh rate)
   var shakeStartTime = null;
-  // 成功加长(3.5s/2.7s) 失败保持(3.1s/2.3s)
-  var isSuccess = (mode !== 'fail');
-  var shakeDuration = isSuccess ? (_isMob ? 2400 : 3200) : (_isMob ? 2000 : 2800);
+  // +8~+13加长(3.5s/2.7s) +1~+7和失败保持(3.1s/2.3s)
+  var isPremium = (mode === 'gold' || mode === 'rainbow');
+  var shakeDuration = isPremium ? (_isMob ? 2400 : 3200) : (_isMob ? 2000 : 2800);
   var spotShown = false;
   var lastClass = '';
   var finished = false;
