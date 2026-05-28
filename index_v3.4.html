@@ -2924,13 +2924,14 @@ function showBurstSuccess(level, oldOvr, newOvr) {
   textWrap.classList.remove('expand');
   document.getElementById('resultConfirmBtn').classList.remove('fail-mode');
 
-  title.textContent = '强化成功！';
+  title.textContent = '强化成功';
   subtitle.textContent = '球员提升至 +' + level;
 
   var ovrGain = newOvr - oldOvr;
-  stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化等级</span><span class="rs-value">+' + level + '</span></div>' +
+  var traitCount = level >= 12 ? 7 : level >= 9 ? 6 : level >= 6 ? 5 : level >= 3 ? 4 : 3;
+  stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化等级</span><span class="rs-value"><img src="images/enhance/' + level + '.png" alt="+' + level + '" style="height:20px;vertical-align:middle;"></span></div>' +
     '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + newOvr + ' (+' + ovrGain + ')</span></div>' +
-    '<div class="rs-row"><span class="rs-label">累计成功</span><span class="rs-value">' + totalSuccess + ' / ' + totalAttempts + ' 次</span></div>';
+    '<div class="rs-row"><span class="rs-label">特性槽</span><span class="rs-value">' + traitCount + '</span></div>';
 
   resultOverlay.classList.add('show');
   /* P1 FIX: 先隐藏 burstOverlay 再显示 resultOverlay，消除闪烁 */
