@@ -19,7 +19,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
-  height: 100vh; height: 100dvh;
+  height: 100vh; height: -webkit-fill-available; height: 100dvh;
   overflow-x: hidden; overflow-y: auto;
   -webkit-tap-highlight-color: transparent;
 }
@@ -1036,6 +1036,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   .app { padding: 140px 10px 0; }
   body.browser-wechat .app { padding-top: 120px; }
   body.browser-quark .app { padding-top: 160px; }
+  body.browser-chrome { min-height: -webkit-fill-available; }
   body.browser-chrome .app { padding-top: 200px; }
   body.browser-chrome .settings-trigger { position: sticky; top: 10px; z-index: 100; }
   .player-card { gap: 10px; padding: 8px 0; margin-bottom: 6px; }
