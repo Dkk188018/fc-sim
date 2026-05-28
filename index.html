@@ -1034,6 +1034,8 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 
 @media (max-width: 480px) {
   .app { padding: 140px 10px 0; }
+  body.browser-wechat .app { padding-top: 120px; }
+  body.browser-quark .app, body.browser-chrome .app { padding-top: 160px; }
   .player-card { gap: 10px; padding: 8px 0; margin-bottom: 6px; }
   .player-face { width: 80px; height: 80px; font-size: 36px; }
   .player-face.has-img { width: 135px; height: 206px; }
@@ -1535,6 +1537,14 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 <!-- Particle Layer -->
 <div class="particle-layer" id="particleLayer"></div>
 <script>
+// Browser detection for per-browser mobile CSS
+(function(){
+  var ua = navigator.userAgent;
+  if (!/Mobile|Android|iPhone/i.test(ua)) return;
+  if (/MicroMessenger/i.test(ua)) { document.body.classList.add('browser-wechat'); }
+  else if (/Quark/i.test(ua)) { document.body.classList.add('browser-quark'); }
+  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) { document.body.classList.add('browser-chrome'); }
+})();
 
 const PLAYER_IMAGES = {
 "马库斯·图拉姆":"images/player_000.png",
