@@ -2009,13 +2009,7 @@ function refreshAll() {
     var sharedLv = sharedPlayerCards.levels.find(function(l) { return l.lv === currentLevel; });
     if (sharedLv && sharedLv.dataUrl) imgUrl = sharedLv.dataUrl;
   }
-  // 2. Legacy per-level images (always on server)
-  if (!imgUrl && playerName === '姆巴佩') {
-    imgUrl = `images/mbappe/mbappe_${currentLevel}.png`;
-  } else if (!imgUrl && playerName === '哈里·凯恩') {
-    imgUrl = `images/players/kane/Lv${currentLevel}.png`;
-  }
-  // 3. Card manifest (server per-level PNGs, works after images deployed)
+  // 2. Card manifest -- WebP card images on GitHub Pages
   if (!imgUrl && window.__cardManifest && window.__cardManifest.players) {
     var manEntry = window.__cardManifest.players[playerName];
     if (manEntry && manEntry.source && manEntry.levels.indexOf(currentLevel) !== -1) {
