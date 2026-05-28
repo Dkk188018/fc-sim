@@ -1035,15 +1035,15 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
         </select>
       </div>
       <div class="field">
-        <label>球员名称</label>
-        <input type="text" id="inpName" value="姆巴佩" placeholder="输入球员名称">
+        <label>快速选择球员</label>
+        <select id="inpPlayerSelect" onchange="onPlayerSelect()">
+          <option value="">— 自定义球员 —</option>
+        </select>
       </div>
       <div class="field-row">
         <div class="field">
-          <label>快速选择球员</label>
-          <select id="inpPlayerSelect" onchange="onPlayerSelect()">
-            <option value="">— 自定义球员 —</option>
-          </select>
+          <label>球员名称</label>
+          <input type="text" id="inpName" value="姆巴佩" placeholder="输入球员名称">
         </div>
         <div class="field">
           <label>位置</label>
