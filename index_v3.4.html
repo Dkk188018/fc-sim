@@ -1546,10 +1546,11 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   var app = document.querySelector('.app');
   if (!app) return;
   var ua = navigator.userAgent;
-  if (/MicroMessenger/i.test(ua)) app.style.paddingTop = '120px';
-  else if (/Quark/i.test(ua)) app.style.paddingTop = '160px';
-  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) app.style.paddingTop = '200px';
-  else app.style.paddingTop = '140px';
+  var pad = '140px';
+  if (/MicroMessenger/i.test(ua)) pad = '120px';
+  else if (/Quark/i.test(ua)) pad = '160px';
+  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) pad = '200px';
+  app.style.setProperty('padding-top', pad, 'important');
 })();
 
 const PLAYER_IMAGES = {
