@@ -2196,7 +2196,7 @@ if (currentLevel >= 12) avatar.classList.add('ultimate');
   else if (currentLevel >= 5) avatar.classList.add('elite');
 
   // Trait slots count
-  const traitCount = currentLevel >= 12 ? 7 : currentLevel >= 9 ? 6 : currentLevel >= 6 ? 5 : currentLevel >= 3 ? 4 : 3;
+  const traitCount = currentLevel >= 12 ? 2 : 1;
   document.getElementById('infoTraitCount').textContent = traitCount;
 
   // Skill moves stars
@@ -2928,7 +2928,7 @@ function showBurstSuccess(level, oldOvr, newOvr) {
   subtitle.textContent = '球员提升至 +' + level;
 
   var ovrGain = newOvr - oldOvr;
-  var traitCount = level >= 12 ? 7 : level >= 9 ? 6 : level >= 6 ? 5 : level >= 3 ? 4 : 3;
+  var traitCount = level >= 12 ? 2 : 1;
   stats.innerHTML = '<div class="rs-row"><span class="rs-label">强化等级</span><span class="rs-value"><img src="images/enhance/' + level + '.png" alt="+' + level + '" style="height:20px;vertical-align:middle;"></span></div>' +
     '<div class="rs-row"><span class="rs-label">OVR</span><span class="rs-value">' + oldOvr + ' → ' + newOvr + ' (+' + ovrGain + ')</span></div>' +
     '<div class="rs-row"><span class="rs-label">特性槽</span><span class="rs-value">' + traitCount + '</span></div>';
