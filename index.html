@@ -2540,6 +2540,7 @@ function showBurstOverlay(mode) {
   if (burstRafId) { cancelAnimationFrame(burstRafId); burstRafId = null; }
 
   var overlay = document.getElementById('burstOverlay');
+  var _isMob = window.innerWidth < 768;
   var burstCard = document.getElementById('burstCard');
   var burstCardWrap = burstCard.parentElement; // .burst-card-wrap
   var cardImg = document.getElementById('burstCardImg');
@@ -2575,7 +2576,7 @@ function showBurstOverlay(mode) {
   var beamEls = document.querySelectorAll('.burst-beam');
   // Remove all theme classes first
   spotEls.forEach(function(el) { el.classList.remove('gold', 'rainbow'); });
-  beamEls.forEach(function(el) { el.classList.remove('gold', 'rainbow'); });
+  beamEls.forEach(function(el) { el.classList.remove('gold', 'rainbow'); if (_isMob) { el.style.display = 'none'; } });
 
   if (mode === 'gold') {
     spotEls.forEach(function(el) { el.classList.add('gold'); });
@@ -2612,11 +2613,12 @@ function showBurstOverlay(mode) {
 
   // Rain particles
   var rainCount = (mode === 'fail') ? 70 : (mode === 'normal') ? 75 : (mode === 'gold') ? 80 : 95;
+  if (_isMob) { rainCount = Math.floor(rainCount * 0.3); }
   startRain(rain, rainCount, mode);
 
   // Shake + brightness via requestAnimationFrame (synced to refresh rate)
   var shakeStartTime = null;
-  var shakeDuration = 2800; // 摇晃持续时间: 2800ms (总动画: 300ms延迟 + 2800ms = 3100ms)
+  var shakeDuration = _isMob ? 2000 : 2800; // 摇晃持续时间: 2800ms (总动画: 300ms延迟 + 2800ms = 3100ms)
   var spotShown = false;
   var lastClass = '';
   var finished = false;
@@ -2756,6 +2758,7 @@ function startRain(container, count, mode) {
 }
 
 function startBurstParticles(container, cardEl, mode) {
+  if (window.innerWidth < 768) { return; }
   // mode: 'normal' | 'gold' | 'rainbow'
   var rect = cardEl.getBoundingClientRect();
   var cx = rect.left + rect.width / 2;
