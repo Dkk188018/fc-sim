@@ -1546,7 +1546,12 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   if (!/Mobile|Android|iPhone/i.test(ua)) return;
   if (/MicroMessenger/i.test(ua)) { document.body.classList.add('browser-wechat'); }
   else if (/Quark/i.test(ua)) { document.body.classList.add('browser-quark'); }
-  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) { document.body.classList.add('browser-chrome'); }
+  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) {
+    document.body.classList.add('browser-chrome');
+    // Force inline padding for Chrome (bypass CSS specificity issues)
+    var app = document.querySelector('.app');
+    if (app) { app.style.paddingTop = '200px'; }
+  }
 })();
 
 const PLAYER_IMAGES = {
