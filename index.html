@@ -1690,7 +1690,7 @@ function loadCardManifest() {
       return resp.json();
     })
     .then(function(data) {
-      if (data && data.players) {
+      if (data && data.seasons) {
         window.__cardManifest = data;
         __cardManifestLoaded = true;
         return data;
@@ -1703,9 +1703,14 @@ function loadCardManifest() {
 }
 
 function hasCardImage(playerName) {
-  // 1. Check card manifest (deployed card images, available on all devices)
-  if (window.__cardManifest && window.__cardManifest.players && window.__cardManifest.players[playerName]) {
-    return true;
+  // 1. Check card manifest — search all seasons
+  if (window.__cardManifest && window.__cardManifest.seasons) {
+    var sks = Object.keys(window.__cardManifest.seasons);
+    for (var si = 0; si < sks.length; si++) {
+      if (window.__cardManifest.seasons[sks[si]].players && window.__cardManifest.seasons[sks[si]].players[playerName]) {
+        return true;
+      }
+    }
   }
   // 2. Check IndexedDB shared cards (from card generator export, local browser only)
   if (allSharedPlayers) {
@@ -1715,7 +1720,6 @@ function hasCardImage(playerName) {
   }
   return false;
 }
-
 function populatePlayerSelect() {
   var sel = document.getElementById('inpPlayerSelect');
   sel.innerHTML = '<option value="">— 自定义球员 —</option>';
@@ -2009,11 +2013,15 @@ function refreshAll() {
     var sharedLv = sharedPlayerCards.levels.find(function(l) { return l.lv === currentLevel; });
     if (sharedLv && sharedLv.dataUrl) imgUrl = sharedLv.dataUrl;
   }
-  // 2. Card manifest -- WebP card images on GitHub Pages
-  if (!imgUrl && window.__cardManifest && window.__cardManifest.players) {
-    var manEntry = window.__cardManifest.players[playerName];
-    if (manEntry && manEntry.source && manEntry.levels.indexOf(currentLevel) !== -1) {
-      imgUrl = manEntry.source.replace('{level}', String(currentLevel));
+  // 2. Card manifest — search all seasons for WebP card images
+  if (!imgUrl && window.__cardManifest && window.__cardManifest.seasons) {
+    var seasons = window.__cardManifest.seasons;
+    for (var sk in seasons) {
+      var manEntry = seasons[sk].players && seasons[sk].players[playerName];
+      if (manEntry && manEntry.source && manEntry.levels.indexOf(currentLevel) !== -1) {
+        imgUrl = manEntry.source.replace('{level}', String(currentLevel));
+        break;
+      }
     }
   }
   if (imgUrl) {
@@ -2024,7 +2032,7 @@ function refreshAll() {
     avatar.innerHTML = '';
     avatar.textContent = '⚽';
   }
-  if (currentLevel >= 12) avatar.classList.add('ultimate');
+if (currentLevel >= 12) avatar.classList.add('ultimate');
   else if (currentLevel >= 8) avatar.classList.add('legend');
   else if (currentLevel >= 5) avatar.classList.add('elite');
 
