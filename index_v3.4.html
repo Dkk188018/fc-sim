@@ -1891,6 +1891,7 @@ let stopLevel = 13;
 let autoTimer = null;
 let autoCloseTimer = null;
 let _pendingSuccess = false;
+let _pendingMode = 'fail';
 let isEnhancing = false;
 let history = [];
 
@@ -2438,19 +2439,22 @@ function startEnhance() {
     else if (nextLv >= 8) { mode = 'gold'; }
     else { mode = 'normal'; }
   }
+  _pendingMode = mode;
   showBurstOverlay(mode);
 }
 
 function executeEnhance() {
-  _pendingSuccess = false;
   const nextLv = currentLevel + 1;
   const nextD = data(nextLv);
   const rate = getFinalRate(nextD.rate);
   const success = _pendingSuccess;
+  _pendingSuccess = false;
+  // Safety: gold/rainbow always succeed despite any race condition
+  var finalSuccess = success || _pendingMode === 'gold' || _pendingMode === 'rainbow';
 
   totalAttempts++;
 
-  if (success) {
+  if (finalSuccess) {
     const oldOvr = curOvr();
     currentLevel = nextLv;
     totalSuccess++;
