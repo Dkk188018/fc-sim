@@ -1234,7 +1234,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
     <div class="player-face" id="playerAvatar">⚽</div>
     <div class="player-info">
       <div class="info-title-row">
-        <img class="info-season-icon" id="infoSeasonIcon" src="images/25ucl_badge.png" alt="25UCL">
+        <img class="info-season-icon" id="infoSeasonIcon" src="images/赛季图标/25ucl_badge.png" alt="25UCL">
         <span class="info-player-name" id="playerName">R. Pirès</span>
       </div>
       <div class="info-row-item">
@@ -1272,25 +1272,6 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
     <div class="ppips" id="progressPips"></div>
   </div>
 
-  <!-- Info Chips -->
-  <div class="info-row">
-    <div class="info-chip">
-      <div class="val" id="infoNextLevel">+1</div>
-      <div class="lbl">目标等级</div>
-    </div>
-    <div class="info-chip">
-      <div class="val gold" id="infoRate">100%</div>
-      <div class="lbl">成功率</div>
-    </div>
-    <div class="info-chip">
-      <div class="val green" id="infoOvrGain">+0</div>
-      <div class="lbl">单级OVR提升</div>
-    </div>
-    <div class="info-chip">
-      <div class="val" id="infoTargetOvr">89</div>
-      <div class="lbl">成功后能力值</div>
-    </div>
-  </div>
 
   <div class="protect-divider"></div>
 
@@ -1978,12 +1959,14 @@ function addMaterial() {
   materialCards[idx] = { ovr: ovr };
   updateHexSlots();
   updateEnergyBar();
+  refreshAll();
 }
 
 function clearMaterials() {
   materialCards = [];
   updateHexSlots();
   updateEnergyBar();
+  refreshAll();
 }
 
 function toggleHexCard(card) {
@@ -2177,7 +2160,7 @@ function refreshAll() {
   // Season icon
   const seasonIcon = document.getElementById('infoSeasonIcon');
   if (playerSeason === '25ucl') {
-    seasonIcon.src = 'images/25ucl_badge.png';
+    seasonIcon.src = 'images/赛季图标/25ucl_badge.png';
     seasonIcon.style.display = '';
   } else {
     seasonIcon.style.display = 'none';
@@ -2245,10 +2228,7 @@ if (currentLevel >= 12) avatar.classList.add('ultimate');
   }
 
   // Info chips
-  document.getElementById('infoNextLevel').textContent = canUp ? '+' + nextLv : 'MAX';
-  document.getElementById('infoRate').textContent = canUp ? ((getFinalRate(nextD.rate)*100) >= 1 ? (getFinalRate(nextD.rate)*100).toFixed(0)+'%' : (getFinalRate(nextD.rate)*100).toFixed(1)+'%') : '-';
-  document.getElementById('infoOvrGain').textContent = canUp ? ('+' + nextD.gain) : '-';
-  document.getElementById('infoTargetOvr').textContent = canUp ? (baseOvr + nextD.bonus) : (baseOvr + d.bonus);
+  // Info chips removed — elements no longer in DOM
 
   // Protection slider: only available at +8 and above
   const protectWrap = document.getElementById('protectSliderWrap');
