@@ -1038,7 +1038,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   body.browser-quark .app { padding-top: 160px; }
   body.browser-chrome { min-height: -webkit-fill-available; }
   body.browser-chrome .app { padding-top: 200px; }
-  body.browser-chrome .settings-trigger { position: sticky; top: 10px; z-index: 100; }
+  body.browser-chrome .settings-trigger { position: fixed; top: 12px; left: 10px; z-index: 9999; }
   .player-card { gap: 10px; padding: 8px 0; margin-bottom: 6px; }
   .player-face { width: 80px; height: 80px; font-size: 36px; }
   .player-face.has-img { width: 135px; height: 206px; }
@@ -1528,10 +1528,12 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   if (!app) return;
   var ua = navigator.userAgent;
   var pad = '140px';
-  if (/MicroMessenger/i.test(ua)) pad = '120px';
-  else if (/Quark/i.test(ua)) pad = '160px';
-  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) pad = '200px';
+  var cls = '';
+  if (/MicroMessenger/i.test(ua)) { pad = '120px'; cls = 'browser-wechat'; }
+  else if (/Quark/i.test(ua)) { pad = '160px'; cls = 'browser-quark'; }
+  else if (/Chrome/i.test(ua) && !/Edge/i.test(ua)) { pad = '200px'; cls = 'browser-chrome'; }
   app.style.setProperty('padding-top', pad, 'important');
+  if (cls) document.body.classList.add(cls);
 })();
 
 const PLAYER_IMAGES = {
