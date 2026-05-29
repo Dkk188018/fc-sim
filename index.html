@@ -1038,7 +1038,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   body.browser-quark .app { padding-top: 160px; }
   body.browser-chrome { min-height: -webkit-fill-available; }
   body.browser-chrome .app { padding-top: 200px; }
-  body.browser-chrome .settings-trigger { position: fixed; top: 12px; left: 10px; z-index: 9999; }
+  .settings-trigger { position: fixed; top: 10px; left: 10px; z-index: 9999; margin-bottom: 0; }
   .player-card { gap: 10px; padding: 8px 0; margin-bottom: 6px; }
   .player-face { width: 80px; height: 80px; font-size: 36px; }
   .player-face.has-img { width: 135px; height: 206px; }
@@ -1166,14 +1166,14 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 </head>
 <body>
 
+<!-- Settings Trigger -->
+<span class="settings-trigger" onclick="openSettings()">⚙ 球员设置</span>
+
 <div class="app">
   <!-- Header -->
   <div class="header">
     <h1>FC Online 4 强化模拟器 <span style="font-size:9px;color:#ff6d00;vertical-align:super;">v2.8</span></h1>
   </div>
-
-  <!-- Settings Trigger -->
-  <span class="settings-trigger" onclick="openSettings()">⚙ 球员设置</span>
 
   <!-- Settings Modal -->
   <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
