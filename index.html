@@ -1106,6 +1106,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 
   .burst-card { width: 160px; }
   .result-card { width: 170px; }
+  .result-overlay.success::before { top: 28%; }
   .shatter-effect.animate { animation: shatter-play 0.8s step-end forwards, shatter-scale-mobile 0.8s ease-out forwards; }
   @keyframes shatter-scale-mobile {
     0% { transform: translate(-50%, -50%) scale(1); }
@@ -2920,6 +2921,8 @@ function showBurstSuccess(level, oldOvr, newOvr) {
   var textWrap = document.getElementById('resultTextWrap');
 
   // +1~+7=普通, +8~+10=金色, +11~+13=彩虹
+  resultOverlay.className = 'result-overlay'; // 先重置，强制重建::before伪元素
+  void resultOverlay.offsetWidth;
   if (level >= 11) { resultOverlay.className = 'result-overlay success-plain rainbow'; }
   else if (level >= 8) { resultOverlay.className = 'result-overlay success'; }
   else { resultOverlay.className = 'result-overlay success-plain'; }
