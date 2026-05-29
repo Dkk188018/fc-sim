@@ -1839,7 +1839,7 @@ function loadSharedPlayers() {
 
 var __cardManifestLoaded = false;
 function loadCardManifest() {
-  return fetch('cards_manifest.json?v=' + Date.now())
+  return fetch('cards_manifest.json')
     .then(function(resp) {
       if (!resp.ok) return null;
       return resp.json();
