@@ -1,5 +1,7 @@
 # FC Online 4 球员强化模拟器 — 项目完整文档
 
+> **本文件仅属于FC强化模拟器项目，编辑器相关内容已不属于本项目范围，禁止处理编辑器功能。**
+
 ## 1. 项目总览
 
 ### 1.1 基本信息
@@ -7,9 +9,9 @@
 - **线上地址**：https://fc-simulator.com
 - **GitHub Pages**：https://dkk188018.github.io/fc-sim/
 - **GitHub 仓库**：https://github.com/Dkk188018/fc-sim.git
-- **本地目录**：`F:\CLAUDE\开发\deploy\`
+- **本地目录**：`F:\CLAUDE\FCol4强化模拟器\`
 - **版本文件命名**：`index_vX.X.html`（如 `index_v3.4.html`）
-- **当前最新版本**：v3.4（`index.html`）
+- **当前最新版本**：v3.1（`index.html`）
 - **总文件大小**：约 3311 行，~147KB（不含卡图）
 
 ### 1.2 技术栈
@@ -18,8 +20,6 @@
 - **部署方式**：GitHub Pages + Cloudflare CDN + 自定义域名
 - **域名管理**：腾讯云注册 → Cloudflare DNS（免费 CDN）
 - **图片格式**：WebP（quality=90），从 PNG 批量转换
-- **图片处理**：Node.js + sharp 库
-- **浏览器要求**：Edge（开发/测试）、Chrome/微信/夸克（用户端）
 
 ### 1.3 项目目标
 模拟 FC Online 4 游戏的球员强化系统，包括强化成功率计算、材料卡加成、强化等级保护等功能。提供沉浸式强化动画体验（预掷骰子 → 强化过程动画 → 结果展示）。
@@ -102,18 +102,17 @@
 ## 3. 核心功能与数据流
 
 ### 3.1 球员数据库（PLAYER_DB）
-- **102 名球员**，来自 `F:\CLAUDE\FC编辑器\25u球员包\25UCL\`
+- **102 名球员**，内嵌在 `index.html` 中
 - 每条记录含：`name`, `position`, `ovr`, `enhance`, `salary`, `nationality`, `league`, `club`
 - 附加映射：`PLAYER_ENG`（英文名）、`PLAYER_SKILL`（花式技巧 1-5 星）
 
 ### 3.2 卡图系统
-三层加载优先级（`getCardImgUrl()` / `refreshAll()`）：
+两层加载优先级（`getCardImgUrl()` / `refreshAll()`）：
 
-1. **IndexedDB** → `fc-shared-data` 数据库（卡图生成器导出时写入，仅本机）
-2. **Card Manifest** → `cards_manifest.json`（GitHub Pages 部署，所有用户可见）
+1. **Card Manifest** → `cards_manifest.json`（GitHub Pages 部署，所有用户可见）
    - 结构：`seasons → {赛季} → players → {球员名} → {source, levels}`
    - WebP 图片路径：`images/cards/{赛季}/{球员名}/{球员名}_Lv{level}.webp`
-3. **兜底** → 显示⚽ emoji
+2. **兜底** → 显示⚽ emoji
 
 ### 3.3 强化系统
 - **强化表（TABLE）**：+1~+13 每级的基础成功率
@@ -198,9 +197,8 @@
 
 ### 5.1 版本规则
 - **永远不在原版上改，先复制再改**
-- 新版本：`index.html` → `index_vX.X.html`（归档）
+- 新版本：`index.html` → `index_vX.X.html`（归档至 `archive/所有版本号/`）
 - 当前文件：`index.html`（始终是最新版）
-- 备份：每次改动前先保存旧版本
 
 ### 5.2 版本历史（主要里程碑）
 | 版本 | 日期 | 关键改动 |
@@ -213,6 +211,7 @@
 | v3.0 | 2026-05-28 | 赛季层级目录重构（25UCL） |
 | v3.1-v3.3 | 2026-05-28 | 设置面板UI调整（赛季→球员→名称+位置） |
 | v3.4 | 2026-05-28/29 | 强化动画重构（预掷骰子+三档特效+性能优化+结果页） |
+| v3.5 | 2026-05-29 | 项目迁移至FCol4强化模拟器、目录重构、赛季图标独立目录、永久路径约定、CLAUDE.md+快捷指令、清理编辑器无关内容 |
 
 ### 5.3 回退规则
 - "回退上一步" = 撤销最近一次代码改动，**不是 git 版本回退**
@@ -220,58 +219,9 @@
 
 ---
 
-## 6. 卡图生成器
+## 6. 关键问题与解决方案
 
-### 6.1 卡图生成器（独立工具）
-- **路径**：`F:\CLAUDE\FC编辑器\卡图批量生成器_v1.5.html`
-- **功能**：Canvas 叠加 8 个元素框，批量导出 13 级 PNG
-- **8 个叠加元素**（按图层顺序）：OVR数字 → 位置缩写 → 六边形等级 → 球员头像 → 球员名 → 赛季图标 → 国旗/联赛/俱乐部 → 强化等级图标
-- **资源库**：`F:\CLAUDE\FC编辑器\球员编辑器\`（国旗120个/俱乐部队徽21个/联赛19个/赛季图标6个）
-- **导出目标**：`F:\CLAUDE\FC编辑器\25u球员包\{赛季}\{球员名}\`
-
-### 6.2 源文件目录
-```
-F:\CLAUDE\FC编辑器\25u球员包\25UCL\
-  ├── 姆巴佩\
-  │   ├── 姆巴佩_Lv1.png ... 姆巴佩_Lv13.png
-  ├── 哈兰德\
-  │   └── ...
-  └── ... (102名球员)
-```
-
----
-
-## 7. 新增球员标准工作流
-
-### 7.1 场景一：同赛季新增/更新球员
-1. 用户说"导好了" → 如果没说赛季，先问"哪个赛季？"
-2. 自动对比 `25u球员包\{赛季}\` 和 `cards_manifest.json`，找新增球员
-3. 先汇报给用户确认名单
-4. 复制新球员到 `deploy\images\cards\{赛季}\`
-5. PNG 转 WebP（`sharp.webp({quality:90, effort:6})`），删 PNG
-6. 更新 `cards_manifest.json` 对应赛季的 players
-7. `git commit` + `git push`
-8. 确认线上可访问后 → **同赛季才删**源文件
-9. 用户未列名字时：自动对比 → 汇报 → 等确认再动手
-
-### 7.2 场景二：新增赛季
-1. 新建 `deploy\images\cards\{新赛季}\` 和 `25u球员包\{新赛季}\`
-2. 复制 → 转 WebP
-3. `cards_manifest.json` 新增 `seasons.{新赛季}` 条目（老赛季不动）
-4. 提交推送
-5. **源文件绝对不删**
-
-### 7.3 核心原则
-- **Edge 浏览器**用于所有操作
-- **同赛季覆盖可删源文件，新赛季只能添加不能删老的**
-- **K·阿德耶米教训**：文件名中间点字符必须匹配（U+00B7 vs U+30FB vs 英文句号 U+002E）
-- **Manifest 键名必须与 PLAYER_DB 名字精确一致**
-
----
-
-## 8. 关键问题与解决方案
-
-### 8.1 已解决问题
+### 6.1 已解决问题
 | 问题 | 原因 | 解决方案 |
 |------|------|---------|
 | 811MB PNG 推送极慢 | 1300个文件直推 GitHub | PNG → WebP（89%压缩） |
@@ -280,17 +230,17 @@ F:\CLAUDE\FC编辑器\25u球员包\25UCL\
 | 手机谷歌浏览器内容偏上 | CSS padding 不生效 | JS 同步设 inline style + !important |
 | `_pendingSuccess` 被提前清空 | executeEnhance 先清旗再读旗 | 调换顺序 + _pendingMode 兜底 |
 | 卡框被光照亮 | burstCardWrap.boxShadow | 删除 boxShadow 改用卡片内发光层 |
-| IndexedDB 换浏览器不共享 | 浏览器本地存储隔离 | 转用 manifest GitHub 部署 |
+| 项目结构混乱 | 版本文件散落、图片无分类、编辑器内容混杂 | 目录重构（archive/版本归档、赛季图标独立目录、编辑器内容剥离） |
+| 新增球员流程不清晰 | 路径分散、步骤依赖记忆 | 永久路径约定（赛季图标/卡图/文本数据库）+ 快捷指令自动化 |
 
-### 8.2 待解决问题
+### 6.2 待解决问题
 - iPhone Safari 页面布局偏上（已放弃，用户不用 Safari）
-- 卡图生成器 16 人手动补完未自动化
 
 ---
 
-## 9. 样式与动画规范
+## 7. 样式与动画规范
 
-### 9.1 颜色系统
+### 7.1 颜色系统
 ```css
 --gold: #f0b90b;    /* 金色主题 */
 --success: #00c853; /* 强化成功绿 */
@@ -301,7 +251,7 @@ F:\CLAUDE\FC编辑器\25u球员包\25UCL\
 --accent: #448aff;  /* 蓝色强调 */
 ```
 
-### 9.2 移动端适配
+### 7.2 移动端适配
 - 断点：`@media (max-width: 480px)`
 - 手机顶部间距：JS inline style 按浏览器分别设置
   - 微信：120px
@@ -312,7 +262,7 @@ F:\CLAUDE\FC编辑器\25u球员包\25UCL\
 - 六边形槽：桌面 68×78，手机 52×60
 - 所有按钮 `touch-action: manipulation`，消除 300ms 延迟
 
-### 9.3 动画性能规则
+### 7.3 动画性能规则
 - **禁止**在 `requestAnimationFrame` 中修改 `filter` 属性
 - 发光效果使用 `opacity` + 独立发光层（GPU 合成）
 - `will-change` 仅用于 `transform` 和 `opacity`
@@ -320,7 +270,7 @@ F:\CLAUDE\FC编辑器\25u球员包\25UCL\
 - CSS 动画使用 `transform` 和 `opacity`（合成器线程）
 - 避免 `clip-path` 动画（触发重画）
 
-### 9.4 代码规范
+### 7.4 代码规范
 - 中文注释说明 WHY，不注释 WHAT
 - 变量名：驼峰命名（`playerName`, `baseOvr`, `currentLevel`）
 - 函数名：动词开头（`showBurstOverlay`, `getCardImgUrl`, `refreshAll`）
@@ -330,48 +280,37 @@ F:\CLAUDE\FC编辑器\25u球员包\25UCL\
 
 ---
 
-## 10. 文件与目录清单
+## 8. 文件与目录清单
 
-### 10.1 部署目录（`F:\CLAUDE\开发\deploy\`）
 ```
-deploy/
-├── index.html              ← 当前最新版（v3.4）
-├── index_vX.X.html          ← 归档版本（v2.0 ~ v3.5）
-├── cards_manifest.json      ← 卡图清单（88名25UCL球员）
-├── PROJECT_MEMORY.md        ← 本文档
-├── images/
-│   ├── cards/25UCL/         ← 102名球员 WebP 卡图（~77MB, 1131文件）
-│   ├── enhance/             ← 强化等级图标（1.png ~ 13.png）
-│   ├── 25ucl_badge.png      ← 赛季图标
-│   ├── shatter_sprite.webp  ← 碎片精灵图
-│   └── player_*.png         ← 旧版占位图（不再使用）
-└── .git/                    ← Git 仓库
-```
-
-### 10.2 源文件目录（`F:\CLAUDE\FC编辑器\`）
-```
-FC编辑器/
-├── 卡图批量生成器_v1.5.html  ← 当前生成器
-├── 卡图批量生成器_v1.0~1.4.html  ← 归档
-├── 25u球员包/25UCL/         ← 102名球员 13级 PNG
-├── 球员编辑器/
-│   ├── 国旗/ (120个)
-│   ├── 俱乐部队徽/ (21个)
-│   ├── 联赛/ (19个)
-│   ├── 赛季图标/ (6个)
-│   └── 球员头像/ (102个)
-└── fc-batch-run.js          ← Edge CDP 批量自动化脚本
+FCol4强化模拟器/
+├─ index.html                ← 当前最新版（v3.5）
+├─ cards_manifest.json       ← 卡图清单
+├─ PROJECT_MEMORY.md         ← 本文档
+├─ CLAUDE.md                 ← 项目规则 + 快捷指令（/更新记忆 /检查状态 /晚安）
+├─ .claudeignore             ← 文件过滤
+├─ CNAME                     ← 域名配置（fc-simulator.com）
+├─ images/
+│   ├─ 赛季图标/             ← 赛季徽标（如 25ucl_badge.png）
+│   ├─ enhance/              ← 强化等级图标（1.png ~ 13.png）
+│   ├─ cards/25UCL/          ← 102名球员 WebP 卡图（~77MB）
+│   └─ shatter_sprite.webp   ← 碎片精灵图
+├─ generator/
+│   └─ index.html            ← 卡图生成工具（独立工具）
+└─ archive/
+    ├─ 所有版本号/           ← 历史版本（v2.0 ~ v3.5）
+    └─ 更新改动文本/         ← CHANGELOG.md
 ```
 
 ---
 
-## 11. 商业化与未来方向
+## 9. 商业化与未来方向
 
-### 11.1 竞品分析
+### 9.1 竞品分析
 - fifaaddict.com：~5625日IP, $1500-3500/月广告收入, 48%越南用户
 - 中国无先发 FC Online 强化模拟器
 
-### 11.2 未来计划（已讨论，未实施）
+### 9.2 未来计划（已讨论，未实施）
 - **Android APK**：Capacitor WebView 壳 + AdMob 广告
   - 需要 Android Studio + JDK 17+ + Google AdMob 账号
   - 推荐策略：强化失败→激励视频"看广告复活"
@@ -379,20 +318,21 @@ FC编辑器/
 - **微信小程序**：需 ICP 备案 + 可能需增值电信许可证（审核风险）
 - **多赛季支持**：`cards_manifest.json` 已预留赛季嵌套结构
 
-### 11.3 版权说明
+### 9.3 版权说明
 - 网站加免责声明即可（fc-simulator.com 是描述性域名，不侵权）
 - 球员卡图来自官方市场截图，商用有风险，后续需自行设计卡片
 
 ---
 
-## 12. 记忆文件索引
+## 10. 记忆文件索引
 
 | 文件 | 内容 |
 |------|------|
-| `fc-online-simulator.md` | 项目整体记忆（最详细） |
+| `fc-online-simulator.md` | 项目整体记忆 |
+| `fc-simulator-new-path.md` | 新工作目录路径 |
 | `fc-simulator-deploy-path.md` | 版本文件在 deploy 目录的约定 |
 | `fc_card_webp_compress.md` | WebP 压缩参数与流程 |
-| `fc_workflow_new_players.md` | 新增球员/赛季的标准工作流 |
+| `fc_season_icon_path.md` | 赛季图标存放路径 |
 | `season_icon_spec.md` | 赛季图标 28px 高规范 |
 | `feedback_version_discipline.md` | 版本管理：先复制再改 |
 | `feedback_revert_scope.md` | 回退=撤销最近改动 |
@@ -400,4 +340,4 @@ FC编辑器/
 ---
 
 *最后更新：2026-05-29*
-*当前版本：v3.4*
+*当前版本：v3.1（BP消耗统计+材料价格排序/去重/清理）*
