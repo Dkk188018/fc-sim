@@ -2559,6 +2559,7 @@ function getCardImgUrl() {
 
 function showBurstOverlay(mode) {
   // mode: 'fail' | 'gold' | 'rainbow'
+  document.querySelector('.settings-trigger').style.display = 'none';
   // Clear any stale timers from previous runs
   if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
   if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
@@ -3039,6 +3040,7 @@ function closeResult(isConfirm) {
 function hideAllOverlays() {
   document.getElementById('burstOverlay').classList.remove('show');
   document.getElementById('resultOverlay').classList.remove('show');
+  document.querySelector('.settings-trigger').style.display = '';
 }
 
 function resetEnhanceBtn() {
