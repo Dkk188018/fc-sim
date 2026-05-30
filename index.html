@@ -532,7 +532,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   );
   background-size: 7px 7px;
   animation: stripe-slide 0.8s linear infinite;
-  transition: width 0.3s linear;
+  transition: width 0.2s linear;
 }
 .energy-slot.filled .fill { /* ensures fill gets width from JS */ }
 
@@ -547,7 +547,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   );
   background-size: 7px 7px;
   animation: stripe-slide 0.8s linear infinite;
-  transition: width 0.2s ease;
+  transition: width 0.06s ease;
 }
 
 /* ===== 六边形卡槽 ===== */
@@ -732,6 +732,8 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
 .hist-tag.win { background: rgba(0,200,83,0.15); color: var(--success); }
 .hist-tag.lose { background: rgba(229,57,53,0.12); color: var(--fail); }
 .hist-detail { color: var(--text2); flex: 1; }
+.hist-bp { color: #f0b90b; font-size: 10px; flex-shrink: 0; margin-left: 6px; }
+.hist-bp.zero { color: #5b6880; }
 .hist-empty { color: var(--text3); text-align: center; padding: 16px; font-size: 11px; }
 
 /* ===== Hint ===== */
@@ -1722,7 +1724,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
           <button onclick="stepMaterialOvr(-1)">▼</button>
         </div>
       </div>
-      <button class="mat-btn" onclick="addMaterial()">添加</button>
+      <button class="mat-btn" id="btnAddMat" onclick="addMaterial()">添加</button>
       <button class="mat-btn" onclick="clearMaterials()">清空</button>
       <button class="mat-btn" style="color:#e53935;" onclick="openAdvancedSettings()">高级设置</button>
       <span style="font-size:10px;color:var(--text3);flex:1;text-align:right;" id="materialCount">已填 0/5</span>
@@ -1765,6 +1767,8 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
     <div class="stat-box">
       <div class="num" id="sBPCost"><span style="color:#fff;">0</span>亿</div>
       <div class="tag" style="color:#f0b90b;">BP消耗</div>
+      <div id="bpPreview" style="color:#7a8090;font-size:10px;"></div>
+      <div id="bpHint" style="color:#e53935;font-size:10px;display:none;">材料价格未设置</div>
     </div>
   </div>
 
@@ -2252,6 +2256,8 @@ function stepMaterialOvr(delta) {
 }
 
 function addMaterial() {
+  // 能量条已满则不允许继续添加
+  if (getTotalFill() >= 5) return;
   let idx = -1;
   for (let i = 0; i < 5; i++) {
     if (!materialCards[i]) { idx = i; break; }
@@ -2299,6 +2305,11 @@ function commitHexOvr(card) {
   const idx = parseInt(card.dataset.slot);
   const input = card.querySelector('.hex-input-row input');
   const val = parseInt(input.value) || 0;
+  // 空槽位且能量条已满：禁止新增材料
+  if (!materialCards[idx] && getTotalFill() >= 5) {
+    input.value = '';
+    return;
+  }
   materialCards[idx] = { ovr: Math.max(0, Math.min(999, val)) };
   updateHexSlots();
   updateEnergyBar();
@@ -2328,16 +2339,18 @@ function updateHexProgress(card, ovr) {
   if (label) label.textContent = pct.toFixed(2) + '%';
 }
 
+// 强化能量条公式: 每张材料填充量 = 1.35^(材料OVR-球员OVR)，^是指数符号，最低0.1
+// 实测验证: 130球员 2×128 + 3×126 = 正好2格, 129+126 = 正好1格
 function calcFillRatio(matOvr) {
-  const currentOvr = curOvr();
-  const diff = matOvr - currentOvr;
-  return Math.max(0.1, 1.0 + diff * 0.1);
+  const diff = matOvr - curOvr();
+  return Math.max(0.1, Math.pow(1.35, diff));
 }
 
 function getTotalFill() {
   let total = 0;
   materialCards.forEach(m => { total += calcFillRatio(m.ovr); });
-  return Math.min(total, 5);
+  // 四舍五入到0.1，避免4.995被截断（游戏内2×137+1×136正好拉满135球员）
+  return Math.min(Math.round(total * 10) / 10, 5);
 }
 
 function getMaterialBoost() {
@@ -2361,7 +2374,8 @@ function updateHexSlots() {
     }
   }
 
-  document.getElementById('materialCount').textContent = `已填 ${count}/5`;
+  var fillFull = getTotalFill() >= 5;
+  document.getElementById('materialCount').textContent = fillFull ? '已满' : `已填 ${count}/5`;
   const boost = getMaterialBoost();
   document.getElementById('materialBoost').textContent = '+' + boost + '%';
 
@@ -2374,6 +2388,12 @@ function updateHexSlots() {
     if (count === 0) { enhBtn.style.background = '#444'; enhBtn.style.color = '#888'; enhBtn.style.boxShadow = 'none'; enhBtn.disabled = true; }
     else { enhBtn.style.background = ''; enhBtn.style.color = ''; enhBtn.style.boxShadow = ''; enhBtn.disabled = false; }
   }
+  // 添加按钮：满格禁止，未满恢复
+  var addBtn2 = document.getElementById('btnAddMat');
+  if (addBtn2) {
+    addBtn2.disabled = fillFull;
+    addBtn2.style.opacity = fillFull ? '0.4' : '';
+  }
 }
 
 function clickSlot(n) {
@@ -2385,6 +2405,7 @@ function updateEnergyBar() {
   const fullSlots = Math.floor(totalFill);
   const partialFill = totalFill - fullSlots;
 
+  var slotTargets = [];
   for (let i = 0; i < 5; i++) {
     const slot = document.querySelector(`.energy-slot[data-slot="${i+1}"]`);
     if (!slot) continue;
@@ -2398,6 +2419,7 @@ function updateEnergyBar() {
     } else {
       targetWidth = 0;
     }
+    slotTargets[i] = targetWidth;
 
     if (targetWidth > 0) {
       slot.classList.add('filled');
@@ -2408,27 +2430,36 @@ function updateEnergyBar() {
         slot.appendChild(fill);
       }
       fill.style.transition = '';
-      const delay = i * 300;
+      const delay = i * 100;
       setTimeout(function() {
         fill.style.width = targetWidth + '%';
       }, delay);
     } else {
       slot.classList.remove('filled');
-      if (fill) {
-        var reverseIdx = 4 - i;
-        var removeDelay = reverseIdx * 100;
-        setTimeout(function() {
-          fill.style.transition = 'width 0.1s linear';
-          fill.style.width = '0%';
-          setTimeout(function() { if (fill.parentNode) fill.remove(); }, 100);
-        }, removeDelay);
-      }
     }
+  }
+
+  // 蓝色消退：从右向左级联（只处理无绿色的格子）
+  for (var bi = 4; bi >= 0; bi--) {
+    (function(idx) {
+      var bslot = document.querySelector('.energy-slot[data-slot="' + (idx + 1) + '"]');
+      if (!bslot) return;
+      var bfill = bslot.querySelector('.fill');
+      if (!bfill) return;
+      if (bfill.querySelector('.fill-green')) return; // 有绿色的由绿色分支处理
+      if (slotTargets[idx] > 0) return; // 仍满格不处理
+      var bdelay = (4 - idx) * 100;
+      setTimeout(function() {
+        bfill.style.transition = 'width 0.1s linear';
+        bfill.style.width = '0%';
+        setTimeout(function() { if (bfill.parentNode) bfill.remove(); }, 100);
+      }, bdelay);
+    })(bi);
   }
 
   // 5格全满：等蓝条都走完后，每个格子内部绿色从右向左覆盖（第5格→第1格）
   if (fullSlots >= 5) {
-    var lastBlueDelay = 4 * 300 + 350; // 等第5格蓝条走完
+    var lastBlueDelay = 4 * 100 + 350; // 等第5格蓝条走完
     setTimeout(function() {
       for (var j = 4; j >= 0; j--) {
         (function(idx) {
@@ -2442,7 +2473,7 @@ function updateEnergyBar() {
             fg.className = 'fill-green';
             fill.appendChild(fg);
           }
-          var greenDelay = (4 - idx) * 200; // 5格总时长1秒，每格0.2s依次触发
+          var greenDelay = (4 - idx) * 50; // 5格总时长~0.26秒
           setTimeout(function() {
             fg.style.width = '100%';
           }, greenDelay);
@@ -2450,16 +2481,32 @@ function updateEnergyBar() {
       }
     }, lastBlueDelay);
   } else {
-    // 没满5格，移除所有绿色层
+    // 不满5格：左边仍满格一瞬间全部变蓝，右边被清空格绿色从右向左动画消退
     for (var k = 1; k <= 5; k++) {
       var slot = document.querySelector('.energy-slot[data-slot="' + k + '"]');
       if (!slot) continue;
       var fill = slot.querySelector('.fill');
       if (!fill) continue;
       var fg = fill.querySelector('.fill-green');
-      if (fg) {
-        fg.style.width = '0%';
-        setTimeout(function(el) { if (el.parentNode) el.remove(); }, 1050, fg);
+      if (!fg) continue;
+      if (slotTargets[k - 1] >= 100) {
+        // 仍满格：绿色同步瞬间移除，一秒内全部变蓝底
+        fg.remove();
+      } else {
+        // 被清空格：蓝底透明化+绿色动画消退，全部跟随R→L级联（0.5s总时长）
+        var greenDelay = (5 - k) * 100;
+        setTimeout(function(fillEl, fgEl) {
+          fillEl.style.backgroundColor = 'transparent';
+          fillEl.style.backgroundImage = 'none';
+          fgEl.style.left = '0';
+          fgEl.style.right = 'auto';
+          fgEl.style.transition = 'width 0.1s linear';
+          fgEl.style.width = '0%';
+          setTimeout(function() {
+            if (fgEl.parentNode) fgEl.remove();
+            if (fillEl.parentNode) fillEl.remove();
+          }, 100);
+        }, greenDelay, fill, fg);
       }
     }
   }
@@ -2601,6 +2648,79 @@ if (currentLevel >= 12) avatar.classList.add('ultimate');
   }
   if (stopLevelDisplay) stopLevelDisplay.textContent = '+' + ((stopLevel > 13) ? 13 : stopLevel);
 
+  // BP预览 + 提示
+  var bpPreview = document.getElementById('bpPreview');
+  var bpHint = document.getElementById('bpHint');
+  if (bpPreview && bpHint) {
+    var hasMat = materialCards.some(function(m) { return !!m; });
+    var estimatedCost = 0;
+    var hints = [];
+    var showPreview = false;
+
+    // 材料部分
+    var previewMatTotal = 0;
+    var matAllFound = !hasMat;
+    if (hasMat) {
+      matAllFound = true;
+      var previewPrices = getSavedMatPrices();
+      materialCards.forEach(function(m) {
+        if (!m) return;
+        var match = previewPrices.find(function(p) { return p.ovr === m.ovr; });
+        if (match) {
+          previewMatTotal += match.price;
+        } else {
+          matAllFound = false;
+        }
+      });
+      if (!matAllFound) {
+        hints.push('材料价格未设置');
+      }
+    }
+
+    // BP保护部分（≥+8且滑块>0时，没材料也能单独显示）
+    if (currentLevel >= 8 && protectCount > 0) {
+      var lvVal = localStorage.getItem('fc-lv-value-' + currentLevel);
+      if (lvVal !== null && parseFloat(lvVal) > 0) {
+        estimatedCost += parseFloat(lvVal) * 0.4 * (protectCount / 100);
+        showPreview = true;
+      } else {
+        hints.push('主卡价格未设置');
+      }
+    }
+
+    // 加上材料价格
+    if (matAllFound) {
+      estimatedCost += previewMatTotal;
+      if (hasMat) showPreview = true;
+    }
+
+    bpPreview.textContent = showPreview ? '本次预计 ' + formatCurrency(estimatedCost) : '';
+    bpHint.innerHTML = hints.join('<br>');
+    bpHint.style.display = hints.length > 0 ? 'block' : 'none';
+  }
+
+  // 强化后OVR变化，能量条重新计算 + 溢出裁剪
+  updateEnergyBar();
+  var rawFill = 0;
+  materialCards.forEach(function(m) { rawFill += calcFillRatio(m.ovr); });
+  while (rawFill > 5) {
+    var cut = false;
+    for (var ri = 4; ri >= 0; ri--) {
+      if (materialCards[ri]) {
+        rawFill -= calcFillRatio(materialCards[ri].ovr);
+        delete materialCards[ri]; cut = true; break;
+      }
+    }
+    if (!cut) break;
+  }
+  // 更新添加按钮状态：能量条满了禁止继续添加
+  var addBtn = document.getElementById('btnAddMat');
+  if (addBtn) {
+    var full = getTotalFill() >= 5;
+    addBtn.disabled = full;
+    addBtn.style.opacity = full ? '0.4' : '';
+  }
+
   // Button state
   if (!canUp) {
     document.getElementById('btnEnhance').disabled = true;
@@ -2663,10 +2783,12 @@ function renderHistory() {
     let tagCls, tagText;
     if (h.result === 'success') { tagCls = 'win'; tagText = '成功'; }
     else { tagCls = 'lose'; tagText = '失败'; }
+    var bpCls = h.bpCost > 0 ? 'hist-bp' : 'hist-bp zero';
     return `<li class="history-item">
       <span class="hist-num">#${h.num}</span>
       <span class="hist-tag ${tagCls}">${tagText}</span>
       <span class="hist-detail">${h.desc}</span>
+      <span class="${bpCls}">${formatCurrency(h.bpCost)}</span>
     </li>`;
   }).join('');
 }
@@ -2699,6 +2821,39 @@ function updateProtectUI(val) {
     arrR.style.cursor = 'pointer';
   }
   refreshAdvancedBP();
+  // 拖动滑块时实时刷新BP预览（没材料也能显示保护BP）
+  var bpPreview2 = document.getElementById('bpPreview');
+  if (bpPreview2) {
+    var hasMat2 = materialCards.some(function(m) { return !!m; });
+    var est2 = 0;
+    var show2 = false;
+
+    // BP保护部分
+    if (currentLevel >= 8 && protectCount > 0) {
+      var lvVal2 = localStorage.getItem('fc-lv-value-' + currentLevel);
+      if (lvVal2 !== null && parseFloat(lvVal2) > 0) {
+        est2 = parseFloat(lvVal2) * 0.4 * (protectCount / 100);
+        show2 = true;
+      }
+    }
+
+    // 材料部分
+    if (hasMat2) {
+      var matTotal2 = 0, matOk2 = true;
+      var sp2 = getSavedMatPrices();
+      materialCards.forEach(function(m) {
+        if (!m) return;
+        var mm = sp2.find(function(p) { return p.ovr === m.ovr; });
+        if (mm) matTotal2 += mm.price; else matOk2 = false;
+      });
+      if (matOk2) {
+        est2 += matTotal2;
+        show2 = true;
+      }
+    }
+
+    bpPreview2.textContent = show2 ? '本次预计 ' + formatCurrency(est2) : '';
+  }
 }
 
 function setProtectAnimated(on) {
@@ -2745,6 +2900,7 @@ window.addEventListener('mouseup', function() {
   if (!protectDragging) return;
   protectDragging = false;
   document.body.classList.remove('no-select');
+  refreshAll();
 });
 window.addEventListener('mousemove', function(e) {
   if (!protectDragging) return;
@@ -2755,6 +2911,7 @@ window.addEventListener('touchend', function() {
   if (!protectDragging) return;
   protectDragging = false;
   document.body.classList.remove('no-select');
+  refreshAll();
 });
 window.addEventListener('touchmove', function(e) {
   if (!protectDragging) return;
@@ -2845,19 +3002,33 @@ function executeEnhance() {
   var finalSuccess = success || _pendingMode === 'gold' || _pendingMode === 'rainbow';
 
   totalAttempts++;
-  // 单次强化BP消耗 = 保护BP + 材料总价格
-  // 优先用当前等级对应的保存值（localStorage存的是亿）
-  var savedLvVal = localStorage.getItem('fc-lv-value-' + currentLevel);
-  var playerVal = (savedLvVal !== null && parseFloat(savedLvVal) > 0) ? parseFloat(savedLvVal) : getPlayerValueYi();
-  var protectBP = playerVal * 0.4 * (protectCount / 100);
+  // 单次强化BP消耗
+  var singleBPCost = 0;
   var matTotal = 0;
   var savedPrices = getSavedMatPrices();
+  var allPricesFound = materialCards.length > 0;
   materialCards.forEach(function(m) {
     if (!m) return;
     var match = savedPrices.find(function(p) { return p.ovr === m.ovr; });
-    if (match) matTotal += match.price;
+    if (match) {
+      matTotal += match.price;
+    } else {
+      allPricesFound = false;
+    }
   });
-  totalBPCost += protectBP + matTotal;
+  if (allPricesFound) {
+    if (currentLevel < 8 || protectCount === 0) {
+      singleBPCost = matTotal;
+    } else {
+      var savedLvVal = localStorage.getItem('fc-lv-value-' + currentLevel);
+      if (savedLvVal !== null && parseFloat(savedLvVal) > 0) {
+        var playerVal = parseFloat(savedLvVal);
+        var protectBP = playerVal * 0.4 * (protectCount / 100);
+        singleBPCost = protectBP + matTotal;
+      }
+    }
+  }
+  totalBPCost += singleBPCost;
 
   if (finalSuccess) {
     const oldOvr = curOvr();
@@ -2865,7 +3036,7 @@ function executeEnhance() {
     totalSuccess++;
     const newOvr = curOvr();
 
-    addHistory('success', '+' + (nextLv - 1) + ' → +' + nextLv + '  |  OVR ' + oldOvr + ' → ' + newOvr + '  |  第' + totalAttempts + '次成功');
+    addHistory('success', '+' + (nextLv - 1) + ' → +' + nextLv + '  |  OVR ' + oldOvr + ' → ' + newOvr + '  |  第' + totalAttempts + '次成功', singleBPCost);
     refreshAll();
     showBurstSuccess(nextLv, oldOvr, newOvr);
 
@@ -2886,10 +3057,10 @@ function executeEnhance() {
         dropTo = Math.floor(Math.random() * 6) + 1;
       }
       const dropOvr = baseOvr + data(dropTo).bonus;
-      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  降至 +' + dropTo + '  (OVR ' + dropOvr + ')');
+      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  降至 +' + dropTo + '  (OVR ' + dropOvr + ')', singleBPCost);
       currentLevel = dropTo;
     } else {
-      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  强化等级保护生效，保持 +' + oldLevel);
+      addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  强化等级保护生效，保持 +' + oldLevel, singleBPCost);
       dropTo = oldLevel;
     }
 
@@ -2898,8 +3069,8 @@ function executeEnhance() {
   }
 }
 
-function addHistory(result, desc) {
-  history.unshift({ result, desc, num: totalAttempts });
+function addHistory(result, desc, bpCost) {
+  history.unshift({ result, desc, num: totalAttempts, bpCost: bpCost || 0 });
   if (history.length > 500) history.length = 500;
 }
 
@@ -4126,6 +4297,7 @@ function applyAdvancedSettings() {
   if (_deleteMode) exitDeleteMode();
   cleanIncompleteRows();
   document.getElementById('advancedSettingsOverlay').classList.remove('show');
+  refreshAll();
 }
 
 function openAdvancedSettings() {
