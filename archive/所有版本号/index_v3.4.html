@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>FC Online 4 - 球员强化模拟器</title>
-<link rel="preload" as="image" href="images/shatter_sprite.webp">
-<link rel="preload" as="image" href="images/赛季图标/25ucl_badge.png">
-<link rel="preload" as="image" href="images/enhance/1.png">
 <style>
 :root {
   --gold: #f0b90b;
@@ -42,7 +39,6 @@ body {
   position: relative; isolation: isolate;
   padding: 10px 0;
   background: #060a10;
-  user-select: none; -webkit-user-select: none;
 }
 
 /* 环境光层1 — 顶部冷蓝光 */
@@ -99,8 +95,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   filter: drop-shadow(0 0 16px rgba(240,185,11,0.3)) drop-shadow(0 0 32px rgba(240,185,11,0.1));
 }
 @media (max-width: 480px) {
-  .header h1 { font-size: 12px; letter-spacing: 1px; }
-  .header { margin-bottom: 2px; }
+  .header h1 { font-size: 19px; letter-spacing: 2px; }
 }
 
 /* ===== Settings Trigger ===== */
@@ -113,23 +108,22 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   border-radius: 14px;
   user-select: none; touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  transition: all 0.2s;
   backdrop-filter: blur(4px);
-  will-change: transform;
 }
 .settings-trigger:hover {
   background: rgba(255,255,255,0.12);
   border-color: rgba(255,255,255,0.25);
   color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 /* ===== Settings Modal ===== */
 .settings-overlay {
   display: none;
   position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,0.72);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   justify-content: center; align-items: center;
   padding: 20px;
 }
@@ -143,10 +137,6 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   animation: modalIn 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
   color: #e8eaed;
   box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset;
-  transform: translateZ(0);
-  will-change: transform;
-  contain: layout style paint;
-  overscroll-behavior: contain;
 }
 @keyframes modalIn {
   0% { opacity: 0; transform: translateY(24px) scale(0.96); }
@@ -164,13 +154,7 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   border-radius: 10px;
   color: #fff; font-size: 14px; font-family: inherit; outline: none;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-input, textarea { user-select: text; -webkit-user-select: text; }
-input[readonly] { user-select: none; -webkit-user-select: none; }
-.settings-modal input[readonly] {
-  opacity: 0.65; cursor: default; user-select: none;
-  -webkit-user-select: none;
+  transition: all 0.2s ease;
 }
 .settings-modal input:focus, .settings-modal select:focus {
   border-color: rgba(240,185,11,0.5);
@@ -199,76 +183,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 }
 .settings-modal .btn-main:hover { background: linear-gradient(135deg, #ffc107, #e0a800); box-shadow: 0 4px 16px rgba(240,185,11,0.3); }
 .settings-modal .btn-main:active { transform: scale(0.97); }
-.adv-sticky-footer {
-  position: sticky; bottom: 0; z-index: 10;
-  background: linear-gradient(0deg, #14161c 0%, #14161c 85%, transparent 100%);
-  padding: 10px 0 4px; margin-top: 6px;
-}
-
-/* ===== Level Button Grid ===== */
-.level-btn-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-}
-.lv-btn {
-  padding: 8px 0; background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
-  color: #aab4c0; font-size: 13px; font-weight: 600; font-family: inherit;
-  cursor: pointer; text-align: center;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  transition: all 0.18s ease; min-height: 36px;
-}
-.lv-btn:hover { background: rgba(255,255,255,0.1); color: #e8eaed; }
-.lv-btn:active { transform: scale(0.95); }
-.lv-btn.active {
-  background: linear-gradient(135deg, rgba(240,185,11,0.25), rgba(212,160,10,0.15));
-  border-color: rgba(240,185,11,0.5); color: #f0b90b; font-weight: 700;
-  box-shadow: 0 0 12px rgba(240,185,11,0.15);
-}
-
-/* ===== Player Search List ===== */
-.player-search-input {
-  width: 100%; padding: 10px 14px;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 10px; margin-bottom: 8px;
-  color: #fff; font-size: 14px; font-family: inherit; outline: none;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  transition: all 0.2s ease;
-}
-.player-search-input:focus {
-  border-color: rgba(240,185,11,0.5);
-  box-shadow: 0 0 0 3px rgba(240,185,11,0.08);
-}
-.player-select-list {
-  max-height: 220px; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-}
-.pos-group-header {
-  padding: 6px 14px; font-size: 10px; font-weight: 700; color: #f0b90b;
-  text-transform: uppercase; letter-spacing: 1px;
-  background: rgba(240,185,11,0.06); position: sticky; top: 0;
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-}
-.player-opt {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; cursor: pointer; color: #c8cdd4; font-size: 13px;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
-  transition: all 0.15s ease;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  min-height: 40px;
-}
-.player-opt:last-child { border-bottom: none; }
-.player-opt:hover, .player-opt:active { background: rgba(240,185,11,0.08); color: #fff; }
-.player-opt.selected {
-  background: rgba(240,185,11,0.12); color: #f0b90b;
-  font-weight: 600;
-}
-.player-opt .popt-ovr { font-size: 11px; color: #8899aa; margin-left: 8px; flex-shrink: 0; }
-.player-opt.selected .popt-ovr { color: #f0b90b; }
-.player-opt .popt-dot { color: #4caf50; font-size: 10px; margin-right: 4px; flex-shrink: 0; }
-.player-list-empty {
-  padding: 20px; text-align: center; color: #6a7080; font-size: 13px;
-}
 
 /* ===== Advanced Settings Rows ===== */
 .adv-row {
@@ -307,18 +221,15 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .adv-mat-ovr {
   width: 52px; padding: 6px 8px;
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px 4px 4px 8px;
+  border-radius: 8px;
   color: #e8eaed; font-size: 13px; font-family: inherit; outline: none;
   text-align: right; transition: all 0.2s ease;
 }
 .adv-mat-ovr:focus { border-color: rgba(240,185,11,0.5); background: rgba(255,255,255,0.08); }
-.adv-mat-sep {
-  color: rgba(255,255,255,0.12); font-size: 14px; flex-shrink: 0; margin: 0 -3px;
-}
 .adv-mat-price {
   width: 72px; padding: 6px 10px;
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 4px 8px 8px 4px;
+  border-radius: 8px;
   color: #e8eaed; font-size: 14px; font-family: inherit; outline: none;
   text-align: right; transition: all 0.2s ease;
 }
@@ -332,10 +243,10 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   margin-top: -4px; margin-bottom: 4px;
 }
 .adv-section {
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px; padding: 16px 18px;
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.015);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
   transition: opacity 0.35s;
 }
 .bp-disabled {
@@ -343,28 +254,26 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 }
 .bp-disabled-overlay {
   display: none; position: absolute; inset: 0;
-  background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.01) 3px, rgba(255,255,255,0.01) 6px),
-              rgba(30,30,36,0.75);
-  border-radius: 10px; z-index: 2;
+  background: rgba(50,50,50,0.65); border-radius: 6px; z-index: 2;
 }
 .bp-disabled .bp-disabled-overlay { display: block; }
 .bp-disabled-tip {
   display: none; position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%); z-index: 3;
-  font-size: 20px; font-weight: 700; color: #ffc107;
+  font-size: 20px; font-weight: 700; color: #00c853;
   letter-spacing: 1px; white-space: nowrap;
-  text-shadow: 0 0 20px rgba(255,193,7,0.4), 0 0 40px rgba(255,193,7,0.15);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 .bp-disabled .bp-disabled-tip { display: block; }
 /* 等级价值表 */
 .lv-toggle {
-  text-align: center; padding: 6px 0 4px; cursor: pointer;
-  font-size: 14px; color: #f0b90b; user-select: none;
-  transition: color 0.2s ease; font-weight: 600;
+  text-align: center; padding: 4px 0 2px; cursor: pointer;
+  font-size: 10px; color: #6b7590; user-select: none;
+  transition: color 0.2s ease;
 }
-.lv-toggle:hover { color: #ffc107; }
+.lv-toggle:hover { color: #f0b90b; }
 .lv-table {
-  border-top: 1px solid rgba(255,255,255,0.12); margin-top: 8px; padding-top: 10px;
+  border-top: 1px dashed rgba(255,255,255,0.1); margin-top: 6px; padding-top: 8px;
 }
 .lv-row {
   display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
@@ -445,18 +354,8 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 /* ===== Player Card ===== */
 .player-card {
   display: flex; align-items: center; gap: 10px;
-  padding: 14px 10px; margin-bottom: 18px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 50%, rgba(240,185,11,0.02) 100%);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px;
-  box-shadow: 0 0 30px rgba(240,185,11,0.03), 0 0 60px rgba(240,185,11,0.01), inset 0 1px 0 rgba(255,255,255,0.02);
-  position: relative;
-}
-.player-card::after {
-  content: '';
-  position: absolute; top: -1px; left: 20%; right: 20%; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(240,185,11,0.15), transparent);
-  pointer-events: none;
+  padding: 12px 0; margin-bottom: 18px;
+  background: none; border: none; box-shadow: none;
 }
 .player-face {
   width: 110px; height: 110px; flex-shrink: 0;
@@ -529,8 +428,8 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: 0.7;
   position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); z-index: 2;
 }
-.pconn { width: 3px; height: 2px; background: #2a3048; flex-shrink: 0; border-radius: 1px; }
-.pconn.pass { background: #3a5a46; box-shadow: 0 0 4px rgba(60,140,80,0.2); }
+.pconn { width: 2px; height: 1.5px; background: #2a3048; flex-shrink: 0; }
+.pconn.pass { background: #2e4838; }
 
 .ppips { display: flex; gap: 2px; margin-top: 5px; }
 .ppip { flex: 1; min-width: 16px; height: 2px; border-radius: 1px; background: #1e2435; flex-shrink: 1; }
@@ -582,7 +481,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .pt-color.active::before { opacity: 1; }
 .pt-color.active::after { background: radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(0,0,0,0.18) 100%); }
 .pt-color.active span { text-shadow: 0 0 4px rgba(255,255,255,0.5); }
-.pnode.active { transform: scale(1.08); }
 /* ===== Info Chips ===== */
 .info-row { display: flex; gap: 6px; margin-bottom: 6px; }
 .info-chip { flex: 1; text-align: center; padding: 6px 4px; }
@@ -611,33 +509,30 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   display: flex; align-items: center; gap: 6px; flex-shrink: 0;
 }
 .protect-track-container {
-  position: relative; width: 130px; height: 20px;
+  position: relative; width: 130px; height: 18px;
   display: flex; align-items: center;
   transform: translateX(-4px);
 }
 .protect-track-bg {
   position: absolute; top: 50%; transform: translateY(-50%);
-  left: 0; width: 100%; height: 2px;
-  background: rgba(255,255,255,0.12); border-radius: 1px;
+  left: 0; width: 100%; height: 1.5px;
+  background: rgba(255,255,255,0.15); border-radius: 1px;
 }
 .protect-track-fill {
   position: absolute; top: 50%; transform: translateY(-50%);
-  left: 0; height: 2px;
-  background: linear-gradient(90deg, #1ec35a, #2eeb6e);
-  border-radius: 1px; box-shadow: 0 0 6px rgba(30,195,90,0.3);
+  left: 0; height: 1.5px;
+  background: #1ec35a; border-radius: 1px;
   transition: width 0.15s ease;
 }
 .protect-track-fill.no-trans { transition: none; }
 .protect-handle {
   position: absolute; top: 50%; transform: translate(-50%, -50%);
-  width: 18px; height: 18px; border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #fff, #e8e8e8);
-  border: 1.5px solid #bbb;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3), 0 0 8px rgba(30,195,90,0.2);
-  cursor: pointer; transition: left 0.15s ease, border-color 0.15s, box-shadow 0.15s;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: 1.5px solid #c4c4c4;
+  cursor: pointer; transition: left 0.15s ease;
 }
 .protect-handle.no-trans { transition: none; }
-.protect-handle:hover { border-color: #1ec35a; box-shadow: 0 2px 8px rgba(0,0,0,0.35), 0 0 14px rgba(30,195,90,0.35); }
+.protect-handle:hover { border-color: #999; }
 .protect-slider-wrap.disabled .protect-handle { cursor: default; opacity: 0.4; }
 .protect-slider-wrap.disabled .protect-track-fill { opacity: 0.4; }
 .protect-arrow {
@@ -660,11 +555,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .material-section { margin-bottom: 6px; }
 .material-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 14px; font-size: 15px;
-  padding: 8px 12px;
-  background: rgba(255,255,255,0.02);
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.04);
+  margin-bottom: 20px; font-size: 15px;
 }
 .material-header .title { color: var(--text2); font-weight: 600; }
 .material-header .boost { color: var(--accent); font-weight: 600; }
@@ -674,7 +565,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   0% { background-position: 0 0; }
   100% { background-position: 7px 0; }
 }
-.energy-slots { display: flex; gap: 5px; margin-bottom: 12px; }
+.energy-slots { display: flex; gap: 5px; margin-bottom: 18px; }
 .energy-slot {
   position: relative; overflow: hidden;
   flex: 1; height: 35px;
@@ -691,12 +582,12 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .energy-slot span {
   position: relative; z-index: 2;
 }
-.energy-slot:hover { background: linear-gradient(180deg, #333 0%, #2a2a2a 100%); color: #bbb; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.35); }
+.energy-slot:hover { background: linear-gradient(180deg, #333 0%, #2a2a2a 100%); color: #bbb; transform: translateY(-1px); }
 .energy-slot:active { transform: translateY(0); }
 .energy-slot.filled { color: #000; }
 
 .energy-slot .fill {
-  position: absolute; top: 0; left: 0; height: 100%; width: 100%; z-index: 1;
+  position: absolute; top: 0; left: 0; height: 100%; z-index: 1;
   background-color: #0b91f6;
   background-image: repeating-linear-gradient(
     -45deg,
@@ -705,16 +596,13 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   );
   background-size: 7px 7px;
   animation: stripe-slide 0.8s linear infinite;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.06s linear;
-  will-change: transform;
+  transition: width 0.2s linear;
 }
 .energy-slot.filled .fill { /* ensures fill gets width from JS */ }
 
 /* 5格全满后每个fill内部绿潮（R→L），不盖缝隙不挡数字 */
 .energy-slot .fill .fill-green {
-  position: absolute; top: 0; right: 0; height: 100%; width: 100%;
+  position: absolute; top: 0; right: 0; height: 100%; width: 0;
   background-color: #00c853;
   background-image: repeating-linear-gradient(
     -45deg,
@@ -723,19 +611,10 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   );
   background-size: 7px 7px;
   animation: stripe-slide 0.8s linear infinite;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.06s ease;
-  will-change: transform;
+  transition: width 0.06s ease;
 }
 
 /* ===== 六边形卡槽 ===== */
-.hex-hint {
-  text-align: center; color: rgba(255,255,255,0.25); font-size: 11px;
-  padding: 6px 0 8px; width: 100%;
-  opacity: 1; transition: opacity 0.3s;
-}
-.hex-hint.hidden { opacity: 0; pointer-events: none; }
 @keyframes hex-wave {
   0%, 100% { opacity: 0.08; }
   20%      { opacity: 0.45; }
@@ -756,8 +635,8 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   transition: background 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 2px 8px rgba(0,0,0,0.3);
 }
-.hex-card:hover { background: linear-gradient(160deg, #263248 0%, #1c2638 50%, #151d2b 100%); transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 6px 20px rgba(0,0,0,0.5), 0 0 24px rgba(100,140,200,0.06); }
-.hex-card:active { transform: translateY(0); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 2px 8px rgba(0,0,0,0.3); }
+.hex-card:hover { background: linear-gradient(160deg, #263248 0%, #1c2638 50%, #151d2b 100%); transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 16px rgba(0,0,0,0.4); }
+.hex-card:active { transform: translateY(0); }
 
 .hex-card-stripes {
   position: absolute; inset: 0;
@@ -783,7 +662,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .hex-card:nth-child(5) .hex-card-plus { animation-delay: 0.72s; }
 
 .hex-card.active .hex-card-plus { display: none; }
-.hex-card.active { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 16px rgba(11,145,246,0.22), 0 2px 8px rgba(0,0,0,0.3); }
 
 .hex-card-form {
   display: none; position: relative; z-index: 1;
@@ -817,18 +695,12 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   position: absolute; right: 50%; margin-right: -28px;
 }
 .hex-arrows button {
-  position: relative;
   width: 14px; height: 11px;
   background: #252d3e; border: 1px solid #3a4460;
   border-radius: 2px; color: #8a9bc0; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   font-size: 6px; line-height: 1; padding: 0;
   transition: background 0.15s;
-}
-.hex-arrows button::after {
-  content: '';
-  position: absolute;
-  inset: -7px;
 }
 .hex-arrows button:hover { background: #313d58; }
 
@@ -849,36 +721,31 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   display: none;
   position: absolute; top: 19px; right: 10px;
   width: 14px; height: 14px;
-  background: rgba(255,255,255,0.12); border: none; border-radius: 50%;
-  color: rgba(255,255,255,0.7); font-size: 9px; font-weight: 700;
+  background: #d94a4a; border: none; border-radius: 50%;
+  color: #fff; font-size: 9px; font-weight: 700;
   cursor: pointer; align-items: center; justify-content: center;
   line-height: 1; z-index: 5;
-  transition: background 0.15s, color 0.15s, transform 0.15s;
-}
-.hex-close:hover {
-  background: #d94a4a; color: #fff; transform: scale(1.1);
 }
 .hex-card.active .hex-close { display: flex; }
 
 /* ===== Buttons ===== */
 .btn-row { display: flex; gap: 6px; margin-bottom: 6px; }
 .btn {
-  padding: 11px 18px; border-radius: 10px; border: none;
+  padding: 10px 16px; border-radius: 10px; border: none;
   font-size: 13px; font-weight: 700; cursor: pointer;
   font-family: inherit; letter-spacing: 0.5px;
   user-select: none; touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1.2);
 }
-.btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.3); }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
 .btn:active:not(:disabled) { transform: translateY(1px) scale(0.98); }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 .btn-main {
   flex: 1;
   background: linear-gradient(135deg, #00e559 0%, #00c048 100%);
   color: #151616; font-size: 18px; letter-spacing: 3px;
-  padding: 14px 20px; border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,229,89,0.4), 0 0 50px rgba(0,229,89,0.1);
+  box-shadow: 0 4px 20px rgba(0,229,89,0.35), 0 0 40px rgba(0,229,89,0.08);
   position: relative; overflow: hidden;
   animation: btnBreathe 3s ease-in-out infinite;
 }
@@ -888,9 +755,8 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   border-radius: inherit;
 }
 .btn-main:hover:not(:disabled) {
-  box-shadow: 0 6px 32px rgba(0,229,89,0.55), 0 0 70px rgba(0,229,89,0.18);
+  box-shadow: 0 6px 28px rgba(0,229,89,0.5), 0 0 60px rgba(0,229,89,0.15);
   animation: none;
-  transform: translateY(-2px);
 }
 .btn-main:active:not(:disabled) { transform: scale(0.97); }
 .btn-main:disabled { animation: none; }
@@ -900,8 +766,8 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   background: linear-gradient(135deg, #00e559 0%, #00c048 100%);
 }
 @keyframes btnBreathe {
-  0%,100% { box-shadow: 0 4px 24px rgba(0,229,89,0.4), 0 0 50px rgba(0,229,89,0.1); }
-  50% { box-shadow: 0 4px 28px rgba(0,229,89,0.5), 0 0 64px rgba(0,229,89,0.16); }
+  0%,100% { box-shadow: 0 4px 20px rgba(0,229,89,0.35), 0 0 40px rgba(0,229,89,0.08); }
+  50% { box-shadow: 0 4px 24px rgba(0,229,89,0.45), 0 0 56px rgba(0,229,89,0.14); }
 }
 @keyframes btnCharge {
   0%,100% { box-shadow: 0 4px 16px rgba(0,229,89,0.3); }
@@ -912,14 +778,13 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   font-size: 12px; border: 1px solid rgba(255,255,255,0.12);
   backdrop-filter: blur(4px);
 }
-.btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2); }
 .btn-secondary.active { background: rgba(41,121,255,0.2); border-color: var(--accent); color: #aaccff; }
-.auto-dots { display: inline-block; width: 18px; text-align: left; font-weight: 700; letter-spacing: 1px; color: #aaccff; }
 
 /* ===== Stats ===== */
 .stats {
   display: grid; grid-template-columns: repeat(4,1fr);
-  gap: 8px; margin-bottom: 16px;
+  gap: 8px; margin-bottom: 8px;
 }
 .stat-box {
   text-align: center; padding: 10px 4px;
@@ -927,7 +792,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 12px;
   transition: all 0.2s ease;
-  position: relative;
 }
 .stat-box:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
 .stat-box .num { font-size: 17px; font-weight: 700; color: #fff; }
@@ -936,66 +800,24 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .stat-box .num.f { color: var(--fail); }
 .stat-box .tag { font-size: 9px; color: var(--text3); margin-top: 1px; }
 .stat-box.clickable { cursor: pointer; position: relative; touch-action: manipulation; }
-.stat-box.clickable:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); }
-.stat-box.clickable .tag::after {
-  content: ' ▾'; font-size: 7px; opacity: 0.4;
-}
-.bp-hint-abs { position: absolute; top: 100%; left: 0; right: 0; pointer-events: none; z-index: 1; }
 
 /* ===== History ===== */
 .history-box {
   height: 120px; overflow-y: scroll !important;
-  -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; overscroll-behavior: auto;
   scroll-behavior: smooth; will-change: scroll-position;
-  padding: 8px 6px; border-radius: 10px;
-  background: rgba(255,255,255,0.015);
-  border: 1px solid rgba(255,255,255,0.04);
+  padding-right: 4px;
   touch-action: pan-y; -webkit-user-select: text;
   pointer-events: auto;
 }
 .history-box::-webkit-scrollbar { width: 3px; }
 .history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-.history-title { font-size: 10px; color: var(--text3); margin-bottom: 6px; font-weight: 600; padding-left: 2px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.history-filter { display: flex; gap: 3px; flex-shrink: 0; }
-.hist-fbtn {
-  padding: 2px 7px; font-size: 9px; font-family: inherit;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px; color: #6b7590; cursor: pointer;
-  transition: all 0.15s;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  user-select: none; -webkit-user-select: none;
-}
-.hist-fbtn:hover { background: rgba(255,255,255,0.08); color: #b0b8c0; }
-.hist-fbtn.active { background: rgba(240,185,11,0.15); border-color: rgba(240,185,11,0.3); color: #f0b90b; font-weight: 700; }
-.export-btn {
-  display: flex; align-items: center; gap: 3px;
-  padding: 3px 8px;
-  font-size: 9px; color: var(--text3);
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-  user-select: none; -webkit-user-select: none;
-}
-.export-btn:hover {
-  color: #f0b90b;
-  background: rgba(240,185,11,0.08);
-  border-color: rgba(240,185,11,0.25);
-}
-.export-btn:active { transform: scale(0.96); }
-.export-icon { width: 10px; height: 10px; flex-shrink: 0; }
+.history-title { font-size: 10px; color: var(--text3); margin-bottom: 4px; font-weight: 600; }
 .history-list { list-style: none; }
 .history-item {
   display: flex; align-items: center; gap: 4px;
-  padding: 3px 6px; font-size: 10px;
-  border-radius: 4px;
-  margin-bottom: 1px;
-  border-left: 2px solid transparent;
+  padding: 2px; font-size: 10px;
 }
-.history-item:has(.hist-tag.win) { background: rgba(0,200,83,0.04); border-left-color: rgba(0,200,83,0.2); }
-.history-item:has(.hist-tag.lose) { background: rgba(229,57,53,0.04); border-left-color: rgba(229,57,53,0.2); }
 .hist-num { color: var(--text3); font-size: 9px; min-width: 20px; }
 .hist-tag { font-weight: 700; padding: 0px 5px; border-radius: 2px; font-size: 9px; flex-shrink: 0; }
 .hist-tag.win { background: rgba(0,200,83,0.15); color: var(--success); }
@@ -1006,13 +828,10 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .hist-empty { color: var(--text3); text-align: center; padding: 16px; font-size: 11px; }
 
 /* ===== Hint ===== */
-.hint { text-align: center; font-size: 10px; color: var(--text3); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.hint { text-align: center; font-size: 9px; color: var(--text3); margin-top: 6px; }
 .hint kbd {
-  display: inline-flex; align-items: center;
-  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px; padding: 2px 8px; font-size: 10px; font-family: inherit;
-  font-weight: 600; letter-spacing: 0.3px;
-  color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 2px; padding: 0px 4px; font-size: 9px; font-family: inherit;
 }
 
 /* ===== Rate help icon ===== */
@@ -1037,11 +856,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 @keyframes fadeIn {
   0% { opacity: 0; transform: translateY(4px); }
   100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes numPop {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.22); }
-  100% { transform: scale(1); }
 }
 
 /* ===== Control Panel ===== */
@@ -1341,7 +1155,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   font-weight: 700; font-size: 0.9em; cursor: pointer; z-index: 20;
   letter-spacing: 1px; text-shadow: 0 0 10px rgba(0,0,0,0.8);
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  padding: 12px 16px; margin: -12px -16px; /* 扩大触控区 */
 }
 
 /* ===== Result Overlay ===== */
@@ -1508,8 +1321,8 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   body.browser-quark .app { padding-top: 160px; }
   body.browser-chrome { min-height: -webkit-fill-available; }
   body.browser-chrome .app { padding-top: 200px; }
-  .settings-trigger { position: fixed; top: 10px; left: 10px; z-index: 9999; margin-bottom: 0; font-size: 12px; padding: 8px 14px; min-height: 44px; display: flex; align-items: center; background: rgba(255,255,255,0.14); }
-  .player-card { gap: 10px; padding: 8px 6px; margin-bottom: 6px; }
+  .settings-trigger { position: fixed; top: 10px; left: 10px; z-index: 9999; margin-bottom: 0; font-size: 12px; padding: 8px 14px; min-height: 44px; display: flex; align-items: center; }
+  .player-card { gap: 10px; padding: 8px 0; margin-bottom: 6px; }
   .player-face { width: 80px; height: 80px; font-size: 36px; }
   .player-face.has-img { width: 135px; height: 206px; }
   .settings-trigger { font-size: 10px; padding: 3px 10px; }
@@ -1523,7 +1336,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   .info-value.stars { font-size: 13px; letter-spacing: 1px; }
 
 
-  .progress-header { margin-bottom: 8px; }
   .ptrack { gap: 1px; }
   .pnode { height: 20px; min-width: 11px; font-size: 6px; border-radius: 0; }
   .ppips { gap: 1px; margin-top: 4px; }
@@ -1540,26 +1352,26 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   .protect-arrow { font-size: 11px; padding: 0 2px; }
   .protect-pct { font-size: 16px; width: 38px; }
   .protect-divider { margin: 8px 0; }
-  .protect-row + .protect-divider { margin-top: 10px; }
-  .protect-divider + .protect-row { margin-top: 10px; }
-  .protect-divider + .material-header { margin-top: 10px; }
-  .material-header { font-size: 12px; margin-bottom: 4px; padding: 5px 8px; }
-  .energy-slots { gap: 3px; margin-bottom: 2px; }
-  .hex-slots { gap: 3px; margin-bottom: 4px; }
+  .protect-row + .protect-divider { margin-top: 16px; }
+  .protect-divider + .protect-row { margin-top: 16px; }
+  .protect-divider + .material-header { margin-top: 16px; }
+  .material-header { font-size: 12px; margin-bottom: 16px; }
+  .energy-slots { gap: 3px; margin-bottom: 14px; }
+  .hex-slots { gap: 3px; }
+  .energy-slot { height: 30px; font-size: 18px; padding-left: 6px; }
   .hex-card { aspect-ratio: 100/145; }
   .hex-card-plus { font-size: 22px; }
   .hex-input-row input { width: 30px; height: 20px; font-size: 11px; }
   .hex-arrows { margin-right: -22px; }
   .hex-arrows button { width: 12px; height: 9px; font-size: 5px; }
-  .hex-arrows button::after { inset: -14px; }
   .hex-ovr-label { font-size: 9px; }
   .hex-progress-pct { font-size: 10px; }
-  .hex-close { width: 12px; height: 12px; font-size: 7px; }
+  .hex-close { width: 12px; height: 12px; font-size: 7px; bottom: 4px; left: 2px; }
   .hex-card.active .hex-close { display: flex; }
   .hex-card-form { padding: 6px 5px; gap: 2px; }
   .mat-input-row { gap: 4px; font-size: 10px; }
-  .mat-input-row input { width: 50px; font-size: 11px; height: 27px; box-sizing: border-box; }
-  .mat-btn { font-size: 10px; padding: 4px 8px; height: 27px; box-sizing: border-box; }
+  .mat-input-row input { width: 50px; font-size: 11px; }
+  .mat-btn { font-size: 10px; padding: 4px 8px; }
 
   .stop-row { font-size: 11px; gap: 4px; }
   .stop-row select { font-size: 10px; padding: 3px 16px 3px 4px; }
@@ -1568,7 +1380,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   .btn-main { font-size: 16px; letter-spacing: 2px; min-height: 50px; }
   .btn-row { gap: 6px; }
 
-  .control-panel { padding: 10px 12px; border-radius: 14px; margin-bottom: 10px; }
+  .control-panel { padding: 14px 12px; border-radius: 14px; margin-bottom: 10px; }
 
   .stats { gap: 6px; }
   .stat-box { padding: 10px 4px; min-height: 56px; display: flex; flex-direction: column; justify-content: center; }
@@ -1576,7 +1388,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   .stat-box .tag { font-size: 9px; }
 
   /* 更大的触控区 */
-  .energy-slot { height: 24px; font-size: 16px; padding-left: 4px; min-width: 44px; }
+  .energy-slot { height: 40px; font-size: 22px; padding-left: 8px; min-width: 44px; }
   .hex-card { min-height: 80px; }
   .hex-input-row input { width: 36px; height: 26px; font-size: 13px; }
   .protect-handle { width: 24px; height: 24px; }
@@ -1592,18 +1404,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
     0% { transform: translate(-50%, -50%) scale(1); }
     100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
   }
-
-  /* 球员设置弹窗 — 自定义下拉 */
-  .settings-modal { padding: 14px; }
-  .settings-modal .field { margin-bottom: 8px; }
-  .settings-modal .field-row { gap: 8px; }
-  .settings-modal .btn-row { margin-top: 10px; }
-  .level-btn-grid { gap: 4px; }
-  .lv-btn { min-height: 34px; font-size: 11px; padding: 4px 0; border-radius: 7px; }
-  .player-select-list { max-height: 120px; }
-  .player-opt { padding: 7px 10px; font-size: 11px; min-height: 34px; }
-  .player-search-input { font-size: 13px; padding: 8px 10px; }
-  .pos-group-header { font-size: 9px; padding: 3px 10px; }
 }
 
 /* ===== Particles ===== */
@@ -1711,49 +1511,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   .cust-drop-item { padding: 13px 14px; font-size: 14px; min-height: 44px; }
   .cust-drop-panel { max-height: 280px; }
 }
-
-/* ===== Custom Number Keyboard ===== */
-.kb-overlay {
-  display: none; position: fixed; inset: 0; z-index: 2000;
-  justify-content: center; align-items: flex-end;
-}
-.kb-overlay.show { display: flex; }
-
-.kb-panel {
-  width: 100%;
-  background: #d1d1d6;
-  border-radius: 20px 20px 0 0;
-  overflow: hidden;
-  padding: 8px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
-  animation: kbSlideUp 0.22s ease-out;
-}
-@keyframes kbSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-.kb-row { display: flex; width: 100%; margin-bottom: 1px; }
-
-.kb-key {
-  flex: 1; margin: 3px; height: 56px;
-  border: none; border-radius: 6px;
-  background: #fff; color: #000;
-  font-size: 22px; font-weight: 400;
-  font-family: -apple-system,'SF Pro Display','Helvetica Neue',sans-serif;
-  cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  user-select: none; -webkit-user-select: none;
-}
-.kb-key:active { background: #d1d1d6; }
-
-.kb-letters {
-  font-size: 10px; color: #8e8e93; margin-top: 1px;
-}
-
-@media (max-width: 480px) {
-  .kb-panel { border-radius: 16px 16px 0 0; padding: 6px; padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
-  .kb-key { margin: 3px; height: 50px; font-size: 20px; border-radius: 6px; }
-  .kb-letters { font-size: 9px; }
-}
 </style>
 </head>
 <body>
@@ -1773,7 +1530,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
     <div class="settings-modal" onclick="event.stopPropagation()">
       <div class="field">
         <label>赛季</label>
-        <select id="inpSeason" onchange="onSeasonChange()">
+        <select id="inpSeason">
           <option value="25ucl" selected>25UCL 25欧冠</option>
           <option value="default">基础卡 (普通)</option>
           <option value="live">LIVE 实时</option>
@@ -1789,29 +1546,30 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
       </div>
       <div class="field">
         <label>快速选择球员</label>
-        <input type="text" class="player-search-input" id="playerSearch" placeholder="搜索球员名称..." oninput="filterPlayerList()" autocomplete="off">
-        <div class="player-select-list" id="playerSelectList"></div>
-        <input type="hidden" id="inpPlayerSelect" value="">
+        <select id="inpPlayerSelect" onchange="onPlayerSelect()">
+          <option value="">— 自定义球员 —</option>
+        </select>
       </div>
       <div class="field-row">
         <div class="field">
           <label>球员名称</label>
-          <input type="text" id="inpName" value="姆巴佩" placeholder="输入球员名称" readonly>
+          <input type="text" id="inpName" value="姆巴佩" placeholder="输入球员名称">
         </div>
         <div class="field">
           <label>位置</label>
-          <input type="text" id="inpPos" value="右边锋" placeholder="如 ST, CF" readonly>
+          <input type="text" id="inpPos" value="右边锋" placeholder="如 ST, CF">
         </div>
       </div>
       <div class="field-row">
         <div class="field">
           <label>基础能力值 (OVR)</label>
-          <input type="number" id="inpOvr" value="122" min="40" max="150" readonly>
+          <input type="number" id="inpOvr" value="122" min="40" max="150">
         </div>
         <div class="field">
           <label>当前强化等级</label>
-          <div class="level-btn-grid" id="levelBtnGrid"></div>
-          <input type="hidden" id="inpLevel" value="1">
+          <select id="inpLevel">
+            <option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option><option value="5">+5</option><option value="6">+6</option><option value="7">+7</option><option value="8">+8</option><option value="9">+9</option><option value="10">+10</option><option value="11">+11</option><option value="12">+12</option><option value="13">+13</option>
+          </select>
         </div>
       </div>
       <div class="btn-row">
@@ -1824,11 +1582,12 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   <!-- Advanced Settings Modal -->
   <div class="settings-overlay" id="advancedSettingsOverlay" onclick="closeAdvancedSettings(event)">
     <div class="settings-modal" onclick="event.stopPropagation()">
-      <div style="font-size:18px;font-weight:700;background:linear-gradient(135deg,#f0b90b,#ffc107);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:12px;">高级设置</div>
+      <div style="font-size:18px;font-weight:700;color:#e53935;text-align:center;margin-bottom:12px;">高级设置</div>
       <div class="adv-section" id="bpProtectSection">
         <div class="bp-disabled-overlay"></div>
         <div class="bp-disabled-tip">强化等级 ≥8 时启用</div>
         <div class="adv-title">强化等级BP保护</div>
+        <div class="adv-hint">填写主卡价格设置，自动核算bp消耗</div>
         <div class="adv-row">
           <span class="adv-label">球员价值</span>
           <div class="adv-value-wrap">
@@ -1846,9 +1605,8 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
           <span class="adv-value needed" id="neededBP">0亿</span>
         </div>
         <div class="lv-toggle" onclick="toggleLevelValues()">
-          <span id="lvToggleText">▸ 展开主卡等级价格设置</span>
+          <span id="lvToggleText">展开主卡价格设置 ▸</span>
         </div>
-        <div class="adv-hint" id="lvToggleHint" style="margin-top:2px;">填写后可自动核算BP消耗</div>
         <div class="lv-table" id="lvTable" style="display:none;">
           <div class="lv-row">
             <span class="lv-label">+8</span>
@@ -1875,17 +1633,13 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
             <span class="lv-unit">亿</span>
           </div>
           <div class="btn-row" style="margin-top:6px;">
-            <button class="btn btn-secondary" id="btnSaveLvValues" style="font-size:14px;color:#f0b90b;font-weight:700;" onclick="saveLevelValues()">保存</button>
+            <button class="btn btn-secondary" id="btnSaveLvValues" style="font-size:14px;color:#00c853;font-weight:700;" onclick="saveLevelValues()">保存</button>
           </div>
         </div>
       </div>
       <div class="adv-section" id="matPriceSection">
         <div class="adv-title">材料价格设置</div>
         <div class="adv-hint">自定义材料数值和价格，存为模板保存后永久生效</div>
-        <div style="display:flex;justify-content:flex-end;gap:8px;font-size:10px;color:#6b7590;margin-bottom:4px;">
-          <span style="width:52px;text-align:right;">OVR</span>
-          <span style="width:72px;text-align:right;">价格</span>
-        </div>
         <div id="matPriceRows">
           <div class="select-all-bar" id="selectAllBar" onclick="toggleSelectAll()">
             <span class="sel-dot"></span><span class="select-all-text">全选</span>
@@ -1893,41 +1647,36 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
           <div class="adv-row">
             <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
             <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
+              <input type="number" class="adv-mat-ovr" value="" min="0" placeholder="OVR" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)">
+              <input type="number" class="adv-mat-price" value="0" min="0" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
             </div>
           </div>
           <div class="adv-row">
             <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
             <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
+              <input type="number" class="adv-mat-ovr" value="" min="0" placeholder="OVR" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)">
+              <input type="number" class="adv-mat-price" value="0" min="0" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
             </div>
           </div>
           <div class="adv-row">
             <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
             <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
+              <input type="number" class="adv-mat-ovr" value="" min="0" placeholder="OVR" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)">
+              <input type="number" class="adv-mat-price" value="0" min="0" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
             </div>
           </div>
           <div class="adv-row">
             <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
             <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
+              <input type="number" class="adv-mat-ovr" value="" min="0" placeholder="OVR" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)">
+              <input type="number" class="adv-mat-price" value="0" min="0" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
             </div>
           </div>
           <div class="adv-row">
             <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
             <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
+              <input type="number" class="adv-mat-ovr" value="" min="0" placeholder="OVR" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)">
+              <input type="number" class="adv-mat-price" value="0" min="0" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
             </div>
           </div>
         </div>
@@ -1940,10 +1689,10 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
           <button class="btn-del-confirm" id="btnDelConfirm" disabled onclick="confirmDeleteRows()">删除</button>
         </div>
         <div class="btn-row" id="btnRowSave" style="margin-top:6px;">
-          <button class="btn btn-secondary" style="font-size:14px;color:#f0b90b;font-weight:700;" onclick="saveMatPrices()">保存</button>
+          <button class="btn btn-secondary" style="font-size:14px;color:#00c853;font-weight:700;" onclick="saveMatPrices()">保存</button>
         </div>
       </div>
-      <div class="btn-row adv-sticky-footer">
+      <div class="btn-row" style="margin-top:6px;">
         <button class="btn btn-main" style="font-size:14px;letter-spacing:1px;box-shadow:none;" onclick="applyAdvancedSettings()">应用设置</button>
       </div>
     </div>
@@ -2000,7 +1749,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
     <span style="font-weight:600;">强化等级保护</span>
     <span style="margin-left:16px;"></span>
     <div class="protect-slider-wrap" id="protectSliderWrap">
-      <div class="protect-track-container" id="protectTrack" onclick="protectTrackClick(event)">
+      <div class="protect-track-container" id="protectTrack">
         <div class="protect-track-bg"></div>
         <div class="protect-track-fill no-trans" id="protectFill" style="width:0%"></div>
         <div class="protect-handle no-trans" id="protectHandle" style="left:0%" onmousedown="protectDragStart(event)" ontouchstart="protectDragStart(event)"></div>
@@ -2037,7 +1786,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="" min="0" max="999" inputmode="numeric" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
               <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
               <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
@@ -2058,7 +1807,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="" min="0" max="999" inputmode="numeric" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
               <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
               <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
@@ -2079,7 +1828,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="" min="0" max="999" inputmode="numeric" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
               <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
               <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
@@ -2100,7 +1849,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="" min="0" max="999" inputmode="numeric" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
               <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
               <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
@@ -2121,7 +1870,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
         <div class="hex-card-form">
           <div class="hex-ovr-label">OVR</div>
           <div class="hex-input-row">
-            <input type="number" value="" min="0" max="999" inputmode="numeric" oninput="onHexOvrInput(this)">
+            <input type="number" value="" min="0" max="999" oninput="onHexOvrInput(this)">
             <div class="hex-arrows">
               <button onclick="event.stopPropagation();stepHexOvr(this,1)">▲</button>
               <button onclick="event.stopPropagation();stepHexOvr(this,-1)">▼</button>
@@ -2137,11 +1886,10 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
         <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
       </div>
     </div>
-    <div class="hex-hint" id="hexHint">点击六边形槽添加材料卡</div>
     <div class="mat-input-row">
       <span style="font-size:10px;color:var(--text3);flex-shrink:0;">添加材料 OVR</span>
       <div class="hex-input-row" style="display:inline-flex;width:auto;flex-shrink:0;">
-        <input type="number" id="inpMaterialOvr" value="122" min="40" max="150" inputmode="numeric">
+        <input type="number" id="inpMaterialOvr" value="122" min="40" max="150">
         <div class="hex-arrows" style="position:static;margin-right:0;margin-left:2px;">
           <button onclick="stepMaterialOvr(1)">▲</button>
           <button onclick="stepMaterialOvr(-1)">▼</button>
@@ -2190,27 +1938,14 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
     <div class="stat-box">
       <div class="num" id="sBPCost"><span style="color:#fff;">0</span>亿</div>
       <div class="tag" style="color:#f0b90b;">BP消耗</div>
-      <div class="bp-hint-abs">
-        <div id="bpPreview" style="color:#7a8090;font-size:10px;"></div>
-        <div id="bpHint" style="color:#e53935;font-size:10px;"></div>
-      </div>
+      <div id="bpPreview" style="color:#7a8090;font-size:10px;"></div>
+      <div id="bpHint" style="color:#e53935;font-size:10px;display:none;">材料价格未设置</div>
     </div>
   </div>
 
   <!-- History -->
   <div class="history-box">
-    <div class="history-title">
-        <span>强化记录</span>
-        <div class="history-filter" id="historyFilter">
-          <button class="hist-fbtn active" data-filter="all" onclick="setHistoryFilter('all',this)">全部</button>
-          <button class="hist-fbtn" data-filter="success" onclick="setHistoryFilter('success',this)">成功</button>
-          <button class="hist-fbtn" data-filter="fail" onclick="setHistoryFilter('fail',this)">失败</button>
-        </div>
-        <button class="export-btn" id="btnExportLog" title="导出记录">
-          <svg class="export-icon" viewBox="0 0 16 16"><path d="M3 10v2.5A1.5 1.5 0 004.5 14h7a1.5 1.5 0 001.5-1.5V10M8 2v8M5 6l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>导出</span>
-        </button>
-      </div>
+    <div class="history-title">强化记录</div>
     <ul class="history-list" id="historyList">
       <li class="hist-empty">等待首次强化...</li>
     </ul>
@@ -2245,7 +1980,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 </div>
 
 <!-- Result Overlay (结果展示) -->
-<div class="result-overlay" id="resultOverlay" onclick="if(event.target===this)closeResult(true)">
+<div class="result-overlay" id="resultOverlay">
   <div class="result-card-wrap">
     <div class="result-card" id="resultCard">
       <img id="resultCardImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
@@ -2314,14 +2049,6 @@ function animateNumber(el, target, dur, fmt) {
       if (fmt) el.textContent = fmt(target);
       else el.textContent = Number.isInteger(target) ? target : target.toFixed(2);
       delete _animFrames[key];
-      // Pop pulse
-      el.style.animation = 'none';
-      el.offsetHeight;
-      el.style.animation = 'numPop 0.3s ease';
-      el.addEventListener('animationend', function h() {
-        el.style.animation = '';
-        el.removeEventListener('animationend', h);
-      });
     }
   }
   _animFrames[key] = requestAnimationFrame(step);
@@ -2666,70 +2393,44 @@ function hasCardImage(playerName) {
   }
   return false;
 }
-function populatePlayerList(filterText) {
-  var list = document.getElementById('playerSelectList');
-  if (!list) return;
-  var ft = (filterText || '').toLowerCase().trim();
+function populatePlayerSelect() {
+  var sel = document.getElementById('inpPlayerSelect');
+  sel.innerHTML = '<option value="">— 自定义球员 —</option>';
   // Group by position
   var positions = [...new Set(PLAYER_DB.map(function(p) { return p.position; }))];
   positions.sort();
-  var html = '';
-  var totalShown = 0;
   positions.forEach(function(pos) {
+    var group = document.createElement('optgroup');
+    group.label = pos;
     var players = PLAYER_DB.filter(function(p) { return p.position === pos; });
-    var shown = ft ? players.filter(function(p) { return p.name.toLowerCase().indexOf(ft) !== -1; }) : players;
-    if (shown.length === 0) return;
-    html += '<div class="pos-group-header">' + pos + '</div>';
-    shown.forEach(function(p) {
-      var dot = hasCardImage(p.name) ? '<span class="popt-dot">●</span>' : '';
-      var selClass = (document.getElementById('inpPlayerSelect').value === p.name) ? ' selected' : '';
-      html += '<div class="player-opt' + selClass + '" data-name="' + p.name + '" data-position="' + p.position + '" data-ovr="' + p.ovr + '" data-enhance="' + p.enhance + '" onclick="selectPlayerOption(this)">';
-      html += '<span>' + dot + p.name + '</span>';
-      html += '<span class="popt-ovr">OVR ' + p.ovr + '</span>';
-      html += '</div>';
-      totalShown++;
+    players.forEach(function(p) {
+      var opt = document.createElement('option');
+      opt.value = p.name;
+      var dot = hasCardImage(p.name) ? '● ' : '  ';
+      opt.textContent = dot + p.name + ' · OVR ' + p.ovr;
+      opt.dataset.position = p.position;
+      opt.dataset.ovr = p.ovr;
+      opt.dataset.enhance = p.enhance;
+      group.appendChild(opt);
     });
+    sel.appendChild(group);
   });
-  if (totalShown === 0) {
-    html = '<div class="player-list-empty">无匹配球员</div>';
-  }
-  list.innerHTML = html;
 }
 
-function filterPlayerList() {
-  var ft = document.getElementById('playerSearch').value;
-  populatePlayerList(ft);
-}
-
-function selectPlayerOption(el) {
-  var name = el.dataset.name;
-  document.getElementById('inpPlayerSelect').value = name;
+function onPlayerSelect() {
+  const sel = document.getElementById('inpPlayerSelect');
+  const name = sel.value;
+  if (!name) return; // "自定义" option
+  const opt = sel.selectedOptions[0];
   document.getElementById('inpName').value = name;
-  document.getElementById('inpPos').value = el.dataset.position;
-  document.getElementById('inpOvr').value = el.dataset.ovr;
-  document.getElementById('inpLevel').value = el.dataset.enhance;
-  setLevelGridActive(parseInt(el.dataset.enhance) || 1);
+  document.getElementById('inpPos').value = opt.dataset.position;
+  document.getElementById('inpOvr').value = opt.dataset.ovr;
+  document.getElementById('inpLevel').value = opt.dataset.enhance;
   document.getElementById('inpSeason').value = '25ucl';
-  var _selOvr = parseInt(el.dataset.ovr) || 122;
-  var _selLv = parseInt(el.dataset.enhance) || 1;
+  var _selOvr = parseInt(opt.dataset.ovr) || 122;
+  var _selLv = parseInt(opt.dataset.enhance) || 1;
   document.getElementById('inpMaterialOvr').value = _selOvr + data(_selLv).bonus;
-  // Update visual state
-  var prev = document.querySelector('.player-opt.selected');
-  if (prev) prev.classList.remove('selected');
-  el.classList.add('selected');
-  // Live preview: update background card
-  var shared = null;
-  if (allSharedPlayers) {
-    shared = allSharedPlayers.find(function(p) { return p.name === name; }) || null;
-  }
-  previewPlayerCard(name, '25ucl', el.dataset.position, _selOvr, _selLv, shared);
-}
-
-function setLevelGridActive(lv) {
-  var btns = document.querySelectorAll('#levelBtnGrid .lv-btn');
-  btns.forEach(function(b) {
-    b.classList.toggle('active', parseInt(b.dataset.lv) === lv);
-  });
+  // Don't auto-apply — user must click 应用设置
 }
 
 // ============================================================
@@ -2748,7 +2449,6 @@ let autoMode = false;
 let stopLevel = 13;
 let autoTimer = null;
 let autoCloseTimer = null;
-let _autoDotsTimer = null;
 let _pendingSuccess = false;
 let _pendingMode = 'fail';
 let _debugAllSuccess = false; // 测试完改回 false
@@ -2756,7 +2456,6 @@ let isEnhancing = false;
 let history = [];
 
 let materialCards = []; // {ovr: number}
-var _energyClearing = false;
 
 // ============================================================
 //  Material Card — 六边形卡槽
@@ -2770,8 +2469,6 @@ function stepMaterialOvr(delta) {
 }
 
 function addMaterial() {
-  // 能量条消退动画进行中，禁止添加
-  if (_energyClearing) return;
   // 能量条已满则不允许继续添加
   if (getTotalFill() >= 5) return;
   let idx = -1;
@@ -2785,24 +2482,14 @@ function addMaterial() {
   materialCards[idx] = { ovr: ovr };
   updateHexSlots();
   updateEnergyBar();
-  refreshRate();
-  refreshBPPreview();
+  refreshAll();
 }
 
 function clearMaterials() {
   materialCards = [];
   updateHexSlots();
   updateEnergyBar();
-  refreshRate();
-  refreshBPPreview();
-  // 锁住添加按钮，等消退动画走完再解锁
-  _energyClearing = true;
-  var addBtn = document.getElementById('btnAddMat');
-  if (addBtn) addBtn.disabled = true;
-  setTimeout(function() {
-    _energyClearing = false;
-    if (addBtn) { addBtn.disabled = false; refreshRate(); refreshBPPreview(); }
-  }, 400);
+  refreshAll();
 }
 
 function toggleHexCard(card) {
@@ -2814,8 +2501,8 @@ function toggleHexCard(card) {
   const label = card.querySelector('.hex-progress-pct');
   if (label) label.textContent = '0.00%';
   card.classList.add('active');
-  // 同步聚焦以保持用户手势上下文，触发系统键盘
-  if (input) { input.focus(); input.select(); }
+  // Auto-focus the input
+  setTimeout(() => { if (input) input.focus(); }, 50);
 }
 
 function closeHexCard(btn) {
@@ -2825,8 +2512,6 @@ function closeHexCard(btn) {
   card.classList.remove('active');
   updateHexSlots();
   updateEnergyBar();
-  refreshRate();
-  refreshBPPreview();
 }
 
 function commitHexOvr(card) {
@@ -2841,8 +2526,7 @@ function commitHexOvr(card) {
   materialCards[idx] = { ovr: Math.max(0, Math.min(999, val)) };
   updateHexSlots();
   updateEnergyBar();
-  refreshRate();
-  refreshBPPreview();
+  refreshAll();
 }
 
 function onHexOvrInput(input) {
@@ -2886,35 +2570,6 @@ function getMaterialBoost() {
   return Math.round(getTotalFill()) * 1;
 }
 
-// 强化结果出现后自动裁剪多余材料
-// 按OVR从小到大贪心选择，能拉满5格即停，优先保留便宜材料
-function trimMaterials() {
-  if (!materialCards || materialCards.length === 0) return;
-  // 收集当前所有材料
-  var mats = [];
-  for (var i = 0; i < 5; i++) { if (materialCards[i]) mats.push(materialCards[i].ovr); }
-  if (mats.length <= 1) return;
-  if (getTotalFill() < 5) return; // 没满格，不裁剪
-
-  // OVR从小到大排序（便宜的在前，优先保留）
-  mats.sort(function(a, b) { return a - b; });
-
-  // 贪心选择：从最便宜的开始加，直到拉满5格
-  var kept = [];
-  var keptRaw = 0;
-  for (var j = 0; j < mats.length; j++) {
-    if (Math.min(Math.round(keptRaw * 10) / 10, 5) >= 5) break;
-    kept.push(mats[j]);
-    keptRaw += calcFillRatio(mats[j]);
-  }
-
-  // 重建materialCards：保留的填入左侧槽位，右侧清空
-  materialCards = [];
-  for (var k = 0; k < kept.length; k++) {
-    materialCards[k] = { ovr: kept[k] };
-  }
-}
-
 function updateHexSlots() {
   let count = 0;
   for (let i = 0; i < 5; i++) {
@@ -2932,12 +2587,8 @@ function updateHexSlots() {
     }
   }
 
-  // 六边形引导提示：所有槽位空时显示
-  var hint = document.getElementById('hexHint');
-  if (hint) { if (count === 0) hint.classList.remove('hidden'); else hint.classList.add('hidden'); }
-
   var fillFull = getTotalFill() >= 5;
-  document.getElementById('materialCount').textContent = fillFull ? '已满' : '已填 ' + count + '/5';
+  document.getElementById('materialCount').textContent = fillFull ? '已满' : `已填 ${count}/5`;
   const boost = getMaterialBoost();
   var boostEl = document.getElementById('materialBoost');
   animateNumber(boostEl, boost, 250, function(v) { return '+' + Math.round(v) + '%'; });
@@ -2963,10 +2614,7 @@ function clickSlot(n) {
   // Energy bar is display-only — no action on click
 }
 
-var _energyAnimSeq = 0; // 动画序列号，防止快速操作时新旧定时器竞态
-
 function updateEnergyBar() {
-  var seq = ++_energyAnimSeq; // 新序列号，旧定时器检查不匹配则跳过
   const totalFill = getTotalFill();
   const fullSlots = Math.floor(totalFill);
   const partialFill = totalFill - fullSlots;
@@ -2992,21 +2640,13 @@ function updateEnergyBar() {
       if (!fill) {
         fill = document.createElement('div');
         fill.className = 'fill';
-        fill.style.transform = 'scaleX(0)';
+        fill.style.width = '0%';
         slot.appendChild(fill);
       }
-      fill.style.transition = 'transform 0.06s linear';
-      var curScaleX = 0;
-      var curTransform = fill.style.transform;
-      if (curTransform) {
-        var m = curTransform.match(/scaleX\(([\d.]+)\)/);
-        if (m) curScaleX = parseFloat(m[1]);
-      }
-      var isShrinking = curScaleX * 100 > targetWidth;
-      var delay = isShrinking ? (4 - i) * 50 : i * 50;
+      fill.style.transition = '';
+      const delay = i * 100;
       setTimeout(function() {
-        if (_energyAnimSeq !== seq) return;
-        fill.style.transform = 'scaleX(' + (targetWidth / 100) + ')';
+        fill.style.width = targetWidth + '%';
       }, delay);
     } else {
       slot.classList.remove('filled');
@@ -3022,24 +2662,19 @@ function updateEnergyBar() {
       if (!bfill) return;
       if (bfill.querySelector('.fill-green')) return; // 有绿色的由绿色分支处理
       if (slotTargets[idx] > 0) return; // 仍满格不处理
-      var bdelay = (4 - idx) * 50;
+      var bdelay = (4 - idx) * 100;
       setTimeout(function() {
-        if (_energyAnimSeq !== seq) return;
-        bfill.style.transition = 'transform 0.06s linear';
-        bfill.style.transform = 'scaleX(0)';
-        setTimeout(function() {
-          if (_energyAnimSeq !== seq) return;
-          if (bfill.parentNode) bfill.remove();
-        }, 60);
+        bfill.style.transition = 'width 0.1s linear';
+        bfill.style.width = '0%';
+        setTimeout(function() { if (bfill.parentNode) bfill.remove(); }, 100);
       }, bdelay);
     })(bi);
   }
 
   // 5格全满：等蓝条都走完后，每个格子内部绿色从右向左覆盖（第5格→第1格）
   if (fullSlots >= 5) {
-    var lastBlueDelay = 4 * 50 + 60; // 等蓝条全部走完
+    var lastBlueDelay = 4 * 100 + 350; // 等第5格蓝条走完
     setTimeout(function() {
-      if (_energyAnimSeq !== seq) return;
       for (var j = 4; j >= 0; j--) {
         (function(idx) {
           var slot = document.querySelector('.energy-slot[data-slot="' + (idx + 1) + '"]');
@@ -3052,21 +2687,15 @@ function updateEnergyBar() {
             fg.className = 'fill-green';
             fill.appendChild(fg);
           }
-          var greenDelay = (4 - idx) * 50; // 5格总时长
+          var greenDelay = (4 - idx) * 50; // 5格总时长~0.26秒
           setTimeout(function() {
-            if (_energyAnimSeq !== seq) return;
-            fg.style.transform = 'scaleX(1)';
+            fg.style.width = '100%';
           }, greenDelay);
         })(j);
       }
     }, lastBlueDelay);
   } else {
-    // 不满5格：分三类处理——满格瞬间去绿、空格R→L消退、部分填充等空格清完再动
-    // 先统计右侧连续空格数，用于计算部分填充的等待延迟
-    var emptyCount = 0;
-    for (var e = 4; e >= 0; e--) {
-      if (slotTargets[e] <= 0) emptyCount++; else break;
-    }
+    // 不满5格：左边仍满格一瞬间全部变蓝，右边被清空格绿色从右向左动画消退
     for (var k = 1; k <= 5; k++) {
       var slot = document.querySelector('.energy-slot[data-slot="' + k + '"]');
       if (!slot) continue;
@@ -3075,36 +2704,22 @@ function updateEnergyBar() {
       var fg = fill.querySelector('.fill-green');
       if (!fg) continue;
       if (slotTargets[k - 1] >= 100) {
-        // 仍满格：绿色同步瞬间移除
+        // 仍满格：绿色同步瞬间移除，一秒内全部变蓝底
         fg.remove();
-      } else if (slotTargets[k - 1] > 0) {
-        // 部分填充：等右侧空格消退完再移除绿色、恢复蓝色底
-        var partialDelay = emptyCount * 50;
-        (function(fillEl, targetW) {
-          setTimeout(function() {
-            if (_energyAnimSeq !== seq) return;
-            var fgEl = fillEl.querySelector('.fill-green');
-            if (fgEl) fgEl.remove();
-            fillEl.style.transform = 'scaleX(' + (targetW / 100) + ')';
-            fillEl.style.backgroundColor = '#0b91f6';
-            fillEl.style.backgroundImage = 'repeating-linear-gradient(-45deg, transparent, transparent 2px, #097dd4 2px, #097dd4 5px)';
-          }, partialDelay);
-        })(fill, slotTargets[k - 1]);
       } else {
-        // 被清空格：蓝底透明化+绿色动画消退，全部跟随R→L级联
-        var greenDelay = (5 - k) * 50;
+        // 被清空格：蓝底透明化+绿色动画消退，全部跟随R→L级联（0.5s总时长）
+        var greenDelay = (5 - k) * 100;
         setTimeout(function(fillEl, fgEl) {
-          if (_energyAnimSeq !== seq) return;
           fillEl.style.backgroundColor = 'transparent';
           fillEl.style.backgroundImage = 'none';
-          fgEl.style.transformOrigin = 'left';
-          fgEl.style.transition = 'transform 0.06s linear';
-          fgEl.style.transform = 'scaleX(0)';
+          fgEl.style.left = '0';
+          fgEl.style.right = 'auto';
+          fgEl.style.transition = 'width 0.1s linear';
+          fgEl.style.width = '0%';
           setTimeout(function() {
-            if (_energyAnimSeq !== seq) return;
             if (fgEl.parentNode) fgEl.remove();
             if (fillEl.parentNode) fillEl.remove();
-          }, 60);
+          }, 100);
         }, greenDelay, fill, fg);
       }
     }
@@ -3128,136 +2743,207 @@ function canEnhance() { return currentLevel < 13; }
 // ============================================================
 //  UI Update
 // ============================================================
-//  (已拆分为5个局部函数: refreshPlayerCard/refreshRate/refreshStats/refreshBPPreview/refreshEnergyGate)
-// ============================================================
+function refreshAll() {
+  const d = data(currentLevel);
+  const ovr = curOvr();
+  const nextLv = currentLevel + 1;
+  const canUp = canEnhance();
+  const nextD = canUp ? data(nextLv) : null;
 
-function refreshPlayerCard() {
-  var ovr = curOvr();
+  // Player card
   document.getElementById('playerOvr').textContent = ovr;
-  var enhanceIcon = document.getElementById('infoEnhanceIcon');
-  enhanceIcon.src = 'images/enhance/' + currentLevel + '.png';
+  const enhanceIcon = document.getElementById('infoEnhanceIcon');
+  enhanceIcon.src = `images/enhance/${currentLevel}.png`;
   enhanceIcon.alt = '+' + currentLevel;
   document.getElementById('playerName').textContent = playerName;
   document.getElementById('playerMeta').textContent = playerPos;
-  var seasonIcon = document.getElementById('infoSeasonIcon');
-  if (playerSeason === '25ucl') { seasonIcon.src = 'images/赛季图标/25ucl_badge.png'; seasonIcon.style.display = ''; }
-  else { seasonIcon.style.display = 'none'; }
-  var avatar = document.getElementById('playerAvatar');
+
+  // Season icon
+  const seasonIcon = document.getElementById('infoSeasonIcon');
+  if (playerSeason === '25ucl') {
+    seasonIcon.src = 'images/赛季图标/25ucl_badge.png';
+    seasonIcon.style.display = '';
+  } else {
+    seasonIcon.style.display = 'none';
+  }
+
+  // Avatar — IndexedDB first, then legacy fallbacks, then card manifest
+  const avatar = document.getElementById('playerAvatar');
   avatar.classList.remove('elite','legend','ultimate','has-img');
-  var imgUrl = null;
+  let imgUrl = null;
+  // 1. Check shared IndexedDB card (per-level dataUrl, local browser only)
   if (sharedPlayerCards && sharedPlayerCards.levels) {
     var sharedLv = sharedPlayerCards.levels.find(function(l) { return l.lv === currentLevel; });
     if (sharedLv && sharedLv.dataUrl) imgUrl = sharedLv.dataUrl;
   }
+  // 2. Card manifest — search all seasons for WebP card images
   if (!imgUrl && window.__cardManifest && window.__cardManifest.seasons) {
     var seasons = window.__cardManifest.seasons;
     for (var sk in seasons) {
       var manEntry = seasons[sk].players && seasons[sk].players[playerName];
-      if (manEntry && manEntry.source && manEntry.levels.indexOf(currentLevel) !== -1) { imgUrl = manEntry.source.replace('{level}', String(currentLevel)); break; }
-    }
-  }
-  if (imgUrl) {
-    avatar.textContent = '';
-    avatar.innerHTML = '<img src="' + imgUrl + '" alt="' + playerName + '" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="var av=document.getElementById(\'playerAvatar\');av.innerHTML=\'\';av.textContent=\'⚽\';">';
-    avatar.classList.add('has-img');
-  } else { avatar.innerHTML = ''; avatar.textContent = '⚽'; }
-  if (currentLevel >= 12) avatar.classList.add('ultimate');
-  else if (currentLevel >= 8) avatar.classList.add('legend');
-  else if (currentLevel >= 5) avatar.classList.add('elite');
-  document.getElementById('infoTraitCount').textContent = currentLevel >= 12 ? 2 : 1;
-  var skillMoves = PLAYER_SKILL[playerName] || 3;
-  document.getElementById('infoSkillStars').textContent = '★'.repeat(skillMoves) + '☆'.repeat(5 - skillMoves);
-  var protectWrap = document.getElementById('protectSliderWrap');
-  if (protectWrap) {
-    if (currentLevel < 8) { protectWrap.classList.add('disabled'); updateProtectUI(0); }
-    else { protectWrap.classList.remove('disabled'); }
-  }
-  // 预加载相邻强化等级图标 + 下一等级球员卡图
-  var nextLv = currentLevel + 1;
-  if (nextLv <= 13) {
-    var preImg = new Image();
-    preImg.src = 'images/enhance/' + nextLv + '.png';
-  }
-  if (nextLv <= 13 && window.__cardManifest && window.__cardManifest.seasons) {
-    var seasons = window.__cardManifest.seasons;
-    for (var sk in seasons) {
-      var manEntry = seasons[sk].players && seasons[sk].players[playerName];
-      if (manEntry && manEntry.source && manEntry.levels.indexOf(nextLv) !== -1) {
-        var preCard = new Image();
-        preCard.src = manEntry.source.replace('{level}', String(nextLv));
+      if (manEntry && manEntry.source && manEntry.levels.indexOf(currentLevel) !== -1) {
+        imgUrl = manEntry.source.replace('{level}', String(currentLevel));
         break;
       }
     }
   }
-}
+  if (imgUrl) {
+    avatar.textContent = '';
+    avatar.innerHTML = `<img src="${imgUrl}" alt="${playerName}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="var av=document.getElementById('playerAvatar');av.innerHTML='';av.textContent='⚽';">`;
+    avatar.classList.add('has-img');
+  } else {
+    avatar.innerHTML = '';
+    avatar.textContent = '⚽';
+  }
+if (currentLevel >= 12) avatar.classList.add('ultimate');
+  else if (currentLevel >= 8) avatar.classList.add('legend');
+  else if (currentLevel >= 5) avatar.classList.add('elite');
 
-function refreshRate() {
-  var canUp = canEnhance();
-  var hasMaterials = materialCards.some(function(m) { return !!m; });
+  // Trait slots count
+  const traitCount = currentLevel >= 12 ? 2 : 1;
+  document.getElementById('infoTraitCount').textContent = traitCount;
+
+  // Skill moves stars
+  const skillMoves = PLAYER_SKILL[playerName] || 3;
+  const starsStr = '★'.repeat(skillMoves) + '☆'.repeat(5 - skillMoves);
+  document.getElementById('infoSkillStars').textContent = starsStr;
+
+  // Progress bar
+  renderProgress();
+
+  // Rate info
   if (!canUp) {
     document.getElementById('rateInfo').innerHTML = '<strong style="color:#f0b90b;">已满级 MAX +13</strong>';
     document.getElementById('btnEnhance').disabled = true;
     document.getElementById('btnEnhance').textContent = '已满级';
-    document.getElementById('btnAuto').disabled = true;
   } else {
-    var nextD = data(currentLevel + 1);
-    var r = (getFinalRate(nextD.rate) * 100).toFixed(0) + '%';
-    var boost = getMaterialBoost();
-    var boostStr = boost > 0 ? ' <span style="color:#2979ff;font-size:11px;">(含材料+' + boost + '%)</span>' : '';
-    document.getElementById('rateInfo').innerHTML = '+' + currentLevel + ' → +' + (currentLevel + 1) + ' 成功率 <strong>' + r + '</strong>' + boostStr;
+    const effectiveRate = getFinalRate(nextD.rate);
+    const r = (effectiveRate * 100);
+    const rStr = r >= 1 ? r.toFixed(0) + '%' : r.toFixed(1) + '%';
+    const boost = getMaterialBoost();
+    const boostStr = boost > 0 ? ` <span style="color:#2979ff;font-size:11px;">(含材料+${boost}%)</span>` : '';
+    document.getElementById('rateInfo').innerHTML = `+${currentLevel} → +${nextLv} 成功率 <strong>${rStr}</strong>${boostStr}`;
+    var hasMaterials = materialCards.some(function(m) { return !!m; });
     document.getElementById('btnEnhance').disabled = !hasMaterials;
     document.getElementById('btnEnhance').textContent = hasMaterials ? '强 化' : '需添加材料';
-    document.getElementById('btnAuto').disabled = !hasMaterials;
   }
-}
 
-function refreshStats() {
-  var sA = document.getElementById('sAttempts'), sS = document.getElementById('sSuccess');
-  var sF = document.getElementById('sFail'), sB = document.getElementById('sBPCost');
-  var slD = document.getElementById('stopLevelDisplay');
-  if (sA) animateNumber(sA, totalAttempts, 350);
-  if (sS) animateNumber(sS, totalSuccess, 350);
-  if (sF) animateNumber(sF, totalAttempts - totalSuccess, 350);
-  if (sB) { var raw = formatCurrency(totalBPCost); var m = raw.match(/^([\d.]+)(.*)$/); if (m) { var oldBpHtml = sB.innerHTML; sB.innerHTML = '<span style="color:#fff;">' + m[1] + '</span>' + m[2]; if (oldBpHtml !== sB.innerHTML && totalAttempts > 0) { sB.style.animation = 'none'; sB.offsetHeight; sB.style.animation = 'numPop 0.3s ease'; sB.addEventListener('animationend', function h() { sB.style.animation = ''; sB.removeEventListener('animationend', h); }); } } else sB.textContent = raw; }
-  if (slD) slD.textContent = '+' + (stopLevel > 13 ? 13 : stopLevel);
-}
+  // Info chips
+  // Info chips removed — elements no longer in DOM
 
-function refreshBPPreview() {
-  var bpP = document.getElementById('bpPreview'), bpH = document.getElementById('bpHint');
-  if (!bpP || !bpH) return;
-  var hm = materialCards.some(function(m) { return !!m; }), ec = 0, hints = [], sp = false;
-  var pmt = 0, maf = !hm;
-  if (hm) {
-    maf = true;
-    var pp = getSavedMatPrices();
-    materialCards.forEach(function(m) { if (!m) return; var mt = pp.find(function(p) { return p.ovr === m.ovr; }); if (mt) pmt += mt.price; else maf = false; });
-    if (!maf) hints.push('材料价格未设置');
+  // Protection slider: only available at +8 and above
+  const protectWrap = document.getElementById('protectSliderWrap');
+  if (protectWrap) {
+    if (currentLevel < 8) {
+      protectWrap.classList.add('disabled');
+      updateProtectUI(0);
+    } else {
+      protectWrap.classList.remove('disabled');
+    }
   }
-  if (currentLevel >= 8 && protectCount > 0) {
-    var lvV = localStorage.getItem('fc-lv-value-' + currentLevel);
-    if (lvV !== null && parseFloat(lvV) > 0) { ec += parseFloat(lvV) * 0.4 * (protectCount / 100); sp = true; }
-    else hints.push('主卡价格未设置');
-  }
-  if (maf) { ec += pmt; if (hm) sp = true; }
-  bpP.textContent = sp ? '本次预计 ' + formatCurrency(ec) : '';
-  bpH.innerHTML = hints.join('<br>');
-}
 
-function refreshEnergyGate() {
+  // Stats (with safety null checks)
+  const sAttempts = document.getElementById('sAttempts');
+  const sSuccess = document.getElementById('sSuccess');
+  const sFail = document.getElementById('sFail');
+  const sBPCost = document.getElementById('sBPCost');
+  const stopLevelDisplay = document.getElementById('stopLevelDisplay');
+  if (sAttempts) animateNumber(sAttempts, totalAttempts, 350);
+  if (sSuccess) animateNumber(sSuccess, totalSuccess, 350);
+  if (sFail) {
+    var failCount = totalAttempts - totalSuccess;
+    animateNumber(sFail, failCount, 350);
+  }
+  if (sBPCost) {
+    var raw = formatCurrency(totalBPCost);
+    var m = raw.match(/^([\d.]+)(.*)$/);
+    if (m) {
+      sBPCost.innerHTML = '<span style="color:#fff;">' + m[1] + '</span>' + m[2];
+    } else {
+      sBPCost.textContent = raw;
+    }
+  }
+  if (stopLevelDisplay) stopLevelDisplay.textContent = '+' + ((stopLevel > 13) ? 13 : stopLevel);
+
+  // BP预览 + 提示
+  var bpPreview = document.getElementById('bpPreview');
+  var bpHint = document.getElementById('bpHint');
+  if (bpPreview && bpHint) {
+    var hasMat = materialCards.some(function(m) { return !!m; });
+    var estimatedCost = 0;
+    var hints = [];
+    var showPreview = false;
+
+    // 材料部分
+    var previewMatTotal = 0;
+    var matAllFound = !hasMat;
+    if (hasMat) {
+      matAllFound = true;
+      var previewPrices = getSavedMatPrices();
+      materialCards.forEach(function(m) {
+        if (!m) return;
+        var match = previewPrices.find(function(p) { return p.ovr === m.ovr; });
+        if (match) {
+          previewMatTotal += match.price;
+        } else {
+          matAllFound = false;
+        }
+      });
+      if (!matAllFound) {
+        hints.push('材料价格未设置');
+      }
+    }
+
+    // BP保护部分（≥+8且滑块>0时，没材料也能单独显示）
+    if (currentLevel >= 8 && protectCount > 0) {
+      var lvVal = localStorage.getItem('fc-lv-value-' + currentLevel);
+      if (lvVal !== null && parseFloat(lvVal) > 0) {
+        estimatedCost += parseFloat(lvVal) * 0.4 * (protectCount / 100);
+        showPreview = true;
+      } else {
+        hints.push('主卡价格未设置');
+      }
+    }
+
+    // 加上材料价格
+    if (matAllFound) {
+      estimatedCost += previewMatTotal;
+      if (hasMat) showPreview = true;
+    }
+
+    bpPreview.textContent = showPreview ? '本次预计 ' + formatCurrency(estimatedCost) : '';
+    bpHint.innerHTML = hints.join('<br>');
+    bpHint.style.display = hints.length > 0 ? 'block' : 'none';
+  }
+
+  // 强化后OVR变化，能量条重新计算 + 溢出裁剪
   updateEnergyBar();
+  var rawFill = 0;
+  materialCards.forEach(function(m) { rawFill += calcFillRatio(m.ovr); });
+  while (rawFill > 5) {
+    var cut = false;
+    for (var ri = 4; ri >= 0; ri--) {
+      if (materialCards[ri]) {
+        rawFill -= calcFillRatio(materialCards[ri].ovr);
+        delete materialCards[ri]; cut = true; break;
+      }
+    }
+    if (!cut) break;
+  }
+  // 更新添加按钮状态：能量条满了禁止继续添加
   var addBtn = document.getElementById('btnAddMat');
-  if (addBtn) { var full = getTotalFill() >= 5; addBtn.disabled = full; addBtn.style.opacity = full ? '0.4' : ''; }
-}
+  if (addBtn) {
+    var full = getTotalFill() >= 5;
+    addBtn.disabled = full;
+    addBtn.style.opacity = full ? '0.4' : '';
+  }
 
-function refreshAll() {
-  refreshPlayerCard();
-  renderProgress();
-  refreshRate();
-  refreshStats();
-  refreshBPPreview();
-  updateHexSlots();
-  refreshEnergyGate();
-  if (!canEnhance() && autoMode) stopAuto();
+  // Button state
+  if (!canUp) {
+    document.getElementById('btnEnhance').disabled = true;
+    if (autoMode) stopAuto();
+  }
+
   renderHistory();
 }
 
@@ -3303,105 +2989,75 @@ function renderProgress() {
   pips.innerHTML = pipsHtml;
 }
 
-var _historyFilter = 'all';
-function setHistoryFilter(filter, btn) {
-  _historyFilter = filter;
-  var btns = document.querySelectorAll('#historyFilter .hist-fbtn');
-  btns.forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  renderHistory();
-}
 function renderHistory() {
   const list = document.getElementById('historyList');
   if (!list) return;
-  var filtered = history;
-  if (_historyFilter === 'success') filtered = history.filter(function(h) { return h.result === 'success'; });
-  else if (_historyFilter === 'fail') filtered = history.filter(function(h) { return h.result !== 'success'; });
-  if (filtered.length === 0) {
-    var emptyText = _historyFilter === 'success' ? '暂无成功记录' : (_historyFilter === 'fail' ? '暂无失败记录' : '等待首次强化...');
-    list.innerHTML = '<li class="hist-empty">' + emptyText + '</li>';
+  if (history.length === 0) {
+    list.innerHTML = '<li class="hist-empty">等待首次强化...</li>';
     return;
   }
-  list.innerHTML = filtered.map(function(h) {
-    var tagCls, tagText;
+  list.innerHTML = history.map(h => {
+    let tagCls, tagText;
     if (h.result === 'success') { tagCls = 'win'; tagText = '成功'; }
     else { tagCls = 'lose'; tagText = '失败'; }
     var bpCls = h.bpCost > 0 ? 'hist-bp' : 'hist-bp zero';
-    return '<li class="history-item">' +
-      '<span class="hist-num">#' + h.num + '</span>' +
-      '<span class="hist-tag ' + tagCls + '">' + tagText + '</span>' +
-      '<span class="hist-detail">' + h.desc + '</span>' +
-      '<span class="' + bpCls + '">' + formatCurrency(h.bpCost) + '</span>' +
-    '</li>';
+    return `<li class="history-item">
+      <span class="hist-num">#${h.num}</span>
+      <span class="hist-tag ${tagCls}">${tagText}</span>
+      <span class="hist-detail">${h.desc}</span>
+      <span class="${bpCls}">${formatCurrency(h.bpCost)}</span>
+    </li>`;
   }).join('');
 }
 
 // ============================================================
 //  Actions
 // ============================================================
-var _protectRefreshRAF = 0;
 function updateProtectUI(val) {
   val = Math.max(0, Math.min(100, Math.round(val)));
   protectCount = val;
-  var fill = document.getElementById('protectFill');
-  var handle = document.getElementById('protectHandle');
-  var pctEl = document.getElementById('protectPctNum');
-  var hasTrans = !fill.classList.contains('no-trans');
-  if (!hasTrans) {
-    fill.style.width = val + '%';
-    handle.style.left = val + '%';
-  } else {
-    fill.style.width = val + '%';
-    handle.style.left = val + '%';
-  }
-  // 直接设值，不用 animateNumber — 拖动时 rAF 启动/取消开销导致掉帧
-  pctEl.textContent = val;
-  pctEl.setAttribute('data-num', val);
+  document.getElementById('protectFill').style.width = val + '%';
+  document.getElementById('protectHandle').style.left = val + '%';
+  animateNumber(document.getElementById('protectPctNum'), val, 200);
   var arrL = document.getElementById('protectArrL');
   var arrR = document.getElementById('protectArrR');
   if (val === 0) {
-    arrL.style.color = '#666'; arrL.style.cursor = 'default';
-    arrR.style.color = '#ccc'; arrR.style.cursor = 'pointer';
+    arrL.style.color = '#666';
+    arrL.style.cursor = 'default';
+    arrR.style.color = '#ccc';
+    arrR.style.cursor = 'pointer';
   } else if (val === 100) {
-    arrL.style.color = '#ccc'; arrL.style.cursor = 'pointer';
-    arrR.style.color = '#666'; arrR.style.cursor = 'default';
+    arrL.style.color = '#ccc';
+    arrL.style.cursor = 'pointer';
+    arrR.style.color = '#666';
+    arrR.style.cursor = 'default';
   } else {
-    arrL.style.color = '#ccc'; arrL.style.cursor = 'pointer';
-    arrR.style.color = '#ccc'; arrR.style.cursor = 'pointer';
+    arrL.style.color = '#ccc';
+    arrL.style.cursor = 'pointer';
+    arrR.style.color = '#ccc';
+    arrR.style.cursor = 'pointer';
   }
-  // 拖动期间用 rAF 节流昂贵计算，避免每帧都刷新
-  if (protectDragging) {
-    if (_protectRefreshRAF) cancelAnimationFrame(_protectRefreshRAF);
-    _protectRefreshRAF = requestAnimationFrame(function() {
-      refreshAdvancedBP();
-      updateProtectBPPreview();
-    });
-  } else {
-    refreshAdvancedBP();
-    updateProtectBPPreview();
-  }
-}
-
-function updateProtectBPPreview() {
+  refreshAdvancedBP();
+  // 拖动滑块时实时刷新BP预览（没材料也能显示保护BP）
   var bpPreview2 = document.getElementById('bpPreview');
-  if (!bpPreview2) return;
-  var hasMat2 = materialCards.some(function(m) { return !!m; });
-  var est2 = 0;
-  var show2 = false;
+  if (bpPreview2) {
+    var hasMat2 = materialCards.some(function(m) { return !!m; });
+    var est2 = 0;
+    var show2 = false;
 
-  // BP保护部分
-  if (currentLevel >= 8 && protectCount > 0) {
-    var lvVal2 = localStorage.getItem('fc-lv-value-' + currentLevel);
-    if (lvVal2 !== null && parseFloat(lvVal2) > 0) {
-      est2 = parseFloat(lvVal2) * 0.4 * (protectCount / 100);
-      show2 = true;
+    // BP保护部分
+    if (currentLevel >= 8 && protectCount > 0) {
+      var lvVal2 = localStorage.getItem('fc-lv-value-' + currentLevel);
+      if (lvVal2 !== null && parseFloat(lvVal2) > 0) {
+        est2 = parseFloat(lvVal2) * 0.4 * (protectCount / 100);
+        show2 = true;
+      }
     }
-  }
 
-  // 材料部分
-  if (hasMat2) {
-    var matTotal2 = 0, matOk2 = true;
-    var sp2 = getSavedMatPrices();
+    // 材料部分
+    if (hasMat2) {
+      var matTotal2 = 0, matOk2 = true;
+      var sp2 = getSavedMatPrices();
       materialCards.forEach(function(m) {
         if (!m) return;
         var mm = sp2.find(function(p) { return p.ovr === m.ovr; });
@@ -3413,7 +3069,8 @@ function updateProtectBPPreview() {
       }
     }
 
-  bpPreview2.textContent = show2 ? '本次预计 ' + formatCurrency(est2) : '';
+    bpPreview2.textContent = show2 ? '本次预计 ' + formatCurrency(est2) : '';
+  }
 }
 
 function setProtectAnimated(on) {
@@ -3430,25 +3087,6 @@ function setProtectAnimated(on) {
 
 var protectDragging = false;
 
-function snapProtect(pct) {
-  var snaps = [0, 25, 50, 75, 100];
-  for (var i = 0; i < snaps.length; i++) {
-    if (Math.abs(pct - snaps[i]) <= 3) return snaps[i];
-  }
-  return Math.round(pct);
-}
-
-function protectTrackClick(e) {
-  var wrap = document.getElementById('protectSliderWrap');
-  if (wrap.classList.contains('disabled')) return;
-  var rect = document.getElementById('protectTrack').getBoundingClientRect();
-  var pct = ((e.pageX - rect.left) / rect.width) * 100;
-  pct = snapProtect(pct);
-  setProtectAnimated(true);
-  updateProtectUI(pct);
-  refreshBPPreview();
-}
-
 function protectDragStart(e) {
   var wrap = document.getElementById('protectSliderWrap');
   if (wrap.classList.contains('disabled')) return;
@@ -3463,7 +3101,7 @@ document.getElementById('protectArrL').onclick = function() {
   if (wrap.classList.contains('disabled')) return;
   if (protectCount <= 0) return;
   setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount - 1));
+  updateProtectUI(protectCount - 1);
   requestAnimationFrame(function() { setProtectAnimated(false); });
 };
 document.getElementById('protectArrR').onclick = function() {
@@ -3471,7 +3109,7 @@ document.getElementById('protectArrR').onclick = function() {
   if (wrap.classList.contains('disabled')) return;
   if (protectCount >= 100) return;
   setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount + 1));
+  updateProtectUI(protectCount + 1);
   requestAnimationFrame(function() { setProtectAnimated(false); });
 };
 
@@ -3479,9 +3117,7 @@ window.addEventListener('mouseup', function() {
   if (!protectDragging) return;
   protectDragging = false;
   document.body.classList.remove('no-select');
-  setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount));
-  refreshBPPreview();
+  refreshAll();
 });
 window.addEventListener('mousemove', function(e) {
   if (!protectDragging) return;
@@ -3492,9 +3128,7 @@ window.addEventListener('touchend', function() {
   if (!protectDragging) return;
   protectDragging = false;
   document.body.classList.remove('no-select');
-  setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount));
-  refreshBPPreview();
+  refreshAll();
 });
 window.addEventListener('touchmove', function(e) {
   if (!protectDragging) return;
@@ -3509,33 +3143,18 @@ function toggleAuto() {
 
 function startAuto() {
   if (!canEnhance()) return;
-  var hasMat = materialCards.some(function(m) { return !!m; });
-  if (!hasMat) return;
   autoMode = true;
-  var btn = document.getElementById('btnAuto');
+  const btn = document.getElementById('btnAuto');
   btn.textContent = '停止';
   btn.classList.add('active');
-  // Start dot animation
-  var dotPhase = 0;
-  if (_autoDotsTimer) clearInterval(_autoDotsTimer);
-  _autoDotsTimer = setInterval(function() {
-    dotPhase = (dotPhase + 1) % 4;
-    var dots = '';
-    for (var i = 0; i < dotPhase; i++) dots += '.';
-    if (autoMode && btn.textContent.indexOf('停止') === 0) {
-      btn.textContent = '停止' + dots;
-    }
-  }, 300);
   doAutoStep();
 }
 
 function stopAuto() {
   autoMode = false;
-  isEnhancing = false;
-  var btn = document.getElementById('btnAuto');
+  const btn = document.getElementById('btnAuto');
   btn.textContent = '自动';
   btn.classList.remove('active');
-  if (_autoDotsTimer) { clearInterval(_autoDotsTimer); _autoDotsTimer = null; }
   if (autoTimer) clearTimeout(autoTimer);
   if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
 }
@@ -3633,7 +3252,6 @@ function executeEnhance() {
     currentLevel = nextLv;
     totalSuccess++;
     const newOvr = curOvr();
-    trimMaterials();
 
     addHistory('success', '+' + (nextLv - 1) + ' → +' + nextLv + '  |  OVR ' + oldOvr + ' → ' + newOvr + '  |  第' + totalAttempts + '次成功', singleBPCost);
     refreshAll();
@@ -3658,7 +3276,6 @@ function executeEnhance() {
       const dropOvr = baseOvr + data(dropTo).bonus;
       addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  降至 +' + dropTo + '  (OVR ' + dropOvr + ')', singleBPCost);
       currentLevel = dropTo;
-      trimMaterials();
     } else {
       addHistory('fail', '+' + oldLevel + ' → +' + nextLv + ' 失败  |  强化等级保护生效，保持 +' + oldLevel, singleBPCost);
       dropTo = oldLevel;
@@ -3693,7 +3310,6 @@ function getCardImgUrl() {
 
 function showBurstOverlay(mode) {
   // mode: 'fail' | 'gold' | 'rainbow'
-  _skipBurstGuard = false;
   document.querySelector('.settings-trigger').style.display = 'none';
   // Clear any stale timers from previous runs
   if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
@@ -3888,11 +3504,7 @@ function finishBurstOverlay() {
   }
 }
 
-var _skipBurstGuard = false;
-
 function skipBurst() {
-  if (_skipBurstGuard) return;
-  _skipBurstGuard = true;
   if (burstTimer) { clearTimeout(burstTimer); burstTimer = null; }
   if (burstShakeTimeout) { clearTimeout(burstShakeTimeout); burstShakeTimeout = null; }
   if (burstShakeTimer) { clearInterval(burstShakeTimer); burstShakeTimer = null; }
@@ -4192,41 +3804,8 @@ function resetEnhanceBtn() {
   btn.classList.remove('charging');
 }
 
-// ============================================================
-//  Swipe gesture detection
-// ============================================================
-function addSwipeToClose(el, onSwipeDown, onSwipeLeft, onSwipeRight) {
-  var startX = 0, startY = 0, tracking = false;
-  el.addEventListener('touchstart', function(e) {
-    if (e.target.closest && (e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea'))) return;
-    if (e.touches.length === 1) {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      tracking = true;
-    }
-  }, {passive: true});
-  el.addEventListener('touchend', function(e) {
-    if (!tracking) return;
-    tracking = false;
-    var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : startX) - startX;
-    var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : startY) - startY;
-    if (Math.abs(dy) > Math.abs(dx) && dy > 60 && onSwipeDown) onSwipeDown();
-    if (Math.abs(dx) > Math.abs(dy) && dx < -60 && onSwipeLeft) onSwipeLeft();
-    if (Math.abs(dx) > Math.abs(dy) && dx > 60 && onSwipeRight) onSwipeRight();
-  });
-}
-
-// Attach swipe-down to close modals (only on modal backgrounds, not the panels)
-(function() {
-  var settingsOverlay = document.getElementById('settingsOverlay');
-  if (settingsOverlay) {
-    addSwipeToClose(settingsOverlay, function() { closeSettingsDirect(); });
-  }
-  var resultOverlay = document.getElementById('resultOverlay');
-  if (resultOverlay) {
-    addSwipeToClose(resultOverlay, function() { closeResult(true); }, function() { closeResult(true); }, function() { closeResult(true); });
-  }
-})();
+function closeModal() { closeResult(true); }
+function showModal() {}
 
 // ============================================================
 //  Rate help tooltip
@@ -4358,83 +3937,18 @@ function spawnParticles(type) {
 
 // Sync the player select dropdown with current player
 function syncPlayerSelect() {
-  var hidden = document.getElementById('inpPlayerSelect');
-  var match = PLAYER_DB.find(function(p) { return p.name === playerName; });
+  const sel = document.getElementById('inpPlayerSelect');
+  const match = PLAYER_DB.find(p => p.name === playerName);
   if (match) {
-    hidden.value = match.name;
+    sel.value = match.name;
   } else {
-    hidden.value = '';
-  }
-  // Update visual list if visible
-  if (document.getElementById('settingsOverlay').classList.contains('show')) {
-    populatePlayerList();
+    sel.value = '';
   }
 }
 
-var _settingsSnapshot = null;
-function previewPlayerCard(name, season, pos, ovr, lv, sharedCards) {
-  playerName = name;
-  playerSeason = season;
-  playerPos = pos;
-  baseOvr = Math.max(40, Math.min(150, ovr));
-  currentLevel = Math.max(1, Math.min(13, lv));
-  sharedPlayerCards = sharedCards || null;
-  refreshPlayerCard();
-  renderProgress();
-  refreshRate();
-  refreshBPPreview();
-  // Update material OVR input
-  document.getElementById('inpMaterialOvr').value = curOvr();
-}
 function openSettings() {
   document.getElementById('inpMaterialOvr').value = curOvr();
-  // Save snapshot for cancel-restore
-  _settingsSnapshot = {
-    name: playerName, season: playerSeason, pos: playerPos,
-    ovr: baseOvr, lv: currentLevel, shared: sharedPlayerCards
-  };
-  // Populate level button grid if needed
-  populateLevelGrid();
-  // Populate player list
-  populatePlayerList();
-  // Sync selection
-  document.getElementById('inpPlayerSelect').value = playerName;
-  setLevelGridActive(currentLevel);
   document.getElementById('settingsOverlay').classList.add('show');
-}
-
-function populateLevelGrid() {
-  var grid = document.getElementById('levelBtnGrid');
-  if (!grid || grid.children.length > 0) return; // already populated
-  var html = '';
-  for (var i = 1; i <= 13; i++) {
-    html += '<button class="lv-btn' + (i === currentLevel ? ' active' : '') + '" data-lv="' + i + '" onclick="onLevelBtnClick(' + i + ', this)">+' + i + '</button>';
-  }
-  grid.innerHTML = html;
-}
-
-function onSeasonChange() {
-  var season = document.getElementById('inpSeason').value;
-  var name = document.getElementById('inpName').value.trim();
-  var pos = document.getElementById('inpPos').value.trim();
-  var ovr = parseInt(document.getElementById('inpOvr').value) || 122;
-  var lv = parseInt(document.getElementById('inpLevel').value) || 1;
-  previewPlayerCard(name, season, pos, ovr, lv, sharedPlayerCards);
-}
-
-function onLevelBtnClick(lv, btn) {
-  document.getElementById('inpLevel').value = lv;
-  setLevelGridActive(lv);
-  // Live preview with new level
-  var name = document.getElementById('inpName').value.trim();
-  var season = document.getElementById('inpSeason').value;
-  var pos = document.getElementById('inpPos').value.trim();
-  var ovr = parseInt(document.getElementById('inpOvr').value) || 122;
-  var shared = null;
-  if (allSharedPlayers) {
-    shared = allSharedPlayers.find(function(p) { return p.name === name; }) || null;
-  }
-  previewPlayerCard(name, season, pos, ovr, lv, shared);
 }
 
 function formatCurrency(valYi) {
@@ -4473,15 +3987,12 @@ function refreshAdvancedBP() {
 function toggleLevelValues() {
   var table = document.getElementById('lvTable');
   var toggle = document.getElementById('lvToggleText');
-  var hint = document.getElementById('lvToggleHint');
   if (table.style.display === 'none') {
     table.style.display = 'block';
-    toggle.textContent = '▾ 收起主卡等级价格设置';
-    if (hint) hint.style.display = 'none';
+    toggle.textContent = '收起主卡价格设置 ▾';
   } else {
     table.style.display = 'none';
-    toggle.textContent = '▸ 展开主卡等级价格设置';
-    if (hint) hint.style.display = '';
+    toggle.textContent = '展开主卡价格设置 ▸';
   }
 }
 
@@ -4653,23 +4164,6 @@ function onMatPriceChange(el) {
   // 单个输入框输入时不转换，失焦时自动转
 }
 
-var _matOvrTimer = 0;
-function onMatOvrInput(el) {
-  var raw = el.value.replace(/[^0-9]/g, '');
-  if (raw.length > 3) raw = raw.slice(0, 3);
-  el.value = raw;
-  var ovr = parseInt(raw) || 0;
-  if (ovr > 190) { el.value = '190'; ovr = 190; }
-  clearTimeout(_matOvrTimer);
-  if (raw.length >= 3 && ovr >= 50 && ovr <= 190) {
-    var priceInput = el.closest('.adv-row').querySelector('.adv-mat-price');
-    if (priceInput) {
-      _matOvrTimer = setTimeout(function() { priceInput.focus(); priceInput.select(); }, 80);
-    }
-  }
-}
-
-
 function getPriceYi(priceInp) {
   if (!priceInp) return 0;
   var unitEl = priceInp.parentElement.querySelector('.mat-price-unit');
@@ -4772,9 +4266,8 @@ function addMatPriceRow() {
   row.className = 'adv-row';
   row.innerHTML = '<span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>' +
     '<div class="adv-value-wrap">' +
-    '<input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">' +
-    '<span class="adv-mat-sep">·</span>' +
-    '<input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>' +
+    '<input type="number" class="adv-mat-ovr" value="" min="0" placeholder="OVR" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)">' +
+    '<input type="number" class="adv-mat-price" value="0" min="0" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>' +
     '</div>';
   container.appendChild(row);
   var newOvrInp = row.querySelector('.adv-mat-ovr');
@@ -5052,27 +4545,11 @@ function closeAdvancedSettingsDirect() {
 
 function closeSettings(e) {
   if (e && e.target !== document.getElementById('settingsOverlay')) return;
-  closeSettingsDirect();
+  document.getElementById('settingsOverlay').classList.remove('show');
 }
 
 function closeSettingsDirect() {
   document.getElementById('settingsOverlay').classList.remove('show');
-  // Restore player state from snapshot (cancel)
-  if (_settingsSnapshot) {
-    var s = _settingsSnapshot;
-    playerName = s.name;
-    playerSeason = s.season;
-    playerPos = s.pos;
-    baseOvr = s.ovr;
-    currentLevel = s.lv;
-    sharedPlayerCards = s.shared;
-    _settingsSnapshot = null;
-    refreshPlayerCard();
-    renderProgress();
-    refreshRate();
-    refreshBPPreview();
-    document.getElementById('inpMaterialOvr').value = curOvr();
-  }
 }
 
 function applySettings() {
@@ -5114,15 +4591,10 @@ function applySettings() {
   // Sync player select dropdown
   syncPlayerSelect();
 
-  // Clear snapshot (no restore needed)
-  _settingsSnapshot = null;
   // Close settings modal
   closeSettingsDirect();
 
-  refreshPlayerCard();
-  renderProgress();
-  refreshRate();
-  refreshBPPreview();
+  refreshAll();
 }
 
 // ============================================================
@@ -5135,35 +4607,19 @@ document.getElementById('inpStopLevel').addEventListener('change', function() {
 
 //  Keyboard
 // ============================================================
-var _spaceGuard = false;
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
   if (e.code === 'Space') {
     e.preventDefault();
-    if (_spaceGuard) return;
     var burstOverlay = document.getElementById('burstOverlay');
     var resultOverlay = document.getElementById('resultOverlay');
     if (burstOverlay.classList.contains('show')) {
-      _spaceGuard = true;
       skipBurst();
-      setTimeout(function() { _spaceGuard = false; }, 400);
     } else if (resultOverlay.classList.contains('show')) {
-      _spaceGuard = true;
-      if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
-      hideAllOverlays();
-      resetEnhanceBtn();
-      if (autoMode) {
-        if (autoTimer) clearTimeout(autoTimer);
-        autoTimer = setTimeout(function() { doAutoStep(); }, 800);
-      }
-      setTimeout(function() { _spaceGuard = false; }, 400);
-    } else if (!autoMode && !isEnhancing && canEnhance()) {
+      closeResult(true);
+    } else if (!isEnhancing && canEnhance()) {
       var hasMat = materialCards.some(function(m) { return !!m; });
-      if (hasMat) {
-        _spaceGuard = true;
-        startEnhance();
-        setTimeout(function() { _spaceGuard = false; }, 600);
-      }
+      if (hasMat) startEnhance();
     }
   }
   if (e.code === 'KeyA') {
@@ -5183,7 +4639,7 @@ Promise.all([loadSharedPlayers(), loadCardManifest()]).then(function(results) {
     var sp = allSharedPlayers.find(function(p) { return p.name === playerName; });
     if (sp) sharedPlayerCards = sp;
   }
-  // Player list and level grid are populated on-demand in openSettings()
+  populatePlayerSelect();
   initCustomDropdowns();
   refreshAll();
   document.getElementById('inpMaterialOvr').value = curOvr();
@@ -5283,215 +4739,11 @@ function custDrop(sel) {
 
 function initCustomDropdowns() {
   // 只替换设置弹窗里的下拉，控制面板的 stop-level 保持原生
-  // inpPlayerSelect 和 inpLevel 已改为自定义UI，不再用 custDrop
-  ['inpSeason'].forEach(function(id) {
+  ['inpSeason', 'inpPlayerSelect', 'inpLevel'].forEach(function(id) {
     var el = document.getElementById(id); if (el) custDrop(el);
   });
 }
 
-// 导出强化记录
-var _exporting = false;
-document.getElementById('btnExportLog').onclick = function() {
-  if (_exporting) return;
-  if (history.length === 0) return;
-  var text = buildExportText();
-  if (!text) return;
-  _exporting = true;
-  var btn = document.getElementById('btnExportLog');
-  var origHTML = btn.innerHTML;
-  navigator.clipboard.writeText(text).then(function() {
-    btn.innerHTML = '<svg class="export-icon" viewBox="0 0 16 16"><polyline points="3 8 6.5 12 13 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>已复制</span>';
-    btn.style.color = '#00c853';
-    btn.style.borderColor = 'rgba(0,200,83,0.3)';
-    setTimeout(function() {
-      btn.innerHTML = origHTML;
-      btn.style.color = '';
-      btn.style.borderColor = '';
-      _exporting = false;
-    }, 1200);
-  }).catch(function() {
-    var ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    btn.innerHTML = '<svg class="export-icon" viewBox="0 0 16 16"><polyline points="3 8 6.5 12 13 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>已复制</span>';
-    btn.style.color = '#00c853';
-    btn.style.borderColor = 'rgba(0,200,83,0.3)';
-    setTimeout(function() {
-      btn.innerHTML = origHTML;
-      btn.style.color = '';
-      btn.style.borderColor = '';
-      _exporting = false;
-    }, 1200);
-  });
-};
-
-function buildExportText() {
-  if (history.length === 0) return '';
-  var season = (playerSeason || '').toUpperCase();
-  var ovr = curOvr();
-  var lines = [];
-  lines.push('FC强化记录');
-  lines.push('球员: ' + season + ' ' + ovr + ' ' + playerName + '  +' + currentLevel);
-  lines.push('');
-
-  // 按目标强化等级分组
-  var groups = {};
-  history.forEach(function(h) {
-    var match = h.desc.match(/\+\d+ → \+(\d+)/);
-    var key = match ? parseInt(match[1]) : 0;
-    if (!groups[key]) groups[key] = { att: 0, win: 0, bp: 0 };
-    groups[key].att++;
-    groups[key].bp += (h.bpCost || 0);
-    if (h.result === 'success') groups[key].win++;
-  });
-
-  var levels = Object.keys(groups).map(Number).sort(function(a, b) { return a - b; });
-  var totalAtt = 0, totalWin = 0, totalBP = 0;
-
-  // 先收集所有行数据，计算每列最大视觉宽度
-  var rows = [];
-  levels.forEach(function(lv) {
-    var g = groups[lv];
-    var rateVal = g.att > 0 ? (g.win / g.att * 100) : 0;
-    var rateStr = (rateVal % 1 === 0 ? Math.round(rateVal) : rateVal.toFixed(1)) + '%';
-    var lose = g.att - g.win;
-    rows.push(['+' + lv, String(g.att), String(g.win), String(lose), rateStr, formatExportBP(g.bp)]);
-    totalAtt += g.att;
-    totalWin += g.win;
-    totalBP += g.bp;
-  });
-
-  var headers = ['等级', '次数', '成功', '失败', '胜率', '消耗'];
-  var colW = [0, 0, 0, 0, 0, 0];
-  for (var c = 0; c < 6; c++) {
-    colW[c] = vwidth(headers[c]);
-    for (var r = 0; r < rows.length; r++) {
-      var w = vwidth(rows[r][c]);
-      if (w > colW[c]) colW[c] = w;
-    }
-  }
-
-  // 表头
-  var hdr = '';
-  for (var c = 0; c < 6; c++) {
-    hdr += vpad(headers[c], colW[c]);
-    if (c < 5) hdr += ' | ';
-  }
-  lines.push(hdr);
-
-  // 数据行
-  for (var r = 0; r < rows.length; r++) {
-    var row = '';
-    for (var c = 0; c < 6; c++) {
-      row += vpad(rows[r][c], colW[c]);
-      if (c < 5) row += ' | ';
-    }
-    lines.push(row);
-  }
-
-  // 合计行
-  var totalRateVal = totalAtt > 0 ? (totalWin / totalAtt * 100) : 0;
-  var totalRateStr = (totalRateVal % 1 === 0 ? Math.round(totalRateVal) : totalRateVal.toFixed(1)) + '%';
-  var totalLose = totalAtt - totalWin;
-  var totalRow = ['合计', String(totalAtt), String(totalWin), String(totalLose), totalRateStr, formatExportBP(totalBP)];
-  var tr = '';
-  for (var c = 0; c < 6; c++) {
-    tr += vpad(totalRow[c], colW[c]);
-    if (c < 5) tr += ' | ';
-  }
-  lines.push(tr);
-
-  return lines.join('\n');
-}
-
-function vwidth(s) {
-  var w = 0;
-  for (var i = 0; i < s.length; i++) {
-    var c = s.charCodeAt(i);
-    // CJK、全角字符视觉宽度=2，ASCII=1
-    if (c >= 0x4E00 && c <= 0x9FFF || c >= 0x3000 && c <= 0x303F || c >= 0xFF00 && c <= 0xFFEF || c >= 0x2000 && c <= 0x206F) w += 2;
-    else w += 1;
-  }
-  return w;
-}
-
-function vpad(s, w) {
-  var cur = vwidth(s);
-  var r = s;
-  while (cur < w) { r += ' '; cur++; }
-  return r;
-}
-
-function formatExportBP(val) {
-  var s;
-  if (val >= 10000) s = (val / 10000).toFixed(2); else s = val.toFixed(1);
-  // 去掉末尾无意义的零
-  s = s.replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
-  return s + (val >= 10000 ? '兆' : '亿');
-}
-
-// ============================================================
-//  Custom Number Keyboard (iOS Style)
-// ============================================================
-var _kbInput = null;
-
-function showCustomKeyboard(input) {
-  _kbInput = input;
-  document.getElementById('kbOverlay').classList.add('show');
-}
-
-function hideCustomKeyboard() {
-  document.getElementById('kbOverlay').classList.remove('show');
-  if (_kbInput) {
-    var el = _kbInput;
-    _kbInput = null;
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-    el.dispatchEvent(new Event('blur', { bubbles: true }));
-  }
-}
-
-function kbKeyPress(key) {
-  if (!_kbInput) return;
-  var el = _kbInput;
-  if (key === 'del') {
-    el.value = el.value.slice(0, -1);
-  } else {
-    var max = parseInt(el.getAttribute('max'));
-    if (max && parseInt(el.value + key) > max) return;
-    el.value = el.value + key;
-  }
-  el.dispatchEvent(new Event('input', { bubbles: true }));
-}
-
-// 自定义键盘已禁用，全部使用系统原生键盘
-
 </script>
-
-<!-- Custom Keyboard Overlay -->
-<div class="kb-overlay" id="kbOverlay" onclick="if(event.target===this)hideCustomKeyboard()">
-  <div class="kb-panel" id="kbPanel">
-    <div class="kb-row">
-      <button class="kb-key" data-key="1" onclick="kbKeyPress('1')">1</button>
-      <button class="kb-key" data-key="2" onclick="kbKeyPress('2')">2<br><span class="kb-letters">ABC</span></button>
-      <button class="kb-key" data-key="3" onclick="kbKeyPress('3')">3<br><span class="kb-letters">DEF</span></button>
-    </div>
-    <div class="kb-row">
-      <button class="kb-key" data-key="4" onclick="kbKeyPress('4')">4<br><span class="kb-letters">GHI</span></button>
-      <button class="kb-key" data-key="5" onclick="kbKeyPress('5')">5<br><span class="kb-letters">JKL</span></button>
-      <button class="kb-key" data-key="6" onclick="kbKeyPress('6')">6<br><span class="kb-letters">MNO</span></button>
-    </div>
-    <div class="kb-row">
-      <button class="kb-key" data-key="7" onclick="kbKeyPress('7')">7<br><span class="kb-letters">PQRS</span></button>
-      <button class="kb-key" data-key="8" onclick="kbKeyPress('8')">8<br><span class="kb-letters">TUV</span></button>
-      <button class="kb-key" data-key="9" onclick="kbKeyPress('9')">9<br><span class="kb-letters">WXYZ</span></button>
-    </div>
-    <div class="kb-row">
-      <div style="flex:1"></div>
-      <button class="kb-key" data-key="0" onclick="kbKeyPress('0')">0</button>
-      <button class="kb-key kb-del" data-key="del" onclick="kbKeyPress('del')">⌫</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
