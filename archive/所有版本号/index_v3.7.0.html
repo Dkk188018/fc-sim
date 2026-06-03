@@ -143,10 +143,6 @@ button,input,select,textarea,[onclick],.hex-card,.stat-box.clickable,.settings-t
   animation: modalIn 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
   color: #e8eaed;
   box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset;
-  transform: translateZ(0);
-  will-change: transform;
-  contain: layout style paint;
-  overscroll-behavior: contain;
 }
 @keyframes modalIn {
   0% { opacity: 0; transform: translateY(24px) scale(0.96); }
@@ -199,11 +195,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 }
 .settings-modal .btn-main:hover { background: linear-gradient(135deg, #ffc107, #e0a800); box-shadow: 0 4px 16px rgba(240,185,11,0.3); }
 .settings-modal .btn-main:active { transform: scale(0.97); }
-.adv-sticky-footer {
-  position: sticky; bottom: 0; z-index: 10;
-  background: linear-gradient(0deg, #14161c 0%, #14161c 85%, transparent 100%);
-  padding: 10px 0 4px; margin-top: 6px;
-}
 
 /* ===== Level Button Grid ===== */
 .level-btn-grid {
@@ -696,7 +687,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .energy-slot.filled { color: #000; }
 
 .energy-slot .fill {
-  position: absolute; top: 0; left: 0; height: 100%; width: 100%; z-index: 1;
+  position: absolute; top: 0; left: 0; height: 100%; z-index: 1;
   background-color: #0b91f6;
   background-image: repeating-linear-gradient(
     -45deg,
@@ -705,16 +696,13 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   );
   background-size: 7px 7px;
   animation: stripe-slide 0.8s linear infinite;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.06s linear;
-  will-change: transform;
+  transition: width 0.06s linear;
 }
 .energy-slot.filled .fill { /* ensures fill gets width from JS */ }
 
 /* 5格全满后每个fill内部绿潮（R→L），不盖缝隙不挡数字 */
 .energy-slot .fill .fill-green {
-  position: absolute; top: 0; right: 0; height: 100%; width: 100%;
+  position: absolute; top: 0; right: 0; height: 100%; width: 0;
   background-color: #00c853;
   background-image: repeating-linear-gradient(
     -45deg,
@@ -723,19 +711,10 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   );
   background-size: 7px 7px;
   animation: stripe-slide 0.8s linear infinite;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.06s ease;
-  will-change: transform;
+  transition: width 0.06s ease;
 }
 
 /* ===== 六边形卡槽 ===== */
-.hex-hint {
-  text-align: center; color: rgba(255,255,255,0.25); font-size: 11px;
-  padding: 6px 0 8px; width: 100%;
-  opacity: 1; transition: opacity 0.3s;
-}
-.hex-hint.hidden { opacity: 0; pointer-events: none; }
 @keyframes hex-wave {
   0%, 100% { opacity: 0.08; }
   20%      { opacity: 0.45; }
@@ -914,7 +893,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 }
 .btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 .btn-secondary.active { background: rgba(41,121,255,0.2); border-color: var(--accent); color: #aaccff; }
-.auto-dots { display: inline-block; width: 18px; text-align: left; font-weight: 700; letter-spacing: 1px; color: #aaccff; }
 
 /* ===== Stats ===== */
 .stats {
@@ -955,18 +933,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 }
 .history-box::-webkit-scrollbar { width: 3px; }
 .history-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-.history-title { font-size: 10px; color: var(--text3); margin-bottom: 6px; font-weight: 600; padding-left: 2px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.history-filter { display: flex; gap: 3px; flex-shrink: 0; }
-.hist-fbtn {
-  padding: 2px 7px; font-size: 9px; font-family: inherit;
-  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px; color: #6b7590; cursor: pointer;
-  transition: all 0.15s;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  user-select: none; -webkit-user-select: none;
-}
-.hist-fbtn:hover { background: rgba(255,255,255,0.08); color: #b0b8c0; }
-.hist-fbtn.active { background: rgba(240,185,11,0.15); border-color: rgba(240,185,11,0.3); color: #f0b90b; font-weight: 700; }
+.history-title { font-size: 10px; color: var(--text3); margin-bottom: 6px; font-weight: 600; padding-left: 2px; display: flex; align-items: center; justify-content: space-between; }
 .export-btn {
   display: flex; align-items: center; gap: 3px;
   padding: 3px 8px;
@@ -1773,7 +1740,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
     <div class="settings-modal" onclick="event.stopPropagation()">
       <div class="field">
         <label>赛季</label>
-        <select id="inpSeason" onchange="onSeasonChange()">
+        <select id="inpSeason">
           <option value="25ucl" selected>25UCL 25欧冠</option>
           <option value="default">基础卡 (普通)</option>
           <option value="live">LIVE 实时</option>
@@ -1943,7 +1910,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
           <button class="btn btn-secondary" style="font-size:14px;color:#f0b90b;font-weight:700;" onclick="saveMatPrices()">保存</button>
         </div>
       </div>
-      <div class="btn-row adv-sticky-footer">
+      <div class="btn-row" style="margin-top:6px;">
         <button class="btn btn-main" style="font-size:14px;letter-spacing:1px;box-shadow:none;" onclick="applyAdvancedSettings()">应用设置</button>
       </div>
     </div>
@@ -2137,7 +2104,6 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
         <button class="hex-close" onclick="event.stopPropagation();closeHexCard(this)" title="移除材料">×</button>
       </div>
     </div>
-    <div class="hex-hint" id="hexHint">点击六边形槽添加材料卡</div>
     <div class="mat-input-row">
       <span style="font-size:10px;color:var(--text3);flex-shrink:0;">添加材料 OVR</span>
       <div class="hex-input-row" style="display:inline-flex;width:auto;flex-shrink:0;">
@@ -2200,12 +2166,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   <!-- History -->
   <div class="history-box">
     <div class="history-title">
-        <span>强化记录</span>
-        <div class="history-filter" id="historyFilter">
-          <button class="hist-fbtn active" data-filter="all" onclick="setHistoryFilter('all',this)">全部</button>
-          <button class="hist-fbtn" data-filter="success" onclick="setHistoryFilter('success',this)">成功</button>
-          <button class="hist-fbtn" data-filter="fail" onclick="setHistoryFilter('fail',this)">失败</button>
-        </div>
+        强化记录
         <button class="export-btn" id="btnExportLog" title="导出记录">
           <svg class="export-icon" viewBox="0 0 16 16"><path d="M3 10v2.5A1.5 1.5 0 004.5 14h7a1.5 1.5 0 001.5-1.5V10M8 2v8M5 6l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <span>导出</span>
@@ -2717,12 +2678,6 @@ function selectPlayerOption(el) {
   var prev = document.querySelector('.player-opt.selected');
   if (prev) prev.classList.remove('selected');
   el.classList.add('selected');
-  // Live preview: update background card
-  var shared = null;
-  if (allSharedPlayers) {
-    shared = allSharedPlayers.find(function(p) { return p.name === name; }) || null;
-  }
-  previewPlayerCard(name, '25ucl', el.dataset.position, _selOvr, _selLv, shared);
 }
 
 function setLevelGridActive(lv) {
@@ -2748,7 +2703,6 @@ let autoMode = false;
 let stopLevel = 13;
 let autoTimer = null;
 let autoCloseTimer = null;
-let _autoDotsTimer = null;
 let _pendingSuccess = false;
 let _pendingMode = 'fail';
 let _debugAllSuccess = false; // 测试完改回 false
@@ -2814,8 +2768,8 @@ function toggleHexCard(card) {
   const label = card.querySelector('.hex-progress-pct');
   if (label) label.textContent = '0.00%';
   card.classList.add('active');
-  // 同步聚焦以保持用户手势上下文，触发系统键盘
-  if (input) { input.focus(); input.select(); }
+  // Auto-focus the input
+  setTimeout(() => { if (input) input.focus(); }, 50);
 }
 
 function closeHexCard(btn) {
@@ -2932,12 +2886,8 @@ function updateHexSlots() {
     }
   }
 
-  // 六边形引导提示：所有槽位空时显示
-  var hint = document.getElementById('hexHint');
-  if (hint) { if (count === 0) hint.classList.remove('hidden'); else hint.classList.add('hidden'); }
-
   var fillFull = getTotalFill() >= 5;
-  document.getElementById('materialCount').textContent = fillFull ? '已满' : '已填 ' + count + '/5';
+  document.getElementById('materialCount').textContent = fillFull ? '已满' : `已填 ${count}/5`;
   const boost = getMaterialBoost();
   var boostEl = document.getElementById('materialBoost');
   animateNumber(boostEl, boost, 250, function(v) { return '+' + Math.round(v) + '%'; });
@@ -2992,21 +2942,16 @@ function updateEnergyBar() {
       if (!fill) {
         fill = document.createElement('div');
         fill.className = 'fill';
-        fill.style.transform = 'scaleX(0)';
+        fill.style.width = '0%';
         slot.appendChild(fill);
       }
-      fill.style.transition = 'transform 0.06s linear';
-      var curScaleX = 0;
-      var curTransform = fill.style.transform;
-      if (curTransform) {
-        var m = curTransform.match(/scaleX\(([\d.]+)\)/);
-        if (m) curScaleX = parseFloat(m[1]);
-      }
-      var isShrinking = curScaleX * 100 > targetWidth;
-      var delay = isShrinking ? (4 - i) * 50 : i * 50;
+      fill.style.transition = 'width 0.06s linear';
+      var curW = fill.style.width ? parseFloat(fill.style.width) : 0;
+      var isShrinking = curW > targetWidth;
+      var delay = isShrinking ? (4 - i) * 100 : i * 100;
       setTimeout(function() {
         if (_energyAnimSeq !== seq) return;
-        fill.style.transform = 'scaleX(' + (targetWidth / 100) + ')';
+        fill.style.width = targetWidth + '%';
       }, delay);
     } else {
       slot.classList.remove('filled');
@@ -3022,11 +2967,11 @@ function updateEnergyBar() {
       if (!bfill) return;
       if (bfill.querySelector('.fill-green')) return; // 有绿色的由绿色分支处理
       if (slotTargets[idx] > 0) return; // 仍满格不处理
-      var bdelay = (4 - idx) * 50;
+      var bdelay = (4 - idx) * 100;
       setTimeout(function() {
         if (_energyAnimSeq !== seq) return;
-        bfill.style.transition = 'transform 0.06s linear';
-        bfill.style.transform = 'scaleX(0)';
+        bfill.style.transition = 'width 0.06s linear';
+        bfill.style.width = '0%';
         setTimeout(function() {
           if (_energyAnimSeq !== seq) return;
           if (bfill.parentNode) bfill.remove();
@@ -3037,7 +2982,7 @@ function updateEnergyBar() {
 
   // 5格全满：等蓝条都走完后，每个格子内部绿色从右向左覆盖（第5格→第1格）
   if (fullSlots >= 5) {
-    var lastBlueDelay = 4 * 50 + 60; // 等蓝条全部走完
+    var lastBlueDelay = 4 * 100 + 60; // 等蓝条全部走完
     setTimeout(function() {
       if (_energyAnimSeq !== seq) return;
       for (var j = 4; j >= 0; j--) {
@@ -3052,10 +2997,10 @@ function updateEnergyBar() {
             fg.className = 'fill-green';
             fill.appendChild(fg);
           }
-          var greenDelay = (4 - idx) * 50; // 5格总时长
+          var greenDelay = (4 - idx) * 100; // 5格总时长
           setTimeout(function() {
             if (_energyAnimSeq !== seq) return;
-            fg.style.transform = 'scaleX(1)';
+            fg.style.width = '100%';
           }, greenDelay);
         })(j);
       }
@@ -3079,27 +3024,28 @@ function updateEnergyBar() {
         fg.remove();
       } else if (slotTargets[k - 1] > 0) {
         // 部分填充：等右侧空格消退完再移除绿色、恢复蓝色底
-        var partialDelay = emptyCount * 50;
+        var partialDelay = emptyCount * 100;
         (function(fillEl, targetW) {
           setTimeout(function() {
             if (_energyAnimSeq !== seq) return;
             var fgEl = fillEl.querySelector('.fill-green');
             if (fgEl) fgEl.remove();
-            fillEl.style.transform = 'scaleX(' + (targetW / 100) + ')';
+            fillEl.style.width = targetW + '%';
             fillEl.style.backgroundColor = '#0b91f6';
             fillEl.style.backgroundImage = 'repeating-linear-gradient(-45deg, transparent, transparent 2px, #097dd4 2px, #097dd4 5px)';
           }, partialDelay);
         })(fill, slotTargets[k - 1]);
       } else {
         // 被清空格：蓝底透明化+绿色动画消退，全部跟随R→L级联
-        var greenDelay = (5 - k) * 50;
+        var greenDelay = (5 - k) * 100;
         setTimeout(function(fillEl, fgEl) {
           if (_energyAnimSeq !== seq) return;
           fillEl.style.backgroundColor = 'transparent';
           fillEl.style.backgroundImage = 'none';
-          fgEl.style.transformOrigin = 'left';
-          fgEl.style.transition = 'transform 0.06s linear';
-          fgEl.style.transform = 'scaleX(0)';
+          fgEl.style.left = '0';
+          fgEl.style.right = 'auto';
+          fgEl.style.transition = 'width 0.06s linear';
+          fgEl.style.width = '0%';
           setTimeout(function() {
             if (_energyAnimSeq !== seq) return;
             if (fgEl.parentNode) fgEl.remove();
@@ -3218,7 +3164,7 @@ function refreshStats() {
   if (sA) animateNumber(sA, totalAttempts, 350);
   if (sS) animateNumber(sS, totalSuccess, 350);
   if (sF) animateNumber(sF, totalAttempts - totalSuccess, 350);
-  if (sB) { var raw = formatCurrency(totalBPCost); var m = raw.match(/^([\d.]+)(.*)$/); if (m) { var oldBpHtml = sB.innerHTML; sB.innerHTML = '<span style="color:#fff;">' + m[1] + '</span>' + m[2]; if (oldBpHtml !== sB.innerHTML && totalAttempts > 0) { sB.style.animation = 'none'; sB.offsetHeight; sB.style.animation = 'numPop 0.3s ease'; sB.addEventListener('animationend', function h() { sB.style.animation = ''; sB.removeEventListener('animationend', h); }); } } else sB.textContent = raw; }
+  if (sB) { var raw = formatCurrency(totalBPCost); var m = raw.match(/^([\d.]+)(.*)$/); if (m) sB.innerHTML = '<span style="color:#fff;">' + m[1] + '</span>' + m[2]; else sB.textContent = raw; }
   if (slD) slD.textContent = '+' + (stopLevel > 13 ? 13 : stopLevel);
 }
 
@@ -3303,36 +3249,24 @@ function renderProgress() {
   pips.innerHTML = pipsHtml;
 }
 
-var _historyFilter = 'all';
-function setHistoryFilter(filter, btn) {
-  _historyFilter = filter;
-  var btns = document.querySelectorAll('#historyFilter .hist-fbtn');
-  btns.forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  renderHistory();
-}
 function renderHistory() {
   const list = document.getElementById('historyList');
   if (!list) return;
-  var filtered = history;
-  if (_historyFilter === 'success') filtered = history.filter(function(h) { return h.result === 'success'; });
-  else if (_historyFilter === 'fail') filtered = history.filter(function(h) { return h.result !== 'success'; });
-  if (filtered.length === 0) {
-    var emptyText = _historyFilter === 'success' ? '暂无成功记录' : (_historyFilter === 'fail' ? '暂无失败记录' : '等待首次强化...');
-    list.innerHTML = '<li class="hist-empty">' + emptyText + '</li>';
+  if (history.length === 0) {
+    list.innerHTML = '<li class="hist-empty">等待首次强化...</li>';
     return;
   }
-  list.innerHTML = filtered.map(function(h) {
-    var tagCls, tagText;
+  list.innerHTML = history.map(h => {
+    let tagCls, tagText;
     if (h.result === 'success') { tagCls = 'win'; tagText = '成功'; }
     else { tagCls = 'lose'; tagText = '失败'; }
     var bpCls = h.bpCost > 0 ? 'hist-bp' : 'hist-bp zero';
-    return '<li class="history-item">' +
-      '<span class="hist-num">#' + h.num + '</span>' +
-      '<span class="hist-tag ' + tagCls + '">' + tagText + '</span>' +
-      '<span class="hist-detail">' + h.desc + '</span>' +
-      '<span class="' + bpCls + '">' + formatCurrency(h.bpCost) + '</span>' +
-    '</li>';
+    return `<li class="history-item">
+      <span class="hist-num">#${h.num}</span>
+      <span class="hist-tag ${tagCls}">${tagText}</span>
+      <span class="hist-detail">${h.desc}</span>
+      <span class="${bpCls}">${formatCurrency(h.bpCost)}</span>
+    </li>`;
   }).join('');
 }
 
@@ -3430,20 +3364,11 @@ function setProtectAnimated(on) {
 
 var protectDragging = false;
 
-function snapProtect(pct) {
-  var snaps = [0, 25, 50, 75, 100];
-  for (var i = 0; i < snaps.length; i++) {
-    if (Math.abs(pct - snaps[i]) <= 3) return snaps[i];
-  }
-  return Math.round(pct);
-}
-
 function protectTrackClick(e) {
   var wrap = document.getElementById('protectSliderWrap');
   if (wrap.classList.contains('disabled')) return;
   var rect = document.getElementById('protectTrack').getBoundingClientRect();
   var pct = ((e.pageX - rect.left) / rect.width) * 100;
-  pct = snapProtect(pct);
   setProtectAnimated(true);
   updateProtectUI(pct);
   refreshBPPreview();
@@ -3463,7 +3388,7 @@ document.getElementById('protectArrL').onclick = function() {
   if (wrap.classList.contains('disabled')) return;
   if (protectCount <= 0) return;
   setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount - 1));
+  updateProtectUI(protectCount - 1);
   requestAnimationFrame(function() { setProtectAnimated(false); });
 };
 document.getElementById('protectArrR').onclick = function() {
@@ -3471,7 +3396,7 @@ document.getElementById('protectArrR').onclick = function() {
   if (wrap.classList.contains('disabled')) return;
   if (protectCount >= 100) return;
   setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount + 1));
+  updateProtectUI(protectCount + 1);
   requestAnimationFrame(function() { setProtectAnimated(false); });
 };
 
@@ -3479,8 +3404,6 @@ window.addEventListener('mouseup', function() {
   if (!protectDragging) return;
   protectDragging = false;
   document.body.classList.remove('no-select');
-  setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount));
   refreshBPPreview();
 });
 window.addEventListener('mousemove', function(e) {
@@ -3492,8 +3415,6 @@ window.addEventListener('touchend', function() {
   if (!protectDragging) return;
   protectDragging = false;
   document.body.classList.remove('no-select');
-  setProtectAnimated(true);
-  updateProtectUI(snapProtect(protectCount));
   refreshBPPreview();
 });
 window.addEventListener('touchmove', function(e) {
@@ -3512,30 +3433,18 @@ function startAuto() {
   var hasMat = materialCards.some(function(m) { return !!m; });
   if (!hasMat) return;
   autoMode = true;
-  var btn = document.getElementById('btnAuto');
+  const btn = document.getElementById('btnAuto');
   btn.textContent = '停止';
   btn.classList.add('active');
-  // Start dot animation
-  var dotPhase = 0;
-  if (_autoDotsTimer) clearInterval(_autoDotsTimer);
-  _autoDotsTimer = setInterval(function() {
-    dotPhase = (dotPhase + 1) % 4;
-    var dots = '';
-    for (var i = 0; i < dotPhase; i++) dots += '.';
-    if (autoMode && btn.textContent.indexOf('停止') === 0) {
-      btn.textContent = '停止' + dots;
-    }
-  }, 300);
   doAutoStep();
 }
 
 function stopAuto() {
   autoMode = false;
   isEnhancing = false;
-  var btn = document.getElementById('btnAuto');
+  const btn = document.getElementById('btnAuto');
   btn.textContent = '自动';
   btn.classList.remove('active');
-  if (_autoDotsTimer) { clearInterval(_autoDotsTimer); _autoDotsTimer = null; }
   if (autoTimer) clearTimeout(autoTimer);
   if (autoCloseTimer) { clearTimeout(autoCloseTimer); autoCloseTimer = null; }
 }
@@ -4193,42 +4102,6 @@ function resetEnhanceBtn() {
 }
 
 // ============================================================
-//  Swipe gesture detection
-// ============================================================
-function addSwipeToClose(el, onSwipeDown, onSwipeLeft, onSwipeRight) {
-  var startX = 0, startY = 0, tracking = false;
-  el.addEventListener('touchstart', function(e) {
-    if (e.target.closest && (e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea'))) return;
-    if (e.touches.length === 1) {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      tracking = true;
-    }
-  }, {passive: true});
-  el.addEventListener('touchend', function(e) {
-    if (!tracking) return;
-    tracking = false;
-    var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : startX) - startX;
-    var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : startY) - startY;
-    if (Math.abs(dy) > Math.abs(dx) && dy > 60 && onSwipeDown) onSwipeDown();
-    if (Math.abs(dx) > Math.abs(dy) && dx < -60 && onSwipeLeft) onSwipeLeft();
-    if (Math.abs(dx) > Math.abs(dy) && dx > 60 && onSwipeRight) onSwipeRight();
-  });
-}
-
-// Attach swipe-down to close modals (only on modal backgrounds, not the panels)
-(function() {
-  var settingsOverlay = document.getElementById('settingsOverlay');
-  if (settingsOverlay) {
-    addSwipeToClose(settingsOverlay, function() { closeSettingsDirect(); });
-  }
-  var resultOverlay = document.getElementById('resultOverlay');
-  if (resultOverlay) {
-    addSwipeToClose(resultOverlay, function() { closeResult(true); }, function() { closeResult(true); }, function() { closeResult(true); });
-  }
-})();
-
-// ============================================================
 //  Rate help tooltip
 // ============================================================
 let rateTooltipEl = null;
@@ -4371,28 +4244,8 @@ function syncPlayerSelect() {
   }
 }
 
-var _settingsSnapshot = null;
-function previewPlayerCard(name, season, pos, ovr, lv, sharedCards) {
-  playerName = name;
-  playerSeason = season;
-  playerPos = pos;
-  baseOvr = Math.max(40, Math.min(150, ovr));
-  currentLevel = Math.max(1, Math.min(13, lv));
-  sharedPlayerCards = sharedCards || null;
-  refreshPlayerCard();
-  renderProgress();
-  refreshRate();
-  refreshBPPreview();
-  // Update material OVR input
-  document.getElementById('inpMaterialOvr').value = curOvr();
-}
 function openSettings() {
   document.getElementById('inpMaterialOvr').value = curOvr();
-  // Save snapshot for cancel-restore
-  _settingsSnapshot = {
-    name: playerName, season: playerSeason, pos: playerPos,
-    ovr: baseOvr, lv: currentLevel, shared: sharedPlayerCards
-  };
   // Populate level button grid if needed
   populateLevelGrid();
   // Populate player list
@@ -4413,28 +4266,9 @@ function populateLevelGrid() {
   grid.innerHTML = html;
 }
 
-function onSeasonChange() {
-  var season = document.getElementById('inpSeason').value;
-  var name = document.getElementById('inpName').value.trim();
-  var pos = document.getElementById('inpPos').value.trim();
-  var ovr = parseInt(document.getElementById('inpOvr').value) || 122;
-  var lv = parseInt(document.getElementById('inpLevel').value) || 1;
-  previewPlayerCard(name, season, pos, ovr, lv, sharedPlayerCards);
-}
-
 function onLevelBtnClick(lv, btn) {
   document.getElementById('inpLevel').value = lv;
   setLevelGridActive(lv);
-  // Live preview with new level
-  var name = document.getElementById('inpName').value.trim();
-  var season = document.getElementById('inpSeason').value;
-  var pos = document.getElementById('inpPos').value.trim();
-  var ovr = parseInt(document.getElementById('inpOvr').value) || 122;
-  var shared = null;
-  if (allSharedPlayers) {
-    shared = allSharedPlayers.find(function(p) { return p.name === name; }) || null;
-  }
-  previewPlayerCard(name, season, pos, ovr, lv, shared);
 }
 
 function formatCurrency(valYi) {
@@ -5052,27 +4886,11 @@ function closeAdvancedSettingsDirect() {
 
 function closeSettings(e) {
   if (e && e.target !== document.getElementById('settingsOverlay')) return;
-  closeSettingsDirect();
+  document.getElementById('settingsOverlay').classList.remove('show');
 }
 
 function closeSettingsDirect() {
   document.getElementById('settingsOverlay').classList.remove('show');
-  // Restore player state from snapshot (cancel)
-  if (_settingsSnapshot) {
-    var s = _settingsSnapshot;
-    playerName = s.name;
-    playerSeason = s.season;
-    playerPos = s.pos;
-    baseOvr = s.ovr;
-    currentLevel = s.lv;
-    sharedPlayerCards = s.shared;
-    _settingsSnapshot = null;
-    refreshPlayerCard();
-    renderProgress();
-    refreshRate();
-    refreshBPPreview();
-    document.getElementById('inpMaterialOvr').value = curOvr();
-  }
 }
 
 function applySettings() {
@@ -5114,8 +4932,6 @@ function applySettings() {
   // Sync player select dropdown
   syncPlayerSelect();
 
-  // Clear snapshot (no restore needed)
-  _settingsSnapshot = null;
   // Close settings modal
   closeSettingsDirect();
 
@@ -5290,19 +5106,13 @@ function initCustomDropdowns() {
 }
 
 // 导出强化记录
-var _exporting = false;
-var _posterImg = null;
 document.getElementById('btnExportLog').onclick = function() {
-  if (_exporting) return;
-  if (history.length === 0) return;
-  var isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  if (isMobile) { generatePoster(); return; }
   var text = buildExportText();
   if (!text) return;
-  _exporting = true;
-  var btn = document.getElementById('btnExportLog');
-  var origHTML = btn.innerHTML;
   navigator.clipboard.writeText(text).then(function() {
+    // 复制成功反馈
+    var btn = document.getElementById('btnExportLog');
+    var origHTML = btn.innerHTML;
     btn.innerHTML = '<svg class="export-icon" viewBox="0 0 16 16"><polyline points="3 8 6.5 12 13 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>已复制</span>';
     btn.style.color = '#00c853';
     btn.style.borderColor = 'rgba(0,200,83,0.3)';
@@ -5310,188 +5120,15 @@ document.getElementById('btnExportLog').onclick = function() {
       btn.innerHTML = origHTML;
       btn.style.color = '';
       btn.style.borderColor = '';
-      _exporting = false;
     }, 1200);
   }).catch(function() {
+    // 降级方案
     var ta = document.createElement('textarea');
     ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
     document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
-    btn.innerHTML = '<svg class="export-icon" viewBox="0 0 16 16"><polyline points="3 8 6.5 12 13 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>已复制</span>';
-    btn.style.color = '#00c853';
-    btn.style.borderColor = 'rgba(0,200,83,0.3)';
-    setTimeout(function() {
-      btn.innerHTML = origHTML;
-      btn.style.color = '';
-      btn.style.borderColor = '';
-      _exporting = false;
-    }, 1200);
   });
 };
-
-// ============================================================
-//  Gemini 海报生成 — 改 buildPosterPrompt() 里的 prompt 调海报样式
-// ============================================================
-var GEMINI_KEY = 'YOUR_GEMINI_API_KEY'; // 替换为你的API Key
-var GEMINI_MODEL = 'gemini-2.5-flash'; // 免费文字模型
-var _h2cLoaded = false;
-
-function loadHtml2Canvas(cb) {
-  if (_h2cLoaded) { cb(); return; }
-  if (window.html2canvas) { _h2cLoaded = true; cb(); return; }
-  var s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-  s.onload = function() { _h2cLoaded = true; cb(); };
-  s.onerror = function() { hidePosterLoading(); alert('海报组件加载失败，请检查网络'); };
-  document.head.appendChild(s);
-}
-
-function buildPosterPrompt() {
-  var ovr = curOvr(), season = (playerSeason || '').toUpperCase();
-  var groups = {};
-  history.forEach(function(h) {
-    var m = h.desc.match(/\+\d+ → \+(\d+)/), k = m ? parseInt(m[1]) : 0;
-    if (!groups[k]) groups[k] = { att: 0, win: 0, bp: 0 };
-    groups[k].att++; groups[k].bp += (h.bpCost || 0);
-    if (h.result === 'success') groups[k].win++;
-  });
-  var ta = 0, tw = 0, tb = 0;
-  Object.keys(groups).forEach(function(k) { ta += groups[k].att; tw += groups[k].win; tb += groups[k].bp; });
-  var rate = ta > 0 ? (tw / ta * 100) : 0;
-
-  var detail = '';
-  var lvs = Object.keys(groups).map(Number).sort(function(a,b){ return a-b; });
-  lvs.forEach(function(lv) {
-    var g = groups[lv], r = g.att > 0 ? (g.win/g.att*100) : 0;
-    detail += '+' + lv + ': ' + g.att + '次/' + g.win + '成/' + (g.att-g.win) + '败' +
-      ' 胜率' + (r%1===0?Math.round(r):r.toFixed(1)) + '% BP' + formatExportBP(g.bp) + '\n';
-  });
-
-  // ★★★★★ 改这里调海报样式 ★★★★★
-  return [
-    '你是一个海报生成器。输出一张纯HTML+CSS的FC Online 4强化记录海报。',
-    '只输出HTML代码，以<!DOCTYPE html>开头，不要markdown包裹，不要任何解释文字。',
-    '',
-    '【设计规范】',
-    '- 宽度375px，高度自适应，深色电竞风背景(#0f131c到#1a1e2a渐变)',
-    '- 顶部金色(#f0b90b)细线装饰',
-    '- 标题"FC Online 强化记录"金色加粗居中，下面灰色小字日期',
-    '- 球员信息区：左侧⚽图标，右侧球员名(白色大号)/赛季·OVR·等级(灰色)',
-    '- 统计栏四列：总次数/成功(绿色)/失败(红色)/胜率(金色)，下面总BP消耗',
-    '- 逐级明细表格：每行显示等级、次数、成功、失败、胜率、BP消耗',
-    '- 底部灰色小字 fc-simulator.com',
-    '- 字体用 -apple-system, sans-serif',
-    '',
-    '【数据】',
-    '球员: ' + playerName,
-    '赛季: ' + season + '  OVR: ' + ovr + '  强化等级: +' + currentLevel,
-    '总次数: ' + ta + '  成功: ' + tw + '  失败: ' + (ta-tw) + '  胜率: ' + (rate%1===0?Math.round(rate):rate.toFixed(1)) + '%',
-    '总BP消耗: ' + formatExportBP(tb),
-    '日期: ' + new Date().toISOString().slice(0,10),
-    '',
-    '逐级明细:',
-    detail
-  ].join('\n');
-}
-
-function generatePoster() {
-  if (_exporting) return;
-  _exporting = true;
-  showPosterLoading();
-  var prompt = buildPosterPrompt();
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GEMINI_KEY, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.3, maxOutputTokens: 8192 }
-    })
-  }).then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (!data.candidates || !data.candidates[0]) throw new Error('API返回异常');
-    var html = data.candidates[0].content.parts[0].text;
-    if (!html) throw new Error('未获取到海报内容');
-    // 去掉可能的markdown包裹
-    if (html.startsWith('```')) html = html.replace(/^```html?\n?/, '').replace(/\n?```$/, '');
-    if (!html.match(/<!DOCTYPE/i)) html = '<!DOCTYPE html>\n' + html;
-    return renderHtmlToPng(html);
-  }).then(function(dataUrl) {
-    _exporting = false;
-    showPosterOverlay(dataUrl);
-  }).catch(function(e) {
-    _exporting = false;
-    hidePosterLoading();
-    alert('海报生成失败: ' + e.message);
-  });
-}
-
-function renderHtmlToPng(html) {
-  return new Promise(function(resolve, reject) {
-    loadHtml2Canvas(function() {
-      var iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position:fixed;left:0;top:0;width:375px;height:0;border:none;z-index:-1;';
-      iframe.sandbox = 'allow-same-origin';
-      document.body.appendChild(iframe);
-      var doc = iframe.contentDocument || iframe.contentWindow.document;
-      doc.open(); doc.write(html); doc.close();
-      // 等渲染完
-      setTimeout(function() {
-        var body = doc.body;
-        var w = Math.max(body.scrollWidth, 375);
-        var h = Math.max(body.scrollHeight, 200);
-        // 调整iframe尺寸以匹配内容
-        iframe.style.width = w + 'px';
-        iframe.style.height = h + 'px';
-        setTimeout(function() {
-          window.html2canvas(body, { width: w, height: h, scale: 2, useCORS: true, backgroundColor: null })
-          .then(function(canvas) {
-            document.body.removeChild(iframe);
-            resolve(canvas.toDataURL('image/png'));
-          }).catch(function(e) {
-            document.body.removeChild(iframe);
-            reject(e);
-          });
-        }, 300);
-      }, 800);
-    });
-  });
-}
-
-function showPosterLoading() {
-  var el = document.getElementById('posterLoading');
-  if (!el) {
-    el = document.createElement('div'); el.id = 'posterLoading';
-    el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:-apple-system,sans-serif;';
-    el.innerHTML = '<div style="width:40px;height:40px;border:3px solid #333;border-top-color:#f0b90b;border-radius:50%;animation:pspin 0.8s linear infinite;margin-bottom:16px;"></div><div style="font-size:16px;">正在生成海报...</div><style>@keyframes pspin{to{transform:rotate(360deg)}}</style>';
-    document.body.appendChild(el);
-  }
-  el.style.display = 'flex';
-}
-
-function hidePosterLoading() {
-  var el = document.getElementById('posterLoading');
-  if (el) el.style.display = 'none';
-}
-
-function showPosterOverlay(dataUrl) {
-  hidePosterLoading();
-  var el = document.getElementById('posterOverlay');
-  if (!el) {
-    el = document.createElement('div'); el.id = 'posterOverlay';
-    el.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;';
-    el.onclick = function(e) { if (e.target === el) hidePosterOverlay(); };
-    el.innerHTML = '<img id="posterImg" style="max-width:92vw;max-height:82vh;border-radius:12px;box-shadow:0 8px 48px rgba(240,185,11,0.2);"><div style="color:rgba(255,255,255,0.45);font-size:12px;margin-top:14px;font-family:-apple-system,sans-serif;">长按海报保存到相册  ·  点空白处关闭</div>';
-    document.body.appendChild(el);
-    _posterImg = el.querySelector('#posterImg');
-  }
-  _posterImg.src = dataUrl;
-  el.style.display = 'flex';
-}
-
-function hidePosterOverlay() {
-  var el = document.getElementById('posterOverlay');
-  if (el) el.style.display = 'none';
-}
 
 function buildExportText() {
   if (history.length === 0) return '';

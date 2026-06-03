@@ -11,8 +11,7 @@
 - **GitHub 仓库**：https://github.com/Dkk188018/fc-sim.git
 - **本地目录**：`F:\CLAUDE\FCol4强化模拟器\`
 - **版本文件命名**：`index_vX.X.X.html`（如 `index_v3.6.1.html`）
-- **当前最新版本**：v3.6.1（`index.html`）
-- **总文件大小**：约 3400 行，~150KB（不含卡图）
+- **当前最新版本**：v3.7.1（`index.html`）
 
 ### 1.2 技术栈
 - **前端框架**：无框架，纯 HTML + CSS + JavaScript（单文件）
@@ -211,7 +210,7 @@
 ### 4.2 域名信息
 - **域名**：fc-simulator.com（腾讯云注册，¥83/年，续费 ~¥85）
 - **DNS**：Cloudflare（免费 CDN + HTTPS）
-- **Nameserver**：decker.ns.cloudflare.com / lia.ns.cloudflare.com
+- **Nameserver**：beau.ns.cloudflare.com / irena.ns.cloudflare.com
 - **SSL**：Cloudflare 自动 HTTPS
 
 ### 4.3 成本
@@ -230,22 +229,8 @@
 - 新版发布：`index.html` → `index_vX.X.X.html`（归档至 `archive/所有版本号/`）
 - 当前文件：`index.html`（始终是最新版）
 
-### 5.2 版本历史（主要里程碑）
-| 版本 | 日期 | 关键改动 |
-|------|------|---------|
-| v2.0-v2.3 | 2026-05-25/26 | 深色背景、球员信息重构、手机适配 |
-| v2.4 | 2026-05-27 | 进度条重构、六边形材料槽、卡框调整 |
-| v2.5 | 2026-05-27 | 共享IndexedDB、卡图生成器联调 |
-| v2.7 | 2026-05-28 | 球员DB更新（102人）、绿点标识替代分组 |
-| v2.8 | 2026-05-28 | 卡片清单系统（cards_manifest.json） |
-| v3.0 | 2026-05-28 | 赛季层级目录重构（25UCL） |
-| v3.1-v3.3 | 2026-05-28 | 设置面板UI调整（赛季→球员→名称+位置） |
-| v3.4.0 | 2026-05-28/29 | 强化动画重构（预掷骰子+三档特效+性能优化+结果页） |
-| v3.5.0 | 2026-05-29 | 项目迁移至FCol4强化模拟器、目录重构、赛季图标独立目录、永久路径约定、CLAUDE.md+快捷指令、清理编辑器无关内容 |
-| v3.1.0 | 2026-05-30 | 主卡等级价格表（+8~+13折叠面板）、保存按钮切换（绿底已保存/取消清除）、球员价值只读自动填入、亿/兆单位失焦转换（getPriceUnitEl修复同行多框bug）、能量条5格全满绿潮R→L、高级设置红色标题 |
-| v3.2.0 | 2026-05-30 | BP消耗系统（单次消耗=保护BP+材料总价）、材料价格/主卡价值双条件检查、BP预览实时刷新（滑块拖动/应用设置）、历史记录显示BP消耗、红色缺失提示、能量条公式实测校准（1.35^OVR差）、绿色满格全有或全无、溢出裁剪、添加按钮满格禁用 |
-| v3.6.0 | 2026-05-31 | 主页面视觉升级（球员卡片微光环/进度条连接线加粗/保护滑块精致化/材料行美化/按钮比例调整/历史记录背景条/页脚胶囊化/统一hover动效/进度节点微放大/统计数字脉冲）、能量条时序统一60ms严格逐格级联（蓝绿进入消退全4阶段2x提速）、清空后400ms锁添加防闪烁、移动端布局压缩~55px（标题缩小/能量格扁化/全间距收紧）、BP提示绝对定位消除布局抖动 |
-| v3.6.1 | 2026-05-31 | 键盘快捷键修复：skipBurst()防重入锁_skipBurstGuard防止失败黑烟动画期间多次累加总次数、空格所有分支统一_spaceGuard 400ms冷却、stopAuto()重置isEnhancing修复状态残留 |
+### 5.2 版本历史
+所有历史版本已归档至 `archive/所有版本号/`。
 
 ### 5.3 回退规则
 - "回退上一步" = 撤销最近一次代码改动，**不是 git 版本回退**
@@ -255,23 +240,7 @@
 
 ## 6. 关键问题与解决方案
 
-### 6.1 已解决问题
-| 问题 | 原因 | 解决方案 |
-|------|------|---------|
-| 811MB PNG 推送极慢 | 1300个文件直推 GitHub | PNG → WebP（89%压缩） |
-| K·阿德耶米卡图不显示 | manifest用`·`(U+00B7) DB用`.`(U+002E) | 统一使用 DB 中的名字 |
-| 手机强化动画卡顿 | 每帧改 filter 触发重画 | 改用 opacity + GPU 合成 |
-| 手机谷歌浏览器内容偏上 | CSS padding 不生效 | JS 同步设 inline style + !important |
-| `_pendingSuccess` 被提前清空 | executeEnhance 先清旗再读旗 | 调换顺序 + _pendingMode 兜底 |
-| 卡框被光照亮 | burstCardWrap.boxShadow | 删除 boxShadow 改用卡片内发光层 |
-| 项目结构混乱 | 版本文件散落、图片无分类、编辑器内容混杂 | 目录重构（archive/版本归档、赛季图标独立目录、编辑器内容剥离） |
-| 新增球员流程不清晰 | 路径分散、步骤依赖记忆 | 永久路径约定（赛季图标/卡图/文本数据库）+ 快捷指令自动化 |
-| 能量条蓝绿进入消退多格同时跑 | 间隔(100ms/50ms) < 过渡(0.2s/0.06s) 导致重叠 | 统一60ms间隔+0.06s过渡，严格逐格不重叠，总耗时从0.6s降到0.3s |
-| 清空→立即添加能量条乱 | 消退动画未完成时新fill被创建，新旧timeout竞态 | _energyClearing锁，清空后400ms禁用添加按钮 |
-| BP提示红字导致页面抖动 | bpHint用display:none切换，文档流高度突变 | 移出stat-box，用position:absolute脱离文档流 |
-| 自动模式快速连按空格总次数异常增加 | skipBurst无防重入、键盘处理仅手动分支有守卫、失败黑烟动画期间burst持续显示800ms | skipBurst()加_skipBurstGuard锁、键盘所有空格分支统一_spaceGuard、stopAuto()清理isEnhancing |
-
-### 6.2 待解决问题
+### 6.1 待解决问题
 - iPhone Safari 页面布局偏上（已放弃，用户不用 Safari）
 
 ---
@@ -322,7 +291,7 @@
 
 ```
 FCol4强化模拟器/
-├─ index.html                ← 当前最新版（v3.4）
+├─ index.html                ← 当前最新版
 ├─ cards_manifest.json       ← 卡图清单
 ├─ PROJECT_MEMORY.md         ← 本文档
 ├─ CLAUDE.md                 ← 项目规则 + 快捷指令（/更新记忆 /检查状态 /晚安）
@@ -342,40 +311,5 @@ FCol4强化模拟器/
 
 ---
 
-## 9. 商业化与未来方向
-
-### 9.1 竞品分析
-- fifaaddict.com：~5625日IP, $1500-3500/月广告收入, 48%越南用户
-- 中国无先发 FC Online 强化模拟器
-
-### 9.2 未来计划（已讨论，未实施）
-- **Android APK**：Capacitor WebView 壳 + AdMob 广告
-  - 需要 Android Studio + JDK 17+ + Google AdMob 账号
-  - 推荐策略：强化失败→激励视频"看广告复活"
-- **图床迁移**：图片量大后迁至 Cloudflare R2（免费 10GB），不占 GitHub 仓库空间
-- **微信小程序**：需 ICP 备案 + 可能需增值电信许可证（审核风险）
-- **多赛季支持**：`cards_manifest.json` 已预留赛季嵌套结构
-
-### 9.3 版权说明
-- 网站加免责声明即可（fc-simulator.com 是描述性域名，不侵权）
-- 球员卡图来自官方市场截图，商用有风险，后续需自行设计卡片
-
----
-
-## 10. 记忆文件索引
-
-| 文件 | 内容 |
-|------|------|
-| `fc-online-simulator.md` | 项目整体记忆 |
-| `fc-simulator-new-path.md` | 新工作目录路径 |
-| `fc-simulator-deploy-path.md` | 版本文件在 deploy 目录的约定 |
-| `fc_card_webp_compress.md` | WebP 压缩参数与流程 |
-| `fc_season_icon_path.md` | 赛季图标存放路径 |
-| `season_icon_spec.md` | 赛季图标 28px 高规范 |
-| `feedback_version_discipline.md` | 版本管理：先复制再改 |
-| `feedback_revert_scope.md` | 回退=撤销最近改动 |
-
----
-
-*最后更新：2026-05-31*
-*当前版本：v3.6.1（键盘快捷键修复）*
+*最后更新：2026-06-03*
+*当前版本：v3.7.1*
