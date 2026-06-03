@@ -1,0 +1,15 @@
+name: 百度搜索URL推送
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  push-to-baidu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 推送URL到百度搜索
+        run: |
+          curl -X POST "http://data.zz.baidu.com/urls?site=https://fc-simulator.com&token=McuOYtzVkKLyegtO" \
+            -H "Content-Type: text/plain" \
+            -d "https://fc-simulator.com/"
