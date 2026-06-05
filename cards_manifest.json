@@ -1949,7 +1949,7 @@
       "label": "PTG",
       "players": {
         "哈兰德": {
-          "source": "images/球员卡/PTG/哈兰德/哈兰德_Lv{level}.png",
+          "source": "images/球员卡/PTG/哈兰德/哈兰德_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -1968,7 +1968,7 @@
           "format": "per-level"
         },
         "孟菲斯·德佩": {
-          "source": "images/球员卡/PTG/孟菲斯·德佩/孟菲斯·德佩_Lv{level}.png",
+          "source": "images/球员卡/PTG/孟菲斯·德佩/孟菲斯·德佩_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -1987,7 +1987,7 @@
           "format": "per-level"
         },
         "哈里·凯恩": {
-          "source": "images/球员卡/PTG/哈里·凯恩/哈里·凯恩_Lv{level}.png",
+          "source": "images/球员卡/PTG/哈里·凯恩/哈里·凯恩_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2006,7 +2006,7 @@
           "format": "per-level"
         },
         "姆巴佩": {
-          "source": "images/球员卡/PTG/姆巴佩/姆巴佩_Lv{level}.png",
+          "source": "images/球员卡/PTG/姆巴佩/姆巴佩_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2025,7 +2025,7 @@
           "format": "per-level"
         },
         "萨拉赫": {
-          "source": "images/球员卡/PTG/萨拉赫/萨拉赫_Lv{level}.png",
+          "source": "images/球员卡/PTG/萨拉赫/萨拉赫_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2044,7 +2044,7 @@
           "format": "per-level"
         },
         "J.多库": {
-          "source": "images/球员卡/PTG/J.多库/J.多库_Lv{level}.png",
+          "source": "images/球员卡/PTG/J.多库/J.多库_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2063,7 +2063,7 @@
           "format": "per-level"
         },
         "德布劳内": {
-          "source": "images/球员卡/PTG/德布劳内/德布劳内_Lv{level}.png",
+          "source": "images/球员卡/PTG/德布劳内/德布劳内_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2082,7 +2082,7 @@
           "format": "per-level"
         },
         "梅西": {
-          "source": "images/球员卡/PTG/梅西/梅西_Lv{level}.png",
+          "source": "images/球员卡/PTG/梅西/梅西_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2101,7 +2101,7 @@
           "format": "per-level"
         },
         "M.阿穆拉": {
-          "source": "images/球员卡/PTG/M.阿穆拉/M.阿穆拉_Lv{level}.png",
+          "source": "images/球员卡/PTG/M.阿穆拉/M.阿穆拉_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2120,7 +2120,7 @@
           "format": "per-level"
         },
         "F.维尔茨": {
-          "source": "images/球员卡/PTG/F.维尔茨/F.维尔茨_Lv{level}.png",
+          "source": "images/球员卡/PTG/F.维尔茨/F.维尔茨_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2139,7 +2139,7 @@
           "format": "per-level"
         },
         "M.凯塞多": {
-          "source": "images/球员卡/PTG/M.凯塞多/M.凯塞多_Lv{level}.png",
+          "source": "images/球员卡/PTG/M.凯塞多/M.凯塞多_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2158,7 +2158,7 @@
           "format": "per-level"
         },
         "维蒂尼亚": {
-          "source": "images/球员卡/PTG/维蒂尼亚/维蒂尼亚_Lv{level}.png",
+          "source": "images/球员卡/PTG/维蒂尼亚/维蒂尼亚_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2177,7 +2177,7 @@
           "format": "per-level"
         },
         "佩德里": {
-          "source": "images/球员卡/PTG/佩德里/佩德里_Lv{level}.png",
+          "source": "images/球员卡/PTG/佩德里/佩德里_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2196,7 +2196,7 @@
           "format": "per-level"
         },
         "布鲁诺·吉马良斯": {
-          "source": "images/球员卡/PTG/布鲁诺·吉马良斯/布鲁诺·吉马良斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/布鲁诺·吉马良斯/布鲁诺·吉马良斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2215,7 +2215,7 @@
           "format": "per-level"
         },
         "奥利塞": {
-          "source": "images/球员卡/PTG/奥利塞/奥利塞_Lv{level}.png",
+          "source": "images/球员卡/PTG/奥利塞/奥利塞_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2234,7 +2234,7 @@
           "format": "per-level"
         },
         "路易斯·迪亚斯": {
-          "source": "images/球员卡/PTG/路易斯·迪亚斯/路易斯·迪亚斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/路易斯·迪亚斯/路易斯·迪亚斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2253,7 +2253,7 @@
           "format": "per-level"
         },
         "赖斯": {
-          "source": "images/球员卡/PTG/赖斯/赖斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/赖斯/赖斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2272,7 +2272,7 @@
           "format": "per-level"
         },
         "C.罗梅罗": {
-          "source": "images/球员卡/PTG/C.罗梅罗/C.罗梅罗_Lv{level}.png",
+          "source": "images/球员卡/PTG/C.罗梅罗/C.罗梅罗_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2291,7 +2291,7 @@
           "format": "per-level"
         },
         "奥亚萨瓦尔": {
-          "source": "images/球员卡/PTG/奥亚萨瓦尔/奥亚萨瓦尔_Lv{level}.png",
+          "source": "images/球员卡/PTG/奥亚萨瓦尔/奥亚萨瓦尔_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2310,7 +2310,7 @@
           "format": "per-level"
         },
         "C.罗纳尔多": {
-          "source": "images/球员卡/PTG/C.罗纳尔多/C.罗纳尔多_Lv{level}.png",
+          "source": "images/球员卡/PTG/C.罗纳尔多/C.罗纳尔多_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2329,7 +2329,7 @@
           "format": "per-level"
         },
         "布鲁诺·费尔南德斯": {
-          "source": "images/球员卡/PTG/布鲁诺·费尔南德斯/布鲁诺·费尔南德斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/布鲁诺·费尔南德斯/布鲁诺·费尔南德斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2348,7 +2348,7 @@
           "format": "per-level"
         },
         "范戴克": {
-          "source": "images/球员卡/PTG/范戴克/范戴克_Lv{level}.png",
+          "source": "images/球员卡/PTG/范戴克/范戴克_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2367,7 +2367,7 @@
           "format": "per-level"
         },
         "孙兴慜": {
-          "source": "images/球员卡/PTG/孙兴慜/孙兴慜_Lv{level}.png",
+          "source": "images/球员卡/PTG/孙兴慜/孙兴慜_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2386,7 +2386,7 @@
           "format": "per-level"
         },
         "佩里西奇": {
-          "source": "images/球员卡/PTG/佩里西奇/佩里西奇_Lv{level}.png",
+          "source": "images/球员卡/PTG/佩里西奇/佩里西奇_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2405,7 +2405,7 @@
           "format": "per-level"
         },
         "M.塔雷米": {
-          "source": "images/球员卡/PTG/M.塔雷米/M.塔雷米_Lv{level}.png",
+          "source": "images/球员卡/PTG/M.塔雷米/M.塔雷米_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2424,7 +2424,7 @@
           "format": "per-level"
         },
         "F.德容": {
-          "source": "images/球员卡/PTG/F.德容/F.德容_Lv{level}.png",
+          "source": "images/球员卡/PTG/F.德容/F.德容_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2443,7 +2443,7 @@
           "format": "per-level"
         },
         "厄德高": {
-          "source": "images/球员卡/PTG/厄德高/厄德高_Lv{level}.png",
+          "source": "images/球员卡/PTG/厄德高/厄德高_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2462,7 +2462,7 @@
           "format": "per-level"
         },
         "乔丹·阿尤": {
-          "source": "images/球员卡/PTG/乔丹·阿尤/乔丹·阿尤_Lv{level}.png",
+          "source": "images/球员卡/PTG/乔丹·阿尤/乔丹·阿尤_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2481,7 +2481,7 @@
           "format": "per-level"
         },
         "加克波": {
-          "source": "images/球员卡/PTG/加克波/加克波_Lv{level}.png",
+          "source": "images/球员卡/PTG/加克波/加克波_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2500,7 +2500,7 @@
           "format": "per-level"
         },
         "拉菲尼亚": {
-          "source": "images/球员卡/PTG/拉菲尼亚/拉菲尼亚_Lv{level}.png",
+          "source": "images/球员卡/PTG/拉菲尼亚/拉菲尼亚_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2519,7 +2519,7 @@
           "format": "per-level"
         },
         "D.邓弗里斯": {
-          "source": "images/球员卡/PTG/D.邓弗里斯/D.邓弗里斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/D.邓弗里斯/D.邓弗里斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2538,7 +2538,7 @@
           "format": "per-level"
         },
         "奥塔门迪": {
-          "source": "images/球员卡/PTG/奥塔门迪/奥塔门迪_Lv{level}.png",
+          "source": "images/球员卡/PTG/奥塔门迪/奥塔门迪_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2557,7 +2557,7 @@
           "format": "per-level"
         },
         "W.帕乔": {
-          "source": "images/球员卡/PTG/W.帕乔/W.帕乔_Lv{level}.png",
+          "source": "images/球员卡/PTG/W.帕乔/W.帕乔_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2576,7 +2576,7 @@
           "format": "per-level"
         },
         "萨迪奥·马内": {
-          "source": "images/球员卡/PTG/萨迪奥·马内/萨迪奥·马内_Lv{level}.png",
+          "source": "images/球员卡/PTG/萨迪奥·马内/萨迪奥·马内_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2595,7 +2595,7 @@
           "format": "per-level"
         },
         "J.阿尔瓦雷斯": {
-          "source": "images/球员卡/PTG/J.阿尔瓦雷斯/J.阿尔瓦雷斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/J.阿尔瓦雷斯/J.阿尔瓦雷斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2614,7 +2614,7 @@
           "format": "per-level"
         },
         "鲁本·迪亚斯": {
-          "source": "images/球员卡/PTG/鲁本·迪亚斯/鲁本·迪亚斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/鲁本·迪亚斯/鲁本·迪亚斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2633,7 +2633,7 @@
           "format": "per-level"
         },
         "巴尔维德": {
-          "source": "images/球员卡/PTG/巴尔维德/巴尔维德_Lv{level}.png",
+          "source": "images/球员卡/PTG/巴尔维德/巴尔维德_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2652,7 +2652,7 @@
           "format": "per-level"
         },
         "卜拉辛·迪亚斯": {
-          "source": "images/球员卡/PTG/卜拉辛·迪亚斯/卜拉辛·迪亚斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/卜拉辛·迪亚斯/卜拉辛·迪亚斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2671,7 +2671,7 @@
           "format": "per-level"
         },
         "蒂莱曼斯": {
-          "source": "images/球员卡/PTG/蒂莱曼斯/蒂莱曼斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/蒂莱曼斯/蒂莱曼斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2690,7 +2690,7 @@
           "format": "per-level"
         },
         "克拉马里奇": {
-          "source": "images/球员卡/PTG/克拉马里奇/克拉马里奇_Lv{level}.png",
+          "source": "images/球员卡/PTG/克拉马里奇/克拉马里奇_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2709,7 +2709,7 @@
           "format": "per-level"
         },
         "马尔基尼奥斯": {
-          "source": "images/球员卡/PTG/马尔基尼奥斯/马尔基尼奥斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/马尔基尼奥斯/马尔基尼奥斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2728,7 +2728,7 @@
           "format": "per-level"
         },
         "哈梅斯·罗德里格斯": {
-          "source": "images/球员卡/PTG/哈梅斯·罗德里格斯/哈梅斯·罗德里格斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/哈梅斯·罗德里格斯/哈梅斯·罗德里格斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2747,7 +2747,7 @@
           "format": "per-level"
         },
         "哲科": {
-          "source": "images/球员卡/PTG/哲科/哲科_Lv{level}.png",
+          "source": "images/球员卡/PTG/哲科/哲科_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2766,7 +2766,7 @@
           "format": "per-level"
         },
         "A.努萨": {
-          "source": "images/球员卡/PTG/A.努萨/A.努萨_Lv{level}.png",
+          "source": "images/球员卡/PTG/A.努萨/A.努萨_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2785,7 +2785,7 @@
           "format": "per-level"
         },
         "D.恩多耶": {
-          "source": "images/球员卡/PTG/D.恩多耶/D.恩多耶_Lv{level}.png",
+          "source": "images/球员卡/PTG/D.恩多耶/D.恩多耶_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2804,7 +2804,7 @@
           "format": "per-level"
         },
         "N.沃尔特马德": {
-          "source": "images/球员卡/PTG/N.沃尔特马德/N.沃尔特马德_Lv{level}.png",
+          "source": "images/球员卡/PTG/N.沃尔特马德/N.沃尔特马德_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2823,7 +2823,7 @@
           "format": "per-level"
         },
         "苏比门迪": {
-          "source": "images/球员卡/PTG/苏比门迪/苏比门迪_Lv{level}.png",
+          "source": "images/球员卡/PTG/苏比门迪/苏比门迪_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2842,7 +2842,7 @@
           "format": "per-level"
         },
         "恩佐·费尔南德斯": {
-          "source": "images/球员卡/PTG/恩佐·费尔南德斯/恩佐·费尔南德斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/恩佐·费尔南德斯/恩佐·费尔南德斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2861,7 +2861,7 @@
           "format": "per-level"
         },
         "赫拉芬贝赫": {
-          "source": "images/球员卡/PTG/赫拉芬贝赫/赫拉芬贝赫_Lv{level}.png",
+          "source": "images/球员卡/PTG/赫拉芬贝赫/赫拉芬贝赫_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2880,7 +2880,7 @@
           "format": "per-level"
         },
         "M.塔勒比": {
-          "source": "images/球员卡/PTG/M.塔勒比/M.塔勒比_Lv{level}.png",
+          "source": "images/球员卡/PTG/M.塔勒比/M.塔勒比_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2899,7 +2899,7 @@
           "format": "per-level"
         },
         "M.库杜斯": {
-          "source": "images/球员卡/PTG/M.库杜斯/M.库杜斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/M.库杜斯/M.库杜斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2918,7 +2918,7 @@
           "format": "per-level"
         },
         "李刚仁": {
-          "source": "images/球员卡/PTG/李刚仁/李刚仁_Lv{level}.png",
+          "source": "images/球员卡/PTG/李刚仁/李刚仁_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2937,7 +2937,7 @@
           "format": "per-level"
         },
         "久保健英": {
-          "source": "images/球员卡/PTG/久保健英/久保健英_Lv{level}.png",
+          "source": "images/球员卡/PTG/久保健英/久保健英_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2956,7 +2956,7 @@
           "format": "per-level"
         },
         "D.劳恩": {
-          "source": "images/球员卡/PTG/D.劳恩/D.劳恩_Lv{level}.png",
+          "source": "images/球员卡/PTG/D.劳恩/D.劳恩_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2975,7 +2975,7 @@
           "format": "per-level"
         },
         "加布里埃尔": {
-          "source": "images/球员卡/PTG/加布里埃尔/加布里埃尔_Lv{level}.png",
+          "source": "images/球员卡/PTG/加布里埃尔/加布里埃尔_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -2994,7 +2994,7 @@
           "format": "per-level"
         },
         "迈克尔·梅里诺": {
-          "source": "images/球员卡/PTG/迈克尔·梅里诺/迈克尔·梅里诺_Lv{level}.png",
+          "source": "images/球员卡/PTG/迈克尔·梅里诺/迈克尔·梅里诺_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3013,7 +3013,7 @@
           "format": "per-level"
         },
         "A.瑟洛特": {
-          "source": "images/球员卡/PTG/A.瑟洛特/A.瑟洛特_Lv{level}.png",
+          "source": "images/球员卡/PTG/A.瑟洛特/A.瑟洛特_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3032,7 +3032,7 @@
           "format": "per-level"
         },
         "基米希": {
-          "source": "images/球员卡/PTG/基米希/基米希_Lv{level}.png",
+          "source": "images/球员卡/PTG/基米希/基米希_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3051,7 +3051,7 @@
           "format": "per-level"
         },
         "恰尔汗奥卢": {
-          "source": "images/球员卡/PTG/恰尔汗奥卢/恰尔汗奥卢_Lv{level}.png",
+          "source": "images/球员卡/PTG/恰尔汗奥卢/恰尔汗奥卢_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3070,7 +3070,7 @@
           "format": "per-level"
         },
         "萨比策": {
-          "source": "images/球员卡/PTG/萨比策/萨比策_Lv{level}.png",
+          "source": "images/球员卡/PTG/萨比策/萨比策_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3089,7 +3089,7 @@
           "format": "per-level"
         },
         "因卡皮耶": {
-          "source": "images/球员卡/PTG/因卡皮耶/因卡皮耶_Lv{level}.png",
+          "source": "images/球员卡/PTG/因卡皮耶/因卡皮耶_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3108,7 +3108,7 @@
           "format": "per-level"
         },
         "努诺·门德斯": {
-          "source": "images/球员卡/PTG/努诺·门德斯/努诺·门德斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/努诺·门德斯/努诺·门德斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3127,7 +3127,7 @@
           "format": "per-level"
         },
         "里斯·詹姆斯": {
-          "source": "images/球员卡/PTG/里斯·詹姆斯/里斯·詹姆斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/里斯·詹姆斯/里斯·詹姆斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3146,7 +3146,7 @@
           "format": "per-level"
         },
         "孔萨": {
-          "source": "images/球员卡/PTG/孔萨/孔萨_Lv{level}.png",
+          "source": "images/球员卡/PTG/孔萨/孔萨_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3165,7 +3165,7 @@
           "format": "per-level"
         },
         "若奥·坎塞洛": {
-          "source": "images/球员卡/PTG/若奥·坎塞洛/若奥·坎塞洛_Lv{level}.png",
+          "source": "images/球员卡/PTG/若奥·坎塞洛/若奥·坎塞洛_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3184,7 +3184,7 @@
           "format": "per-level"
         },
         "H.加林德斯": {
-          "source": "images/球员卡/PTG/H.加林德斯/H.加林德斯_Lv{level}.png",
+          "source": "images/球员卡/PTG/H.加林德斯/H.加林德斯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3203,7 +3203,7 @@
           "format": "per-level"
         },
         "D.里瓦克维奇": {
-          "source": "images/球员卡/PTG/D.里瓦克维奇/D.里瓦克维奇_Lv{level}.png",
+          "source": "images/球员卡/PTG/D.里瓦克维奇/D.里瓦克维奇_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3222,7 +3222,7 @@
           "format": "per-level"
         },
         "乌奈·西蒙": {
-          "source": "images/球员卡/PTG/乌奈·西蒙/乌奈·西蒙_Lv{level}.png",
+          "source": "images/球员卡/PTG/乌奈·西蒙/乌奈·西蒙_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3241,7 +3241,7 @@
           "format": "per-level"
         },
         "G.科贝尔": {
-          "source": "images/球员卡/PTG/G.科贝尔/G.科贝尔_Lv{level}.png",
+          "source": "images/球员卡/PTG/G.科贝尔/G.科贝尔_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3260,7 +3260,7 @@
           "format": "per-level"
         },
         "麦克托米奈": {
-          "source": "images/球员卡/PTG/麦克托米奈/麦克托米奈_Lv{level}.png",
+          "source": "images/球员卡/PTG/麦克托米奈/麦克托米奈_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3279,7 +3279,7 @@
           "format": "per-level"
         },
         "金玟哉": {
-          "source": "images/球员卡/PTG/金玟哉/金玟哉_Lv{level}.png",
+          "source": "images/球员卡/PTG/金玟哉/金玟哉_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3298,7 +3298,7 @@
           "format": "per-level"
         },
         "恩博洛": {
-          "source": "images/球员卡/PTG/恩博洛/恩博洛_Lv{level}.png",
+          "source": "images/球员卡/PTG/恩博洛/恩博洛_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3317,7 +3317,7 @@
           "format": "per-level"
         },
         "S.弗法纳": {
-          "source": "images/球员卡/PTG/S.弗法纳/S.弗法纳_Lv{level}.png",
+          "source": "images/球员卡/PTG/S.弗法纳/S.弗法纳_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3336,7 +3336,7 @@
           "format": "per-level"
         },
         "J.塔": {
-          "source": "images/球员卡/PTG/J.塔/J.塔_Lv{level}.png",
+          "source": "images/球员卡/PTG/J.塔/J.塔_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3355,7 +3355,7 @@
           "format": "per-level"
         },
         "R.德保罗": {
-          "source": "images/球员卡/PTG/R.德保罗/R.德保罗_Lv{level}.png",
+          "source": "images/球员卡/PTG/R.德保罗/R.德保罗_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3374,7 +3374,7 @@
           "format": "per-level"
         },
         "格纳布里": {
-          "source": "images/球员卡/PTG/格纳布里/格纳布里_Lv{level}.png",
+          "source": "images/球员卡/PTG/格纳布里/格纳布里_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3393,7 +3393,7 @@
           "format": "per-level"
         },
         "H.瓦纳肯": {
-          "source": "images/球员卡/PTG/H.瓦纳肯/H.瓦纳肯_Lv{level}.png",
+          "source": "images/球员卡/PTG/H.瓦纳肯/H.瓦纳肯_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3412,7 +3412,7 @@
           "format": "per-level"
         },
         "扎卡": {
-          "source": "images/球员卡/PTG/扎卡/扎卡_Lv{level}.png",
+          "source": "images/球员卡/PTG/扎卡/扎卡_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3431,7 +3431,7 @@
           "format": "per-level"
         },
         "莫德里奇": {
-          "source": "images/球员卡/PTG/莫德里奇/莫德里奇_Lv{level}.png",
+          "source": "images/球员卡/PTG/莫德里奇/莫德里奇_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3450,7 +3450,7 @@
           "format": "per-level"
         },
         "N.赛沃尔德": {
-          "source": "images/球员卡/PTG/N.赛沃尔德/N.赛沃尔德_Lv{level}.png",
+          "source": "images/球员卡/PTG/N.赛沃尔德/N.赛沃尔德_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3469,7 +3469,7 @@
           "format": "per-level"
         },
         "L.克赖奇": {
-          "source": "images/球员卡/PTG/L.克赖奇/L.克赖奇_Lv{level}.png",
+          "source": "images/球员卡/PTG/L.克赖奇/L.克赖奇_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3488,7 +3488,7 @@
           "format": "per-level"
         },
         "J.格瓦迪奥尔": {
-          "source": "images/球员卡/PTG/J.格瓦迪奥尔/J.格瓦迪奥尔_Lv{level}.png",
+          "source": "images/球员卡/PTG/J.格瓦迪奥尔/J.格瓦迪奥尔_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3507,7 +3507,7 @@
           "format": "per-level"
         },
         "M.德库耶佩": {
-          "source": "images/球员卡/PTG/M.德库耶佩/M.德库耶佩_Lv{level}.png",
+          "source": "images/球员卡/PTG/M.德库耶佩/M.德库耶佩_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3526,7 +3526,7 @@
           "format": "per-level"
         },
         "凯西": {
-          "source": "images/球员卡/PTG/凯西/凯西_Lv{level}.png",
+          "source": "images/球员卡/PTG/凯西/凯西_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3545,7 +3545,7 @@
           "format": "per-level"
         },
         "J.瑞尔森": {
-          "source": "images/球员卡/PTG/J.瑞尔森/J.瑞尔森_Lv{level}.png",
+          "source": "images/球员卡/PTG/J.瑞尔森/J.瑞尔森_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3564,7 +3564,7 @@
           "format": "per-level"
         },
         "于帕梅卡诺": {
-          "source": "images/球员卡/PTG/于帕梅卡诺/于帕梅卡诺_Lv{level}.png",
+          "source": "images/球员卡/PTG/于帕梅卡诺/于帕梅卡诺_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3583,7 +3583,7 @@
           "format": "per-level"
         },
         "M.阿坎吉": {
-          "source": "images/球员卡/PTG/M.阿坎吉/M.阿坎吉_Lv{level}.png",
+          "source": "images/球员卡/PTG/M.阿坎吉/M.阿坎吉_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3602,7 +3602,7 @@
           "format": "per-level"
         },
         "莱默尔": {
-          "source": "images/球员卡/PTG/莱默尔/莱默尔_Lv{level}.png",
+          "source": "images/球员卡/PTG/莱默尔/莱默尔_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3621,7 +3621,7 @@
           "format": "per-level"
         },
         "C.姆贝巴": {
-          "source": "images/球员卡/PTG/C.姆贝巴/C.姆贝巴_Lv{level}.png",
+          "source": "images/球员卡/PTG/C.姆贝巴/C.姆贝巴_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3640,7 +3640,7 @@
           "format": "per-level"
         },
         "A.曼迪": {
-          "source": "images/球员卡/PTG/A.曼迪/A.曼迪_Lv{level}.png",
+          "source": "images/球员卡/PTG/A.曼迪/A.曼迪_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3659,7 +3659,7 @@
           "format": "per-level"
         },
         "丹·伯恩": {
-          "source": "images/球员卡/PTG/丹·伯恩/丹·伯恩_Lv{level}.png",
+          "source": "images/球员卡/PTG/丹·伯恩/丹·伯恩_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3678,7 +3678,7 @@
           "format": "per-level"
         },
         "爱德华·门迪": {
-          "source": "images/球员卡/PTG/爱德华·门迪/爱德华·门迪_Lv{level}.png",
+          "source": "images/球员卡/PTG/爱德华·门迪/爱德华·门迪_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3697,7 +3697,7 @@
           "format": "per-level"
         },
         "奥利佛·鲍曼": {
-          "source": "images/球员卡/PTG/奥利佛·鲍曼/奥利佛·鲍曼_Lv{level}.png",
+          "source": "images/球员卡/PTG/奥利佛·鲍曼/奥利佛·鲍曼_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3716,7 +3716,7 @@
           "format": "per-level"
         },
         "Y.福法纳": {
-          "source": "images/球员卡/PTG/Y.福法纳/Y.福法纳_Lv{level}.png",
+          "source": "images/球员卡/PTG/Y.福法纳/Y.福法纳_Lv{level}.webp",
           "levels": [
             1,
             2,
@@ -3735,7 +3735,26 @@
           "format": "per-level"
         },
         "Y.布努": {
-          "source": "images/球员卡/PTG/Y.布努/Y.布努_Lv{level}.png",
+          "source": "images/球员卡/PTG/Y.布努/Y.布努_Lv{level}.webp",
+          "levels": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "format": "per-level"
+        },
+        "D.努涅斯": {
+          "source": "images/球员卡/PTG/D.努涅斯/D.努涅斯_Lv{level}.webp",
           "levels": [
             1,
             2,
