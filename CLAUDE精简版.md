@@ -43,6 +43,35 @@
 2. `/检查状态` — 查看上下文健康度
 3. 梳理当前待办清单，列出下次继续要做的事
 
+### /新增球员
+用户说"/新增球员 XX赛季"时，执行以下全自动流程。用户已提前准备好：
+- `src/{赛季名}球员数据库.txt`
+- `images/球员卡/{赛季名}/` 下所有球员卡图
+- `images/赛季图标/{赛季名小写}_badge.png`
+
+执行步骤（全自动，不打断）：
+1. 读 `src/{赛季名}球员数据库.txt`，取赛季名（第一个 `-` 前面的部分）
+2. 读 `index.html`，找到 `<select id="inpSeason">`，追加 `<option value="{赛季名小写}">{赛季名}</option>`
+3. 在 `index.html` 的 `PLAYER_DB` 数组最后一个 `];` 前，从数据库 txt 逐行转换追加球员数据。字段映射：`赛季-球员名-ovr-场上位置-工资-强化-国籍-联赛-俱乐部` → `{season:"赛季名小写",position, name, ovr, salary, enhance, nationality, league, club}`。ovr/salary/enhance 转数字
+4. 更新 `cards_manifest.json`：在 `"seasons"` 对象中新增赛季 key（小写），每个球员条目格式：
+   ```json
+   "球员名": {
+     "source": "images/球员卡/{赛季名}/{球员名}/{球员名}_Lv{level}.png",
+     "levels": [1,2,3,4,5,6,7,8,9,10,11,12,13],
+     "format": "per-level"
+   }
+   ```
+5. 更新 `cards_manifest.json` 的 `updatedAt` 为当天日期
+6. 检查：赛季图标文件存在、下拉框选项正确、PLAYER_DB 条数正确、manifest entries 正确
+7. 输出：新增球员数量、赛季名、提醒用户刷新本地测试
+
+铁律：
+- 赛季名在 value/key 中统一小写，label 保留原始大小写
+- PLAYER_DB 的 season 字段用小写
+- manifest 的 season key 用小写
+- PNG 格式暂不转 WebP（后续单独处理）
+- 不自动 git push，等用户测试确认
+
 ### /仅模拟器
 锁定工作范围，全程只处理强化模拟器相关内容。
 1. 忽略球员编辑器、卡图生成器相关的提问
@@ -61,18 +90,19 @@ FCol4强化模拟器/
 ├─ index.html              # 主文件（单文件应用）
 ├─ cards_manifest.json     # 卡图索引
 ├─ images/
+│  ├─ 球员卡/              # 球员卡图（按赛季分文件夹）
 │  ├─ 赛季图标/            # 赛季徽标
 │  ├─ enhance/             # 强化等级图标 1~13
-│  ├─ cards/25UCL/         # 球员WebP卡图（102人×13级）
-│  └─ shatter_sprite.webp  # 碎片特效
+│  └─ 球员数据库_.txt      # 主数据库文件
+├─ src/                    # 各赛季数据库源文件
 ├─ generator/              # 卡图生成器（独立工具）
 └─ archive/                # 历史版本+更新日志
 ```
 
 ## 永久数据路径
-- 赛季图标: `images/赛季图标/{赛季名}_badge.png`
-- 球员卡图: `images/cards/{赛季}/{球员名}/{球员名}_Lv{level}.webp`
-- 文本数据库: `images/球员数据库_.txt`（格式: `赛季-球员名-ovr-位置-工资-强化等级-国籍-联赛-俱乐部`）
+- 赛季图标: `images/赛季图标/{赛季名}.png`
+- 球员卡图: `images/球员卡/{赛季}/{球员名}/{球员名}_Lv{level}.webp`
+- 赛季数据库: `src/{赛季}球员数据库.txt`（一赛季一文件，不合并。格式: `赛季-球员名-ovr-位置-工资-强化等级-国籍-联赛-俱乐部`）
 
 ## 技术要点
 - 球员卡图: WebP quality=90 effort=6
@@ -82,14 +112,15 @@ FCol4强化模拟器/
 - 特性槽: 等级<12 = 1个, 等级12/13 = 2个
 - 材料OVR = curOvr() 含强化等级加成
 
-## 新增球员工作流
-用户说"XX赛季更新了" → 对比 `球员数据库_.txt` 和 `PLAYER_DB` → 列新增名单 → 确认后:
+## 新增赛季工作流
+用户说"XX赛季更新了" → 对比 `src/{赛季}球员数据库.txt` 和 `index.html` 中 `PLAYER_DB` → 列新增名单 → 确认后:
 1. PNG → WebP (sharp, quality=90, effort=6)
-2. 放入 `images/cards/{赛季}/{球员名}/`
-3. 更新 `cards_manifest.json`
-4. 更新 `index.html` 中 `PLAYER_DB`
-5. git commit + push
-6. 确认线上可访问后删除源PNG
+2. 放入 `images/球员卡/{赛季}/{球员名}/`
+3. 更新 `index.html` 中 `PLAYER_DB`（从赛季数据库追加该赛季球员）
+4. git commit + push
+5. 确认线上可访问后删除源PNG
+
+注意：每个赛季数据库独立存放，不合并到一个总库。
 
 ## 部署
 ```bash
