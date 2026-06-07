@@ -127,3 +127,12 @@ FCol4强化模拟器/
 git add . && git commit -m "vX.X.X: 描述" && git push
 ```
 GitHub Pages自动部署，Cloudflare CDN自动更新（有缓存延迟）。
+
+## 百度搜索收录推送
+每次 git push 部署后，运行以下命令通知百度爬虫抓取：
+```powershell
+.\push-to-baidu.ps1
+```
+- API接口: `http://data.zz.baidu.com/urls?site=https://fc-simulator.com&token=McuOYtzVkKLyegtO`
+- 后台管理: https://ziyuan.baidu.com/linksubmit/index?site=https://fc-simulator.com/
+- sitemap: https://fc-simulator.com/sitemap.xml（部署后在百度平台提交）
