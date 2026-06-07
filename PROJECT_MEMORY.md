@@ -11,7 +11,7 @@
 - **GitHub 仓库**：https://github.com/Dkk188018/fc-sim.git
 - **本地目录**：`F:\CLAUDE\FCol4强化模拟器\`
 - **版本文件命名**：`index_vX.X.X.html`（如 `index_v3.6.1.html`）
-- **当前最新版本**：v3.9.0（`index.html`）
+- **当前最新版本**：v3.10.3（`index.html`）
 
 ### 1.2 技术栈
 - **前端框架**：无框架，纯 HTML + CSS + JavaScript（单文件）
@@ -154,6 +154,20 @@
 - 问题：`openAdvancedSettings()` 设 `style.display=''` 回退CSS的`display:none`，高级设置打不开
 - 修复：改为 `style.display='flex'`
 
+**v3.10.2 关键修复（2026-06-07）：**
+- `getSavedMatPrices` 函数在 v3.9.0 重构中被删除但仍被 `executeEnhance()` 调用，导致强化动画播放后崩溃无结果页
+- 重新添加该函数，将新版 `_matPricesStore` 对象格式转为旧版调用方期望的数组格式
+- 材料行按压效果从 DOM 创建波纹改为纯 CSS class toggle（`.mat-row-pressed`），零 DOM 操作
+- 删除模式过渡动画全部改为 opacity（GPU 合成），砍掉 max-height/max-width 过渡（布局抖动）
+- OVR 输入限制：禁小数点、3 位自动跳转价格框、`type="number"` → `type="text" inputmode="numeric"`
+
+**v3.10.3 高级设置布局对齐小程序（2026-06-07）：**
+- "应用设置"按钮位置完全对齐小程序：`adv-modal` flex 列 → `adv-modal-scroll`(flex:1,overflow-y:auto) → `adv-sticky-footer`(flex-shrink:0)
+- `.adv-modal`：`padding: 20px 16px 0`（无底部padding，由footer接管）
+- `.adv-sticky-footer`：负margin `0 -16px` 撑满宽度 + 渐变背景 `#1a1d24 → transparent`
+- `.adv-btn-apply`：`width: calc(100% - 24px); margin: 0 auto`
+- 小程序参考路径：`F:\CLAUDE\FCol4强化模拟器-小程序\miniprogram\pages\enhance\enhance.wxml` 和 `.wxss`
+
 ### 3.4 强化动画流程（v3.4 核心改动）
 ```
 用户点击 [强化]
@@ -230,7 +244,15 @@
 - **Nameserver**：beau.ns.cloudflare.com / irena.ns.cloudflare.com
 - **SSL**：Cloudflare 自动 HTTPS
 
-### 4.3 成本
+### 4.3 百度搜索收录（全自动）
+- **API 推送**：`http://data.zz.baidu.com/urls?site=https://fc-simulator.com&token=McuOYtzVkKLyegtO`
+- **GitHub Actions 自动推送**：`.github/workflows/baidu-push.yml`（每次 push main 自动触发）
+- **sitemap**：`https://fc-simulator.com/sitemap.xml`
+- **百度后台**：https://ziyuan.baidu.com/linksubmit/index?site=https://fc-simulator.com/
+- **注意**：sitemap 提交配额为 0，需 ICP 备案号才能获取配额；API 推送不受影响，每日配额充足
+- **Git 推送修复**：Windows 下 git 需 `http.version=HTTP/1.1`（已永久配置 `git config http.version HTTP/1.1`）
+
+### 4.4 成本
 - 域名：~¥85/年
 - GitHub Pages：免费
 - Cloudflare CDN：免费
@@ -310,6 +332,8 @@
 FCol4强化模拟器/
 ├─ index.html                ← 当前最新版
 ├─ cards_manifest.json       ← 卡图清单
+├─ sitemap.xml               ← 百度搜索 sitemap
+├─ push-to-baidu.ps1         ← 手动百度推送脚本（备用，GitHub Actions 已自动化）
 ├─ PROJECT_MEMORY.md         ← 本文档
 ├─ CLAUDE.md                 ← 项目规则 + 快捷指令（/更新记忆 /检查状态 /晚安）
 ├─ .claudeignore             ← 文件过滤
@@ -328,5 +352,5 @@ FCol4强化模拟器/
 
 ---
 
-*最后更新：2026-06-07*
-*当前版本：v3.9.0*
+*最后更新：2026-06-08*
+*当前版本：v3.10.3*
