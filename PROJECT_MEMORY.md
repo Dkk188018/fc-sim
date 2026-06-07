@@ -11,7 +11,7 @@
 - **GitHub 仓库**：https://github.com/Dkk188018/fc-sim.git
 - **本地目录**：`F:\CLAUDE\FCol4强化模拟器\`
 - **版本文件命名**：`index_vX.X.X.html`（如 `index_v3.6.1.html`）
-- **当前最新版本**：v3.7.1（`index.html`）
+- **当前最新版本**：v3.9.0（`index.html`）
 
 ### 1.2 技术栈
 - **前端框架**：无框架，纯 HTML + CSS + JavaScript（单文件）
@@ -136,6 +136,23 @@
 - **强化等级保护**：滑块 0-100%，失败时概率不掉级
 - **自动强化**：可设置目标等级自动连续强化
 - **测试模式**：`_debugAllSuccess = true` 强制 100% 成功
+
+**主按钮波纹 + 高级设置重写（v3.9.0 对齐小程序 v1.0.9）：**
+- 水平扩散波纹系统：主按钮/应用/保存/材料行/删除确认/球员行 共6套波纹
+- 主按钮增强：onMainBtnDown/Up 创建波纹（rgba(0,0,0,0.22)，scaleX 800），500ms渐隐
+- 材料行波纹：轻点burst(0.6s, scaleX 400)，长按slow(3.5s, scaleX 1600)，rgba(255,255,255,0.15)
+- 高级设置完全数据驱动：matPriceRowsData[] 数组 → renderMatPriceRows() 动态生成HTML
+- 删除模式：iOS红底✓勾选框，列头OVR/价格淡出+全选淡入，max-height过渡
+- 长按删除确认：≥2行→"长按删除"+呼吸光晕动画，1.2s三阶段振动(navigator.vibrate)
+- 保存按钮波纹：onSaveBtnDown/Up，通过data-ripple-selector定位
+- 应用按钮波纹：onAdvApplyDown/Up，金色按钮rgba(0,0,0,0.22)波纹
+- 新行入场动画：rowSlideIn (0.35s ease-out)，400ms后清除
+
+**v3.9.0 CSS冲突修复（2026-06-07）：**
+- 问题：新 `.settings-overlay { display:flex }` 覆盖旧 `display:none`，球员设置弹窗关不掉
+- 修复：改回 `display:none`，加 `.settings-overlay.show { display:flex }`
+- 问题：`openAdvancedSettings()` 设 `style.display=''` 回退CSS的`display:none`，高级设置打不开
+- 修复：改为 `style.display='flex'`
 
 ### 3.4 强化动画流程（v3.4 核心改动）
 ```
@@ -311,5 +328,5 @@ FCol4强化模拟器/
 
 ---
 
-*最后更新：2026-06-03*
-*当前版本：v3.7.1*
+*最后更新：2026-06-07*
+*当前版本：v3.9.0*

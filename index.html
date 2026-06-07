@@ -196,7 +196,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .settings-modal .btn-main {
   background: linear-gradient(135deg, #f0b90b, #d4a00a); color: #1a1a1a;
   border: none; font-size: 13px; font-weight: 700; border-radius: 10px;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease; animation: none;
 }
 .settings-modal .btn-main:hover { background: linear-gradient(135deg, #ffc107, #e0a800); box-shadow: 0 4px 16px rgba(240,185,11,0.3); }
 .settings-modal .btn-main:active { transform: scale(0.97); }
@@ -288,7 +288,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px;
   color: #e8eaed; font-size: 14px; font-family: inherit; outline: none;
-  text-align: right; transition: all 0.2s ease;
+  text-align: center; transition: all 0.2s ease;
 }
 .adv-value-wrap input:focus { border-color: rgba(240,185,11,0.5); background: rgba(255,255,255,0.08); }
 .adv-unit {
@@ -309,19 +309,19 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   width: 52px; padding: 6px 8px;
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px 4px 4px 8px;
-  color: #e8eaed; font-size: 13px; font-family: inherit; outline: none;
-  text-align: right; transition: all 0.2s ease;
+  color: #fff; font-size: 13px; font-family: inherit; outline: none;
+  text-align: center; transition: all 0.2s ease;
 }
 .adv-mat-ovr:focus { border-color: rgba(240,185,11,0.5); background: rgba(255,255,255,0.08); }
 .adv-mat-sep {
-  color: rgba(255,255,255,0.12); font-size: 14px; flex-shrink: 0; margin: 0 -3px;
+  color: #fff; font-size: 14px; flex-shrink: 0; margin: 0 -3px;
 }
 .adv-mat-price {
   width: 72px; padding: 6px 10px;
   background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 4px 8px 8px 4px;
-  color: #e8eaed; font-size: 14px; font-family: inherit; outline: none;
-  text-align: right; transition: all 0.2s ease;
+  color: #fff; font-size: 14px; font-family: inherit; outline: none;
+  text-align: center; transition: all 0.2s ease;
 }
 .adv-mat-price:focus { border-color: rgba(240,185,11,0.5); background: rgba(255,255,255,0.08); }
 .adv-hint {
@@ -383,48 +383,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 .lv-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .lv-input:focus { border-color: rgba(240,185,11,0.5); background: rgba(255,255,255,0.08); }
 .lv-unit { font-size: 11px; color: #6b7590; flex-shrink: 0; }
-/* 删除选择模式 */
-.sel-dot {
-  display: none; width: 20px; height: 20px; flex-shrink: 0;
-  border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
-  margin-right: 8px; position: relative; transition: all 0.2s;
-}
-.delete-mode .sel-dot { display: block; }
-.delete-mode .adv-row { cursor: pointer; }
-.adv-row.selected .sel-dot {
-  border-color: #00c853; background: #00c853;
-}
-.adv-row.selected .sel-dot::after {
-  content: ''; position: absolute; left: 5px; top: 2px;
-  width: 6px; height: 10px; border: solid #fff;
-  border-width: 0 2px 2px 0; transform: rotate(45deg);
-}
-.adv-row.selected {
-  border: 2px solid #00c853; border-radius: 6px;
-  padding: 6px 10px; margin: -2px;
-  background: rgba(0,200,83,0.06);
-}
-.delete-bar {
-  display: none; align-items: center; justify-content: space-between;
-  padding: 10px 0; margin-top: 8px; gap: 8px;
-}
-.select-all-bar {
-  display: none; align-items: center; padding: 6px 0 10px 0;
-  cursor: pointer; user-select: none;
-}
-.delete-mode .select-all-bar { display: flex; }
-.select-all-text { font-size: 13px; color: #f0b90b; font-weight: 500; margin-left: 6px; }
-.select-all-bar.all-selected .sel-dot {
-  border-color: #2979ff; background: #2979ff;
-}
-.select-all-bar.all-selected .sel-dot::after {
-  content: ''; position: absolute; left: 5px; top: 2px;
-  width: 6px; height: 10px; border: solid #fff;
-  border-width: 0 2px 2px 0; transform: rotate(45deg);
-}
-.delete-mode .delete-bar { display: flex; }
-.delete-mode #btnRowAddDel,
-.delete-mode #btnRowSave { display: none; }
+/* 删除栏按钮（基础样式，高级设置在下方完整定义） */
 .delete-bar .btn-del-confirm {
   flex: 1; padding: 10px; border-radius: 8px; border: none;
   font-size: 14px; font-weight: 700; color: #fff;
@@ -438,10 +397,12 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   color: #8899aa; background: rgba(255,255,255,0.06); cursor: pointer; font-family: inherit;
 }
 .adv-mat-price::-webkit-outer-spin-button,
-.adv-mat-price::-webkit-inner-spin-button {
+.adv-mat-price::-webkit-inner-spin-button,
+.adv-mat-ovr::-webkit-outer-spin-button,
+.adv-mat-ovr::-webkit-inner-spin-button {
   -webkit-appearance: none; margin: 0;
 }
-.adv-mat-price { -moz-appearance: textfield; }
+.adv-mat-price, .adv-mat-ovr { -moz-appearance: textfield; }
 
 /* ===== Player Card ===== */
 .player-card {
@@ -1755,6 +1716,251 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
   .kb-key { margin: 3px; height: 50px; font-size: 20px; border-radius: 6px; }
   .kb-letters { font-size: 9px; }
 }
+
+/* ===== v3.9.0 水平扩散波纹 + 高级设置（对齐小程序v1.0.9）===== */
+
+/* 水平扩散波纹基础 */
+.btn-ripple {
+  position: absolute; top: 0; bottom: 0; width: 3px;
+  background: rgba(0,0,0,0.22);
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center; pointer-events: none; z-index: 2;
+  animation: ripple-expand 2s linear forwards;
+}
+@keyframes ripple-expand {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(640); }
+}
+.ripple-fade {
+  animation: ripple-expand 2s linear forwards, ripple-fade-out 0.15s ease-out forwards;
+}
+@keyframes ripple-fade-out {
+  from { opacity: 1; } to { opacity: 0; }
+}
+
+/* 主按钮波纹 */
+.btn-main .btn-ripple {
+  animation: ripple-expand-main 2s linear forwards;
+}
+.btn-main .ripple-fade {
+  animation: ripple-expand-main 2s linear forwards, ripple-fade-out 0.15s ease-out forwards;
+}
+@keyframes ripple-expand-main {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(800); }
+}
+
+/* 材料行波纹 — 灰白色，点按burst/长按slow */
+.mat-row .btn-ripple {
+  background: rgba(255,255,255,0.15);
+  animation: none;
+  transition: opacity 0.15s ease-out;
+}
+.mat-row .ripple-burst {
+  animation: ripple-burst-row 0.6s ease-out forwards;
+}
+@keyframes ripple-burst-row {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(800); }
+}
+.mat-row .ripple-slow {
+  animation: ripple-expand-row 3.5s linear forwards;
+}
+@keyframes ripple-expand-row {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(3200); }
+}
+.mat-row .ripple-fade-row { opacity: 0; }
+
+/* 批量删除按钮波纹 */
+.del-btn-batch .btn-ripple {
+  animation: ripple-expand-del 2s linear forwards;
+}
+.del-btn-batch .ripple-fade {
+  animation: ripple-expand-del 2s linear forwards, ripple-fade-out 0.15s ease-out forwards;
+}
+@keyframes ripple-expand-del {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(1280); }
+}
+
+/* 保存 / 应用按钮波纹 — 长按慢速 */
+.adv-btn-save .btn-ripple, .adv-btn-apply .btn-ripple {
+  animation: ripple-hold-save 5s linear forwards;
+}
+.adv-btn-apply .btn-ripple { background: rgba(255,255,255,0.25); }
+.adv-btn-save .ripple-burst-btn, .adv-btn-apply .ripple-burst-btn {
+  animation: ripple-burst-save 0.5s ease-out forwards;
+}
+@keyframes ripple-hold-save {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(960); }
+}
+@keyframes ripple-burst-save {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(1280); }
+}
+
+/* 长按确认波纹 */
+.del-btn-confirm .btn-ripple { animation: none; background: rgba(0,0,0,0.22); transition: none; }
+.del-btn-confirm .btn-ripple.ripple-hold {
+  animation: ripple-hold-expand 1.2s linear forwards;
+}
+.del-btn-confirm .ripple-fade { opacity: 0; transition: opacity 0.15s ease-out; }
+@keyframes ripple-hold-expand {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(50); }
+}
+
+/* 删除确认呼吸光晕 */
+@keyframes delConfirmEnter {
+  from { transform: scale(0.94); box-shadow: 0 0 0 0 rgba(229,57,53,0); }
+  to   { transform: scale(1); }
+}
+@keyframes delConfirmPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(229,57,53,0.4); }
+  50%      { box-shadow: 0 0 16px 4px rgba(229,57,53,0.6); }
+}
+.del-btn-confirm {
+  animation: delConfirmEnter 0.35s ease-out, delConfirmPulse 0.8s ease-in-out 0.35s infinite;
+}
+
+/* 新行动画 */
+@keyframes rowSlideIn {
+  from { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; transform: translateY(-12px); }
+  to   { max-height: 88px; opacity: 1; padding-top: 8px; padding-bottom: 8px; transform: translateY(0); }
+}
+.mat-row.row-new { animation: rowSlideIn 0.35s ease-out; }
+
+/* 球员行波纹 */
+.player-opt { position: relative; overflow: hidden; }
+@keyframes ripple-expand-player {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(2000); }
+}
+
+/* ===== 高级设置弹窗 ===== */
+.settings-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+}
+.settings-overlay.show { display: flex; }
+@keyframes advModalIn {
+  0% { opacity: 0; transform: translateY(24px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.adv-modal {
+  background: #1a1d24; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 20px 16px;
+  width: 100%; max-width: 440px; max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);
+  animation: advModalIn 0.3s cubic-bezier(0.22,0.61,0.36,1);
+}
+.adv-title-text {
+  font-size: 18px; font-weight: 700;
+  background: linear-gradient(135deg,#f0b90b,#ffc107);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; text-align: center; display: block; margin-bottom: 12px;
+}
+.adv-section { margin-bottom: 10px; padding: 12px; background: rgba(255,255,255,0.015); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); position: relative; }
+.adv-section-title { font-size: 18px; font-weight: 700; color: #e8eaed; margin-bottom: 8px; text-align: center; }
+
+/* BP保护 */
+.bp-disabled { position: relative; pointer-events: none; }
+.bp-disabled-overlay { display: none; position: absolute; top:0; left:0; right:0; bottom:0; background: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.01) 3px, rgba(255,255,255,0.01) 6px), rgba(30,30,36,0.75); border-radius: 5px; z-index:2; }
+.bp-disabled .bp-disabled-overlay { display: block; }
+.bp-disabled-tip { display: none; position: absolute; top:50%; left:50%; transform: translate(-50%,-50%); z-index:3; font-size: 20px; font-weight:700; color: #ffc107; text-shadow: 0 0 20px rgba(255,193,7,0.4), 0 0 40px rgba(255,193,7,0.15); }
+.bp-disabled .bp-disabled-tip { display: block; }
+
+/* 等级价值表 */
+.lv-toggle { text-align: center; padding: 6px 0 4px; cursor: pointer; font-size: 14px; color: #f0b90b; font-weight: 600; }
+.lv-toggle:hover { color: #ffc107; }
+.lv-table { border-top: 1px solid rgba(255,255,255,0.12); margin-top: 8px; padding-top: 10px; }
+.lv-row { display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 3px; }
+.lv-label { font-size: 12px; font-weight: 600; color: #8899aa; width: 22px; text-align: center; flex-shrink: 0; }
+.lv-input { width: 68px; padding: 5px 8px; background: rgba(20,30,50,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: #fff; font-size: 13px; text-align: center; outline: none; }
+.lv-input:focus { border-color: rgba(240,185,11,0.5); box-shadow: 0 0 0 3px rgba(240,185,11,0.08); }
+.lv-unit { font-size: 11px; color: #6b7590; flex-shrink: 0; }
+
+/* 材料价格列头 */
+.adv-col-heads-row { display: flex; align-items: center; gap: 4px; padding: 0 0 3px 0; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 2px; }
+.adv-col-heads-right { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: flex-end; transition: opacity 0.25s ease; }
+.adv-col-heads-right.heads-hidden { opacity: 0; pointer-events: none; }
+.adv-col-head-ovr { width: 52px; text-align: center; font-size: 13px; color: #fff; margin-right: 8px; }
+.adv-col-head-price-area { display: flex; align-items: center; }
+.adv-col-head-price { width: 72px; text-align: center; font-size: 13px; color: #fff; }
+.adv-col-head-unit { width: 16px; }
+
+/* 材料行滚动区 */
+.mat-rows-wrap { max-height: 235px; overflow-y: auto; }
+.mat-rows-wrap::-webkit-scrollbar { width: 3px; }
+.mat-rows-wrap::-webkit-scrollbar-track { background: transparent; }
+.mat-rows-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+.mat-row { gap: 4px; padding: 4px; position: relative; overflow: hidden; transition: background 0.25s ease; display: flex; align-items: center; margin-bottom: 3px; }
+.mat-label { font-size: 13px; color: #fff; width: 84px; flex-shrink: 0; }
+.delete-mode-row { background: rgba(255,255,255,0.02); border-radius: 4px; }
+.mat-row.selected { background: rgba(255,255,255,0.06); border-radius: 4px; }
+
+/* 删除模式：禁用输入框点击穿透，整行可点 */
+.delete-mode-row input, .delete-mode-row .adv-mat-sep { pointer-events: none; user-select: none; -webkit-user-select: none; }
+
+/* iOS勾选框 */
+.ios-check { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease, border-color 0.2s ease; }
+.ios-check.checked { background: #e53935; border-color: #e53935; }
+.ios-check-mark { color: #fff; font-size: 8px; font-weight: 700; line-height: 1; }
+
+/* 全选内联 */
+.select-all-inline { display: flex; align-items: center; gap: 4px; max-width: 0; opacity: 0; overflow: hidden; pointer-events: none; transition: max-width 0.25s ease, opacity 0.25s ease; }
+.select-all-inline.show { max-width: 80px; opacity: 1; pointer-events: auto; }
+.select-all-text { font-size: 13px; color: #e8eaed; white-space: nowrap; }
+
+/* 按钮行过渡 */
+.btn-row-normal { max-height: 40px; opacity: 1; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease, margin-top 0.4s cubic-bezier(0.4,0,0.2,1); }
+.btn-row-adddel { margin-top: 4px; }
+.btn-row-save { margin-top: 3px; }
+.btn-row-hidden { max-height: 0; opacity: 0; margin-top: 0 !important; pointer-events: none; }
+
+/* 删除栏 */
+.delete-bar { display: flex; gap: 6px; margin-top: 0; justify-content: center; max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease, margin-top 0.4s cubic-bezier(0.4,0,0.2,1); }
+.delete-bar-show { max-height: 50px; opacity: 1; margin-top: 4px; }
+
+/* 批量删除按钮 */
+.del-btn { position: relative; overflow: hidden; transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; }
+#btnDelCancel { color: rgba(255,255,255,0.45); }
+#btnDelCancel:hover { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.1); }
+.del-btn-batch { background: #e53935 !important; color: #fff !important; font-weight: 700; border: none !important; box-shadow: 0 0 12px rgba(229,57,53,0.3); }
+
+/* 高级设置按钮 */
+.adv-btn-row { display: flex; gap: 6px; margin-top: 6px; justify-content: center; }
+.adv-btn-secondary { flex: 1; padding: 8px 14px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.65); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; }
+.adv-btn-secondary:hover { background: rgba(255,255,255,0.12); }
+.adv-btn-save { flex: 1; padding: 8px 14px; font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; position: relative; overflow: hidden; }
+.adv-btn-save:hover { background: rgba(255,255,255,0.12); }
+.adv-btn-save.saved { color: #151616; background: linear-gradient(135deg,#00e559,#00c048); border: none; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+.adv-btn-save.saved:hover { transform: scale(0.97); }
+.adv-btn-apply { box-sizing: border-box; width: 100%; padding: 11px 18px; font-size: 14px; font-weight: 700; letter-spacing: 1px; background: linear-gradient(135deg,#f0b90b,#e6a800); color: #151616; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: inherit; position: relative; overflow: hidden; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+.adv-btn-apply:hover { transform: scale(0.97); }
+.adv-sticky-footer { position: sticky; bottom: 0; z-index: 10; padding: 6px 0 2px; margin-top: 4px; background: transparent; }
+
+/* 材料输入 */
+.adv-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.adv-label { font-size: 13px; color: #fff; font-weight: 500; flex-shrink: 0; }
+.adv-value-wrap { display: flex; align-items: center; gap: 5px; flex: 1; justify-content: flex-end; }
+.adv-mat-ovr { width: 52px; padding: 6px 8px; background: rgba(20,30,50,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px 2px 2px 4px; color: #fff; font-size: 13px; text-align: center; outline: none; }
+.adv-mat-ovr:focus { border-color: rgba(240,185,11,0.5); box-shadow: 0 0 0 3px rgba(240,185,11,0.08); }
+.adv-mat-sep { color: #fff; font-size: 14px; }
+.adv-mat-price { width: 72px; padding: 6px 10px; background: rgba(20,30,50,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 2px 4px 4px 2px; color: #fff; font-size: 14px; text-align: center; outline: none; user-select: none; -webkit-user-select: none; }
+.adv-mat-price:focus { border-color: rgba(240,185,11,0.5); box-shadow: 0 0 0 3px rgba(240,185,11,0.08); }
+.adv-input { width: 72px; padding: 6px 10px; background: rgba(20,30,50,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: #fff; font-size: 14px; text-align: center; outline: none; }
+.adv-unit { font-size: 13px; color: #fff; flex-shrink: 0; }
+.adv-value { font-size: 14px; color: #e8eaed; font-weight: 600; flex: 1; text-align: right; }
+.adv-value.needed { font-size: 20px; font-weight: 700; color: #00c853; }
+.adv-note { font-size: 10px; color: #6b7590; text-align: right; margin-top: 1px; width: 100%; }
+.adv-hint { font-size: 10px; color: #6b7590; text-align: center; display: block; margin-bottom: 4px; }
+.mat-price-unit { font-size: 10px; width: 16px; }
+.adv-input-group { display: flex; align-items: center; }
+.adv-price-row { display: flex; align-items: center; }
 </style>
 </head>
 <body>
@@ -1814,18 +2020,19 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
     </div>
   </div>
 
-  <!-- Advanced Settings Modal -->
-  <div class="settings-overlay" id="advancedSettingsOverlay" onclick="closeAdvancedSettings(event)">
-    <div class="settings-modal" onclick="event.stopPropagation()">
-      <div style="font-size:18px;font-weight:700;background:linear-gradient(135deg,#f0b90b,#ffc107);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;margin-bottom:12px;">高级设置</div>
+  <!-- Advanced Settings Modal (v3.9.0 对齐小程序) -->
+  <div class="settings-overlay" id="advancedSettingsOverlay" style="display:none;" onclick="closeAdvancedSettings(event)">
+    <div class="adv-modal" onclick="event.stopPropagation()">
+      <span class="adv-title-text">高级设置</span>
+      <!-- BP保护区域 -->
       <div class="adv-section" id="bpProtectSection">
         <div class="bp-disabled-overlay"></div>
         <div class="bp-disabled-tip">强化等级 ≥8 时启用</div>
-        <div class="adv-title">强化等级BP保护</div>
+        <div class="adv-section-title">强化等级BP保护</div>
         <div class="adv-row">
           <span class="adv-label">球员价值</span>
           <div class="adv-value-wrap">
-            <input type="number" id="inpPlayerValue" value="0" min="0" step="1" readonly style="opacity:0.7;pointer-events:none;">
+            <input class="adv-input" type="number" id="inpPlayerValue" value="0" min="0" disabled style="opacity:0.7;">
             <span class="adv-unit">亿</span>
           </div>
         </div>
@@ -1838,106 +2045,67 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
           <span class="adv-label">所需BP</span>
           <span class="adv-value needed" id="neededBP">0亿</span>
         </div>
-        <div class="lv-toggle" onclick="toggleLevelValues()">
+        <div class="lv-toggle" onclick="onToggleLevelValues()">
           <span id="lvToggleText">▸ 展开主卡等级价格设置</span>
         </div>
         <div class="adv-hint" id="lvToggleHint" style="margin-top:2px;">填写后可自动核算BP消耗</div>
         <div class="lv-table" id="lvTable" style="display:none;">
           <div class="lv-row">
-            <span class="lv-label">+8</span>
-            <input type="number" class="lv-input lv-price" id="lvVal8" value="0" min="0" onfocus="fixNumInputFocus(this)" oninput="onLvPriceChange(this,8)">
-            <span class="lv-unit">亿</span>
-            <span class="lv-label">+11</span>
-            <input type="number" class="lv-input lv-price" id="lvVal11" value="0" min="0" onfocus="fixNumInputFocus(this)" oninput="onLvPriceChange(this,11)">
-            <span class="lv-unit">亿</span>
+            <span class="lv-label">+8</span><input class="lv-input" type="number" id="lvVal8" value="0" min="0" data-lv="8" onfocus="fixNumInputFocus(this)" oninput="onLvPriceInput(this)" onblur="onLvPriceBlur(this)"><span class="lv-unit">亿</span>
+            <span class="lv-label">+11</span><input class="lv-input" type="number" id="lvVal11" value="0" min="0" data-lv="11" onfocus="fixNumInputFocus(this)" oninput="onLvPriceInput(this)" onblur="onLvPriceBlur(this)"><span class="lv-unit">亿</span>
           </div>
           <div class="lv-row">
-            <span class="lv-label">+9</span>
-            <input type="number" class="lv-input lv-price" id="lvVal9" value="0" min="0" onfocus="fixNumInputFocus(this)" oninput="onLvPriceChange(this,9)">
-            <span class="lv-unit">亿</span>
-            <span class="lv-label">+12</span>
-            <input type="number" class="lv-input lv-price" id="lvVal12" value="0" min="0" onfocus="fixNumInputFocus(this)" oninput="onLvPriceChange(this,12)">
-            <span class="lv-unit">亿</span>
+            <span class="lv-label">+9</span><input class="lv-input" type="number" id="lvVal9" value="0" min="0" data-lv="9" onfocus="fixNumInputFocus(this)" oninput="onLvPriceInput(this)" onblur="onLvPriceBlur(this)"><span class="lv-unit">亿</span>
+            <span class="lv-label">+12</span><input class="lv-input" type="number" id="lvVal12" value="0" min="0" data-lv="12" onfocus="fixNumInputFocus(this)" oninput="onLvPriceInput(this)" onblur="onLvPriceBlur(this)"><span class="lv-unit">亿</span>
           </div>
           <div class="lv-row">
-            <span class="lv-label">+10</span>
-            <input type="number" class="lv-input lv-price" id="lvVal10" value="0" min="0" onfocus="fixNumInputFocus(this)" oninput="onLvPriceChange(this,10)">
-            <span class="lv-unit">亿</span>
-            <span class="lv-label">+13</span>
-            <input type="number" class="lv-input lv-price" id="lvVal13" value="0" min="0" onfocus="fixNumInputFocus(this)" oninput="onLvPriceChange(this,13)">
-            <span class="lv-unit">亿</span>
+            <span class="lv-label">+10</span><input class="lv-input" type="number" id="lvVal10" value="0" min="0" data-lv="10" onfocus="fixNumInputFocus(this)" oninput="onLvPriceInput(this)" onblur="onLvPriceBlur(this)"><span class="lv-unit">亿</span>
+            <span class="lv-label">+13</span><input class="lv-input" type="number" id="lvVal13" value="0" min="0" data-lv="13" onfocus="fixNumInputFocus(this)" oninput="onLvPriceInput(this)" onblur="onLvPriceBlur(this)"><span class="lv-unit">亿</span>
           </div>
-          <div class="btn-row" style="margin-top:6px;">
-            <button class="btn btn-secondary" id="btnSaveLvValues" style="font-size:14px;color:#f0b90b;font-weight:700;" onclick="saveLevelValues()">保存</button>
+          <div class="adv-btn-row" style="margin-top:6px;">
+            <button class="adv-btn-save" id="btnSaveLvValues" style="font-size:12px;" onmousedown="onSaveBtnDown(event)" onmouseup="onSaveBtnUp(event)" onmouseleave="onSaveBtnUp(event)" ontouchstart="onSaveBtnDown(event)" ontouchend="onSaveBtnUp(event)" ontouchcancel="onSaveBtnUp(event)" onclick="onSaveLevelValues()" data-ripple-selector="#bpProtectSection .adv-btn-save">保存</button>
           </div>
         </div>
       </div>
+      <!-- 材料价格区域 -->
       <div class="adv-section" id="matPriceSection">
-        <div class="adv-title">材料价格设置</div>
+        <div class="adv-section-title">材料价格设置</div>
         <div class="adv-hint">自定义材料数值和价格，存为模板保存后永久生效</div>
-        <div style="display:flex;justify-content:flex-end;gap:8px;font-size:10px;color:#6b7590;margin-bottom:4px;">
-          <span style="width:52px;text-align:right;">OVR</span>
-          <span style="width:72px;text-align:right;">价格</span>
-        </div>
-        <div id="matPriceRows">
-          <div class="select-all-bar" id="selectAllBar" onclick="toggleSelectAll()">
-            <span class="sel-dot"></span><span class="select-all-text">全选</span>
-          </div>
-          <div class="adv-row">
-            <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
-            <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
+        <!-- 标签头 -->
+        <div class="adv-col-heads-row">
+          <div style="width:84px;flex-shrink:0;"></div>
+          <div class="adv-col-heads-right" id="advColHeadsRight">
+            <span class="adv-col-head-ovr">OVR</span>
+            <div class="adv-col-head-price-area">
+              <span class="adv-col-head-price">价格</span>
+              <div class="adv-col-head-unit"></div>
             </div>
           </div>
-          <div class="adv-row">
-            <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
-            <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
-            </div>
-          </div>
-          <div class="adv-row">
-            <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
-            <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
-            </div>
-          </div>
-          <div class="adv-row">
-            <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
-            <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
-            </div>
-          </div>
-          <div class="adv-row">
-            <span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>
-            <div class="adv-value-wrap">
-              <input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">
-              <span class="adv-mat-sep">·</span>
-              <input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>
-            </div>
+          <div class="select-all-inline" id="selectAllInline" onclick="onToggleSelectAll()">
+            <div class="ios-check" id="selectAllCheck"><span class="ios-check-mark" style="display:none;">✓</span></div>
+            <span class="select-all-text">全选</span>
           </div>
         </div>
-        <div class="btn-row" id="btnRowAddDel" style="margin-top:8px;">
-          <button class="btn btn-secondary" onclick="addMatPriceRow()">添加</button>
-          <button class="btn btn-secondary" id="btnDeleteMode" onclick="toggleDeleteMode()">删除</button>
+        <!-- 材料行滚动区 -->
+        <div class="mat-rows-wrap" id="matRowsWrap"></div>
+        <!-- 按钮行（常驻，过渡显隐） -->
+        <div class="adv-btn-row btn-row-normal btn-row-adddel" id="btnRowAddDel">
+          <button class="adv-btn-secondary" onclick="onAddMatRow()">添加</button>
+          <button class="adv-btn-secondary" id="btnDeleteMode" style="color:#e53935;" onclick="onEnterDeleteMode()">删除</button>
         </div>
+        <!-- 删除栏（常驻，过渡显隐） -->
         <div class="delete-bar" id="deleteBar">
-          <button class="btn-del-cancel" onclick="toggleDeleteMode()">取消</button>
-          <button class="btn-del-confirm" id="btnDelConfirm" disabled onclick="confirmDeleteRows()">删除</button>
+          <button class="adv-btn-secondary" id="btnDelCancel" onclick="onCancelOrExitDelete()">取消</button>
+          <button class="adv-btn-save del-btn" id="btnDelConfirm" disabled onclick="onConfirmDeleteRows()" onmousedown="onDelConfirmDown(event)" onmouseup="onDelConfirmUp(event)" onmouseleave="onDelConfirmUp(event)" ontouchstart="onDelConfirmDown(event)" ontouchend="onDelConfirmUp(event)" ontouchcancel="onDelConfirmUp(event)">删除</button>
         </div>
-        <div class="btn-row" id="btnRowSave" style="margin-top:6px;">
-          <button class="btn btn-secondary" style="font-size:14px;color:#f0b90b;font-weight:700;" onclick="saveMatPrices()">保存</button>
+        <!-- 保存按钮 -->
+        <div class="adv-btn-row btn-row-normal btn-row-save" id="btnRowSave">
+          <button class="adv-btn-save" id="btnSaveMatPrices" style="font-size:12px;" onmousedown="onSaveBtnDown(event)" onmouseup="onSaveBtnUp(event)" onmouseleave="onSaveBtnUp(event)" ontouchstart="onSaveBtnDown(event)" ontouchend="onSaveBtnUp(event)" ontouchcancel="onSaveBtnUp(event)" onclick="onSaveMatPrices()" data-ripple-selector="#matPriceSection .adv-btn-save">保存</button>
         </div>
       </div>
-      <div class="btn-row adv-sticky-footer">
-        <button class="btn btn-main" style="font-size:14px;letter-spacing:1px;box-shadow:none;" onclick="applyAdvancedSettings()">应用设置</button>
+      <!-- 底部固定按钮 -->
+      <div class="adv-sticky-footer">
+        <button class="adv-btn-apply" id="btnAdvApply" onmousedown="onAdvApplyDown(event)" onmouseup="onAdvApplyUp(event)" onmouseleave="onAdvApplyUp(event)" ontouchstart="onAdvApplyDown(event)" ontouchend="onAdvApplyUp(event)" ontouchcancel="onAdvApplyUp(event)" onclick="applyAdvancedSettings()">应用设置</button>
       </div>
     </div>
   </div>
@@ -2160,7 +2328,7 @@ input[readonly] { user-select: none; -webkit-user-select: none; }
 
   <!-- Buttons -->
   <div class="btn-row">
-    <button class="btn btn-main" id="btnEnhance" onclick="startEnhance()">强 化</button>
+    <button class="btn btn-main" id="btnEnhance" onmousedown="onMainBtnDown(event)" onmouseup="onMainBtnUp(event)" onmouseleave="onMainBtnUp(event)" ontouchstart="onMainBtnDown(event)" ontouchend="onMainBtnUp(event)" ontouchcancel="onMainBtnUp(event)" onclick="startEnhance()">强 化</button>
     <button class="btn btn-secondary" id="btnAuto" onclick="toggleAuto()">自动</button>
     <button class="btn btn-secondary" onclick="resetCard()">重置</button>
   </div>
@@ -4912,22 +5080,15 @@ function applyLevelValue() {
   onPlayerValueChange();
 }
 
-var matPriceRowCount = 5;
-
-// 通用：获取输入框对应的单位标签（lv-price用nextElementSibling避免同排多个输入框找错）
-function getPriceUnitEl(el) {
-  if (el.classList.contains('lv-price')) {
-    var sib = el.nextElementSibling;
-    if (sib && sib.classList.contains('lv-unit')) return sib;
-    return null;
-  }
-  return el.parentElement.querySelector('.mat-price-unit');
-}
+// （旧材料价格系统已由v3.9.0替代）
 
 // === 全局规则：数字输入框聚焦时清除前导零/重置兆标记 ===
+function getPriceUnitEl(el) {
+  return el.parentElement.querySelector('.mat-price-unit') || el.parentElement.querySelector('.lv-unit');
+}
+
 function fixNumInputFocus(el) {
   if ((el.classList.contains('adv-mat-price') || el.classList.contains('lv-price')) && el.dataset.rawYi) {
-    // 恢复为亿单位原始值，方便编辑
     el.value = el.dataset.rawYi;
     delete el.dataset.rawYi;
     var unitEl = getPriceUnitEl(el);
@@ -4974,34 +5135,6 @@ document.addEventListener('input', function(e) {
   if (cleaned !== raw) { el.value = cleaned; }
 });
 
-function onMatPriceChange(el) {
-  if (!el) {
-    // 刷新所有行（加载localStorage后调用）
-    var rows = document.getElementById('matPriceRows').querySelectorAll('.adv-row');
-    rows.forEach(function(row) {
-      updatePriceUnit(row.querySelector('.adv-mat-price'));
-    });
-  }
-  // 单个输入框输入时不转换，失焦时自动转
-}
-
-var _matOvrTimer = 0;
-function onMatOvrInput(el) {
-  var raw = el.value.replace(/[^0-9]/g, '');
-  if (raw.length > 3) raw = raw.slice(0, 3);
-  el.value = raw;
-  var ovr = parseInt(raw) || 0;
-  if (ovr > 190) { el.value = '190'; ovr = 190; }
-  clearTimeout(_matOvrTimer);
-  if (raw.length >= 3 && ovr >= 50 && ovr <= 190) {
-    var priceInput = el.closest('.adv-row').querySelector('.adv-mat-price');
-    if (priceInput) {
-      _matOvrTimer = setTimeout(function() { priceInput.focus(); priceInput.select(); }, 80);
-    }
-  }
-}
-
-
 function getPriceYi(priceInp) {
   if (!priceInp) return 0;
   var unitEl = priceInp.parentElement.querySelector('.mat-price-unit');
@@ -5037,349 +5170,620 @@ function updatePriceUnit(priceInp) {
   }
 }
 
-function onMatRowComplete(inputEl) {
-  var row = inputEl.closest('.adv-row');
-  var ovrInp = row.querySelector('.adv-mat-ovr');
-  var priceInp = row.querySelector('.adv-mat-price');
-  var ovrVal = parseInt(ovrInp.value) || 0;
-  var priceVal = getPriceYi(priceInp);
-  // 两个框都有值才检查
-  if (!ovrVal || !priceVal) return;
-  // 检查重复OVR
-  var allRows = document.getElementById('matPriceRows').querySelectorAll('.adv-row');
-  for (var i = 0; i < allRows.length; i++) {
-    if (allRows[i] === row) continue;
-    var otherOvr = parseInt(allRows[i].querySelector('.adv-mat-ovr').value) || 0;
-    if (otherOvr === ovrVal) {
-      alert('OVR ' + ovrVal + ' 的价格已锁定，无需重复添加同一材料规格');
-      ovrInp.value = '';
-      ovrInp.focus();
-      return;
-    }
-  }
-  sortMatPriceRows();
+// ===== v3.9.0 水平波纹系统（对齐小程序v1.0.9）=====
+
+// 通用：创建波纹DOM
+function _createRippleDom(el, x, klass) {
+  var ripple = document.createElement('div');
+  ripple.className = 'btn-ripple ' + (klass || '');
+  ripple.style.left = x + 'px';
+  // 清理旧波纹（最多5个）
+  var existing = el.querySelectorAll('.btn-ripple');
+  if (existing.length >= 5) { existing[0].remove(); }
+  el.appendChild(ripple);
+  return ripple;
 }
 
-function sortMatPriceRows() {
-  var container = document.getElementById('matPriceRows');
-  var rows = Array.from(container.querySelectorAll('.adv-row'));
-  // 记住当前焦点在哪个输入框
-  var focusedEl = document.activeElement;
-  var focusedOvrVal = focusedEl && focusedEl.classList.contains('adv-mat-ovr') ? focusedEl.value : null;
-  // 按OVR从小到大排序，空或0排到底部
-  rows.sort(function(a, b) {
-    var aOvr = parseInt(a.querySelector('.adv-mat-ovr').value) || 0;
-    var bOvr = parseInt(b.querySelector('.adv-mat-ovr').value) || 0;
-    if (aOvr === 0 && bOvr === 0) return 0;
-    if (aOvr === 0) return 1;
-    if (bOvr === 0) return -1;
-    return aOvr - bOvr;
-  });
-  // 检查是否需要重排
-  var needReorder = false;
-  for (var i = 0; i < rows.length; i++) {
-    if (rows[i] !== container.children[i]) { needReorder = true; break; }
-  }
-  if (!needReorder) return;
-  // 重新插入排序后的顺序
-  rows.forEach(function(row) {
-    container.appendChild(row);
-  });
-  // 恢复焦点到排序后对应OVR值的输入框
-  if (focusedOvrVal !== null) {
-    var allOvr = container.querySelectorAll('.adv-mat-ovr');
-    for (var j = 0; j < allOvr.length; j++) {
-      if (allOvr[j].value === focusedOvrVal && allOvr[j] !== focusedEl) {
-        allOvr[j].focus();
-        break;
-      }
-    }
-  }
+// 通用：渐隐并清理波纹
+function _fadeRipples(el) {
+  var ripples = el.querySelectorAll('.btn-ripple:not(.ripple-fade)');
+  for (var i = 0; i < ripples.length; i++) { ripples[i].classList.add('ripple-fade'); }
+  setTimeout(function() {
+    var faded = el.querySelectorAll('.btn-ripple.ripple-fade');
+    for (var j = 0; j < faded.length; j++) { faded[j].remove(); }
+  }, 200);
 }
 
-function addMatPriceRow() {
-  matPriceRowCount++;
-  var container = document.getElementById('matPriceRows');
-  var row = document.createElement('div');
-  row.className = 'adv-row';
-  row.innerHTML = '<span class="sel-dot"></span><span class="adv-label">材料卡（垫子）</span>' +
-    '<div class="adv-value-wrap">' +
-    '<input type="number" class="adv-mat-ovr" value="" min="50" max="190" placeholder="OVR" onchange="onMatRowComplete(this)" oninput="onMatOvrInput(this)" onfocus="fixNumInputFocus(this)">' +
-    '<span class="adv-mat-sep">·</span>' +
-    '<input type="number" class="adv-mat-price" value="0" min="0" placeholder="价格" oninput="onMatPriceChange(this)" onchange="onMatRowComplete(this)" onfocus="fixNumInputFocus(this)"><span class="adv-unit mat-price-unit">亿</span>' +
-    '</div>';
-  container.appendChild(row);
-  var newOvrInp = row.querySelector('.adv-mat-ovr');
-  if (newOvrInp) {
+// ===== 主按钮波纹 =====
+var _mainRippleId = 0, _mainTouchActive = false, _mainIsLongPress = false, _mainLongPressTimer = null;
+
+function onMainBtnDown(e) {
+  var btn = document.getElementById('btnEnhance');
+  if (!btn) return;
+  _mainTouchActive = true; _mainIsLongPress = false;
+  var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  var rect = btn.getBoundingClientRect();
+  var x = clientX - rect.left;
+  _createRippleDom(btn, x);
+  _mainLongPressTimer = setTimeout(function() { _mainIsLongPress = true; }, 400);
+}
+function onMainBtnUp() {
+  _mainTouchActive = false;
+  if (_mainLongPressTimer) { clearTimeout(_mainLongPressTimer); _mainLongPressTimer = null; }
+  _fadeRipples(document.getElementById('btnEnhance'));
+  _mainIsLongPress = false;
+}
+
+// ===== 高级设置应用按钮波纹 =====
+var _advRippleId = 0, _advTouchActive = false, _advIsLongPress = false, _advLongPressTimer = null;
+
+function onAdvApplyDown(e) {
+  var btn = document.getElementById('btnAdvApply');
+  if (!btn) return;
+  _advTouchActive = true; _advIsLongPress = false;
+  var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  var rect = btn.getBoundingClientRect();
+  var x = clientX - rect.left;
+  _createRippleDom(btn, x);
+  _advLongPressTimer = setTimeout(function() { _advIsLongPress = true; }, 250);
+}
+function onAdvApplyUp() {
+  _advTouchActive = false;
+  if (_advLongPressTimer) { clearTimeout(_advLongPressTimer); _advLongPressTimer = null; }
+  var btn = document.getElementById('btnAdvApply');
+  if (btn) {
+    var ripples = btn.querySelectorAll('.btn-ripple');
+    for (var i = ripples.length - 1; i >= 0; i--) { ripples[i].remove(); }
+  }
+  _advIsLongPress = false;
+}
+
+// ===== 保存按钮波纹（通用，通过 data-ripple-selector 定位） =====
+var _saveRippleId = 0, _saveTouchActive = false, _saveIsLongPress = false, _saveLongPressTimer = null;
+
+function onSaveBtnDown(e) {
+  var btn = e.currentTarget;
+  _saveTouchActive = true; _saveIsLongPress = false;
+  var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  var rect = btn.getBoundingClientRect();
+  var x = clientX - rect.left;
+  _createRippleDom(btn, x);
+  _saveLongPressTimer = setTimeout(function() { _saveIsLongPress = true; }, 250);
+}
+function onSaveBtnUp() {
+  _saveTouchActive = false;
+  if (_saveLongPressTimer) { clearTimeout(_saveLongPressTimer); _saveLongPressTimer = null; }
+  var btns = document.querySelectorAll('.adv-btn-save');
+  for (var i = 0; i < btns.length; i++) {
+    var ripples = btns[i].querySelectorAll('.btn-ripple');
+    for (var j = ripples.length - 1; j >= 0; j--) { ripples[j].remove(); }
+  }
+  _saveIsLongPress = false;
+}
+
+// ===== 材料行波纹 =====
+var _rowRippleId = 0, _rowTouchActive = false, _rowIsLongPress = false, _rowLongPressTimer = null, _rowTouchRow = null;
+var _matRowsLeft = 0; // 进入删除模式时缓存行左边界，避免每次触摸 getBoundingClientRect()
+
+function onMatRowDown(e) {
+  var row = e.currentTarget;
+  _rowTouchRow = row; _rowTouchActive = true; _rowIsLongPress = false;
+  var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  var x = clientX - _matRowsLeft;
+  var ripple = _createRippleDom(row, x, 'ripple-slow');
+  ripple.style.background = 'rgba(255,255,255,0.15)';
+  _rowLongPressTimer = setTimeout(function() { _rowIsLongPress = true; }, 400);
+}
+function onMatRowUp() {
+  _rowTouchActive = false;
+  if (_rowLongPressTimer) { clearTimeout(_rowLongPressTimer); _rowLongPressTimer = null; }
+  if (_rowTouchRow && !_rowIsLongPress) {
+    // 轻点→burst
+    var ripples = _rowTouchRow.querySelectorAll('.btn-ripple:not(.ripple-fade-row)');
+    for (var i = 0; i < ripples.length; i++) {
+      ripples[i].classList.remove('ripple-slow');
+      ripples[i].classList.add('ripple-burst');
+    }
+  }
+  if (_rowTouchRow) {
+    var allR = _rowTouchRow.querySelectorAll('.btn-ripple:not(.ripple-fade-row)');
+    for (var j = 0; j < allR.length; j++) { allR[j].classList.add('ripple-fade-row'); }
     setTimeout(function() {
-      newOvrInp.focus();
-      // 移动端键盘弹出后保持按钮可见
-      var isMobile = /Mobi|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        setTimeout(function() {
-          row.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }, 300);
-      }
-    }, 100);
+      var faded = _rowTouchRow.querySelectorAll('.btn-ripple.ripple-fade-row');
+      for (var k = 0; k < faded.length; k++) { faded[k].remove(); }
+    }, 200);
   }
+  _rowTouchRow = null; _rowIsLongPress = false;
 }
 
-var _deleteMode = false;
-
-function toggleDeleteMode() {
-  var container = document.getElementById('matPriceRows');
-  var section = container.closest('.adv-section');
-  var rows = container.querySelectorAll('.adv-row');
-  var delBtn = document.getElementById('btnDeleteMode');
-  var delBar = document.getElementById('deleteBar');
-  var confirmBtn = document.getElementById('btnDelConfirm');
-
-  if (!_deleteMode) {
-    // 进入多选删除模式
-    if (rows.length <= 1) return;
-    _deleteMode = true;
-    section.classList.add('delete-mode');
-    if (delBtn) {
-      delBtn.textContent = '取消';
-      delBtn.style.color = '#e53935';
-    }
-    updateSelectAllState();
-    updateDeleteBar();
-  } else {
-    exitDeleteMode();
-  }
+// 球员行波纹（保留）
+function _fadePlayerRowRipple(opt) {
+  var ripples = opt.querySelectorAll('.btn-ripple:not(.ripple-fade)');
+  for (var i = 0; i < ripples.length; i++) { ripples[i].classList.add('ripple-fade'); }
+  setTimeout(function() {
+    var faded = opt.querySelectorAll('.btn-ripple.ripple-fade');
+    for (var j = 0; j < faded.length; j++) { faded[j].remove(); }
+  }, 200);
 }
 
-function exitDeleteMode() {
-  _deleteMode = false;
-  var container = document.getElementById('matPriceRows');
-  var section = container.closest('.adv-section');
-  var delBtn = document.getElementById('btnDeleteMode');
-  section.classList.remove('delete-mode');
-  var rows = container.querySelectorAll('.adv-row');
-  rows.forEach(function(r) {
-    r.classList.remove('selected');
+// 球员行波纹事件委托
+(function() {
+  var playerList = document.getElementById('playerSelectList');
+  if (!playerList) return;
+  playerList.addEventListener('touchstart', function(e) {
+    var opt = e.target.closest('.player-opt');
+    if (!opt) return;
+    var touch = e.touches[0];
+    var rect = opt.getBoundingClientRect();
+    var x = touch.clientX - rect.left;
+    var ripple = document.createElement('div');
+    ripple.className = 'btn-ripple';
+    ripple.style.left = x + 'px';
+    ripple.style.background = 'rgba(255,255,255,0.12)';
+    ripple.style.animation = 'ripple-expand-player 2s linear forwards';
+    var existing = opt.querySelectorAll('.btn-ripple');
+    if (existing.length >= 3) { existing[0].remove(); }
+    opt.appendChild(ripple);
+  }, { passive: true });
+  playerList.addEventListener('touchend', function(e) {
+    var opt = e.target.closest('.player-opt');
+    if (opt) _fadePlayerRowRipple(opt);
   });
-  document.getElementById('selectAllBar').classList.remove('all-selected');
-  if (delBtn) {
-    delBtn.textContent = '删除';
-    delBtn.style.color = '';
+  playerList.addEventListener('touchcancel', function(e) {
+    var opt = e.target.closest('.player-opt');
+    if (opt) _fadePlayerRowRipple(opt);
+  });
+  playerList.addEventListener('mousedown', function(e) {
+    var opt = e.target.closest('.player-opt');
+    if (!opt) return;
+    var rect = opt.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var ripple = document.createElement('div');
+    ripple.className = 'btn-ripple';
+    ripple.style.left = x + 'px';
+    ripple.style.background = 'rgba(255,255,255,0.12)';
+    ripple.style.animation = 'ripple-expand-player 2s linear forwards';
+    var existing = opt.querySelectorAll('.btn-ripple');
+    if (existing.length >= 3) { existing[0].remove(); }
+    opt.appendChild(ripple);
+  });
+  playerList.addEventListener('mouseup', function(e) {
+    var opt = e.target.closest('.player-opt');
+    if (opt) _fadePlayerRowRipple(opt);
+  });
+})();
+
+// ===== 材料价格数据 & 渲染 =====
+var matPriceRowsData = []; // [{ovr, price, priceDisplay, priceUnit, selected}]
+var _matPricesStore = {}; // localStorage同步
+
+function _updatePriceUnit(val) {
+  if (!val || val <= 0) return { display: '0', unit: '亿' };
+  if (val >= 10000) return { display: (val / 10000).toFixed(2), unit: '兆' };
+  return { display: String(val), unit: '亿' };
+}
+
+function _getPriceYiFromRow(display, unit) {
+  var v = parseFloat(display) || 0;
+  return unit === '兆' ? v * 10000 : v;
+}
+
+function _initMatPriceRows() {
+  var prices = _matPricesStore || {};
+  var keys = Object.keys(prices).sort(function(a, b) { return parseInt(a) - parseInt(b); });
+  matPriceRowsData = [];
+  if (keys.length > 0) {
+    for (var i = 0; i < keys.length; i++) {
+      var ovr = parseInt(keys[i]);
+      var rawPrice = prices[keys[i]];
+      var pu = _updatePriceUnit(rawPrice);
+      matPriceRowsData.push({ ovr: ovr, price: rawPrice, priceDisplay: pu.display, priceUnit: pu.unit, selected: false });
+    }
+  } else {
+    for (var j = 0; j < 5; j++) {
+      matPriceRowsData.push({ ovr: '', price: 0, priceDisplay: '0', priceUnit: '亿', selected: false });
+    }
   }
 }
 
-function toggleSelectAll() {
-  var container = document.getElementById('matPriceRows');
-  var rows = container.querySelectorAll('.adv-row');
-  var allBar = document.getElementById('selectAllBar');
-  var allSelected = allBar.classList.contains('all-selected');
-  rows.forEach(function(r) {
-    if (allSelected) {
-      r.classList.remove('selected');
+function renderMatPriceRows() {
+  var wrap = document.getElementById('matRowsWrap');
+  if (!wrap) return;
+  var deleteMode = _deleteMode || false;
+  var html = '';
+  for (var ri = 0; ri < matPriceRowsData.length; ri++) {
+    var row = matPriceRowsData[ri];
+    var selClass = row.selected ? ' selected' : '';
+    var newClass = row._rowNew ? ' row-new' : '';
+    var dmClass = deleteMode ? ' delete-mode-row' : '';
+    var checkedClass = row.selected ? ' checked' : '';
+    var checkMark = row.selected ? '<span class="ios-check-mark">✓</span>' : '';
+    html += '<div class="adv-row mat-row' + dmClass + newClass + selClass + '" id="mat-row-' + ri + '" data-index="' + ri + '"' +
+      (deleteMode ? ' ontouchstart="onMatRowDown(event)" ontouchend="onMatRowUp(event)" ontouchcancel="onMatRowUp(event)" onmousedown="onMatRowDown(event)" onmouseup="onMatRowUp(event)" onmouseleave="onMatRowUp(event)" onclick="onToggleMatSelect(event)"' : '') +
+      '>' +
+      '<span class="adv-label mat-label">材料卡（垫子）</span>' +
+      '<div class="adv-value-wrap">' +
+      '<div class="adv-input-group"><input class="adv-mat-ovr" type="number" value="' + (row.ovr || '') + '" placeholder="OVR" data-index="' + ri + '" oninput="onMatOvrRowInput(this)" onblur="onMatRowBlur(this)"' + (deleteMode ? ' disabled' : '') + '></div>' +
+      '<span class="adv-mat-sep">·</span>' +
+      '<div class="adv-input-group"><div class="adv-price-row"><input class="adv-mat-price" type="number" value="' + (row.priceDisplay || '0') + '" placeholder="价格" data-index="' + ri + '" oninput="onMatPriceRowInput(this)" onblur="onMatPriceRowBlur(this)"' + (deleteMode ? ' disabled' : '') + '>' +
+      (deleteMode ? '' : '<span class="adv-unit mat-price-unit">' + (row.priceUnit || '亿') + '</span>') +
+      '</div></div>' +
+      '</div>' +
+      (deleteMode ? '<div class="ios-check' + checkedClass + '">' + checkMark + '</div>' : '') +
+      '</div>';
+  }
+  wrap.innerHTML = html;
+}
+
+function _updateDeleteUI() {
+  var selCount = 0;
+  for (var i = 0; i < matPriceRowsData.length; i++) { if (matPriceRowsData[i].selected) selCount++; }
+  var allSel = selCount === matPriceRowsData.length && matPriceRowsData.length > 0;
+  // 全选checkbox
+  var sac = document.getElementById('selectAllCheck');
+  if (sac) {
+    if (allSel) { sac.classList.add('checked'); sac.querySelector('.ios-check-mark').style.display = ''; }
+    else { sac.classList.remove('checked'); sac.querySelector('.ios-check-mark').style.display = 'none'; }
+  }
+  // 删除按钮文字
+  var btn = document.getElementById('btnDelConfirm');
+  var delConfirming = _delConfirming || false;
+  if (btn) {
+    if (selCount === 0) {
+      btn.textContent = '删除'; btn.disabled = true;
+      btn.classList.remove('del-btn-batch', 'del-btn-confirm');
+    } else if (selCount === 1) {
+      btn.textContent = '删除（1）'; btn.disabled = false;
+      btn.classList.remove('del-btn-batch', 'del-btn-confirm');
     } else {
-      r.classList.add('selected');
+      if (delConfirming) {
+        btn.textContent = '长按删除'; btn.disabled = false;
+        btn.classList.add('del-btn-batch', 'del-btn-confirm');
+      } else {
+        btn.textContent = '批量删除（' + selCount + '）'; btn.disabled = false;
+        btn.classList.add('del-btn-batch');
+        btn.classList.remove('del-btn-confirm');
+      }
     }
-  });
-  updateSelectAllState();
-  updateDeleteBar();
-}
-
-function updateSelectAllState() {
-  var container = document.getElementById('matPriceRows');
-  var rows = container.querySelectorAll('.adv-row');
-  var allBar = document.getElementById('selectAllBar');
-  var totalRows = rows.length;
-  var selectedRows = container.querySelectorAll('.adv-row.selected').length;
-  if (selectedRows === totalRows) {
-    allBar.classList.add('all-selected');
-  } else {
-    allBar.classList.remove('all-selected');
   }
 }
 
-function updateDeleteBar() {
-  var container = document.getElementById('matPriceRows');
-  var selected = container.querySelectorAll('.adv-row.selected');
-  var confirmBtn = document.getElementById('btnDelConfirm');
-  var n = selected.length;
-  if (n === 0) {
-    confirmBtn.textContent = '删除';
-  } else if (n === 1) {
-    confirmBtn.textContent = '删除（1）';
-  } else {
-    confirmBtn.textContent = '批量删除（' + n + '）';
+// ===== 材料行操作 =====
+
+function onMatOvrRowInput(el) {
+  var idx = parseInt(el.dataset.index);
+  var raw = el.value.replace(/[^0-9]/g, '');
+  if (raw.length > 3) raw = raw.slice(0, 3);
+  matPriceRowsData[idx].ovr = raw;
+  if (document.getElementById('btnSaveMatPrices').textContent === '已保存') {
+    document.getElementById('btnSaveMatPrices').textContent = '保存';
+    document.getElementById('btnSaveMatPrices').classList.remove('saved');
   }
-  confirmBtn.disabled = n === 0;
 }
 
-// 点击行切换选中
-document.addEventListener('click', function(e) {
-  if (!_deleteMode) return;
-  if (e.target.closest('button')) return;
-  var row = e.target.closest('#matPriceRows .adv-row');
+function onMatPriceRowInput(el) {
+  var idx = parseInt(el.dataset.index);
+  var raw = el.value.replace(/^0+/, '');
+  if (!raw) raw = '0';
+  matPriceRowsData[idx].priceDisplay = raw;
+  if (document.getElementById('btnSaveMatPrices').textContent === '已保存') {
+    document.getElementById('btnSaveMatPrices').textContent = '保存';
+    document.getElementById('btnSaveMatPrices').classList.remove('saved');
+  }
+}
+
+function onMatRowBlur(el) {
+  var idx = parseInt(el.dataset.index);
+  var row = matPriceRowsData[idx];
   if (!row) return;
-  e.stopPropagation();
-  // 删除模式下阻止输入框获得焦点
-  if (e.target.closest('input, select, textarea')) {
-    e.preventDefault();
-  }
-  row.classList.toggle('selected');
-  updateSelectAllState();
-  updateDeleteBar();
-}, true);
-
-// 确认删除选中行
-function confirmDeleteRows() {
-  var container = document.getElementById('matPriceRows');
-  var selected = container.querySelectorAll('.adv-row.selected');
-  if (selected.length === 0) return;
-  selected.forEach(function(r) { r.remove(); });
-  matPriceRowCount = Math.max(1, matPriceRowCount - selected.length);
-  // 确保至少保留1行
-  if (container.querySelectorAll('.adv-row').length === 0) {
-    addMatPriceRow();
-  }
-  exitDeleteMode();
+  if (!row.priceDisplay || row.priceDisplay === '') { row.priceDisplay = '0'; row.priceUnit = '亿'; }
+  var val = parseFloat(row.priceDisplay) || 0;
+  var pu = _updatePriceUnit(val);
+  row.price = val;
+  row.priceDisplay = pu.display;
+  row.priceUnit = pu.unit;
+  _checkDupAndSort(idx);
+  renderMatPriceRows();
 }
 
-// ESC退出删除模式
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && _deleteMode) {
-    exitDeleteMode();
-  }
-});
+function onMatPriceRowBlur(el) { onMatRowBlur(el); }
 
-function cleanIncompleteRows() {
-  var container = document.getElementById('matPriceRows');
-  var rows = container.querySelectorAll('.adv-row');
-  // 先删半成品（只填了一个框的）
-  rows.forEach(function(row) {
-    var ovrVal = parseInt(row.querySelector('.adv-mat-ovr').value) || 0;
-    var priceVal = getPriceYi(row.querySelector('.adv-mat-price'));
-    var isComplete = ovrVal > 0 && priceVal > 0;
-    var isEmpty = ovrVal === 0 && priceVal === 0;
-    if (!isComplete && !isEmpty) {
-      row.remove();
-      matPriceRowCount = Math.max(1, matPriceRowCount - 1);
+function _checkDupAndSort(changedIdx) {
+  var changedOvr = parseInt(matPriceRowsData[changedIdx].ovr) || 0;
+  var changedPrice = parseFloat(matPriceRowsData[changedIdx].price) || 0;
+  if (changedOvr > 0 && changedPrice > 0) {
+    for (var i = 0; i < matPriceRowsData.length; i++) {
+      if (i === changedIdx) continue;
+      if ((parseInt(matPriceRowsData[i].ovr) || 0) === changedOvr) {
+        matPriceRowsData[changedIdx].ovr = '';
+        renderMatPriceRows();
+        return;
+      }
     }
-  });
-  // 删完半成品后，删除所有空行
-  rows = container.querySelectorAll('.adv-row');
-  rows.forEach(function(row) {
-    var ovrVal = parseInt(row.querySelector('.adv-mat-ovr').value) || 0;
-    var priceVal = getPriceYi(row.querySelector('.adv-mat-price'));
-    var isEmpty = ovrVal === 0 && priceVal === 0;
-    if (isEmpty) {
-      row.remove();
-      matPriceRowCount = Math.max(1, matPriceRowCount - 1);
-    }
-  });
-  // 如果全删光了，至少保留1个空行
-  if (container.querySelectorAll('.adv-row').length === 0) {
-    addMatPriceRow();
+    matPriceRowsData.sort(function(a, b) {
+      var ao = parseInt(a.ovr) || 0, bo = parseInt(b.ovr) || 0;
+      if (ao === 0 && bo === 0) return 0;
+      if (ao === 0) return 1; if (bo === 0) return -1;
+      return ao - bo;
+    });
+    renderMatPriceRows();
   }
 }
 
-function saveMatPrices() {
-  var btn = document.querySelector('#btnRowSave .btn-secondary');
+function onAddMatRow() {
+  matPriceRowsData.push({ ovr: '', price: 0, priceDisplay: '0', priceUnit: '亿', selected: false, _rowNew: true });
+  renderMatPriceRows();
+  var newIdx = matPriceRowsData.length - 1;
+  var target = document.getElementById('mat-row-' + newIdx);
+  if (target) { target.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  if (document.getElementById('btnSaveMatPrices').textContent === '已保存') {
+    document.getElementById('btnSaveMatPrices').textContent = '保存';
+    document.getElementById('btnSaveMatPrices').classList.remove('saved');
+  }
+  setTimeout(function() {
+    if (matPriceRowsData[newIdx]) matPriceRowsData[newIdx]._rowNew = false;
+    renderMatPriceRows();
+  }, 400);
+}
+
+// ===== 删除模式 =====
+var _deleteMode = false;
+var _delConfirming = false;
+var _delLongPressTimer = null, _delLongPressDone = false, _delMidTimer = null;
+
+function onEnterDeleteMode() {
+  if (matPriceRowsData.length <= 1) return;
+  _deleteMode = true; _delConfirming = false;
+  for (var i = 0; i < matPriceRowsData.length; i++) matPriceRowsData[i].selected = false;
+  renderMatPriceRows();
+  // 显示删除栏，隐藏添加/删除按钮行
+  document.getElementById('btnRowAddDel').classList.add('btn-row-hidden');
+  document.getElementById('btnRowSave').classList.add('btn-row-hidden');
+  document.getElementById('deleteBar').classList.add('delete-bar-show');
+  document.getElementById('advColHeadsRight').classList.add('heads-hidden');
+  document.getElementById('selectAllInline').classList.add('show');
+  document.getElementById('btnDeleteMode').textContent = '取消';
+  _updateDeleteUI();
+  // 缓存行左边界，后续触摸直接用 clientX - _matRowsLeft，避免每次 getBoundingClientRect()
+  var firstRow = document.querySelector('.adv-row');
+  if (firstRow) _matRowsLeft = firstRow.getBoundingClientRect().left;
+}
+function onExitDeleteMode() {
+  _deleteMode = false; _delConfirming = false;
+  _matRowsLeft = 0;
+  if (_delLongPressTimer) { clearTimeout(_delLongPressTimer); _delLongPressTimer = null; }
+  if (_delMidTimer) { clearTimeout(_delMidTimer); _delMidTimer = null; }
+  for (var i = 0; i < matPriceRowsData.length; i++) matPriceRowsData[i].selected = false;
+  renderMatPriceRows();
+  document.getElementById('btnRowAddDel').classList.remove('btn-row-hidden');
+  document.getElementById('btnRowSave').classList.remove('btn-row-hidden');
+  document.getElementById('deleteBar').classList.remove('delete-bar-show');
+  document.getElementById('advColHeadsRight').classList.remove('heads-hidden');
+  document.getElementById('selectAllInline').classList.remove('show');
+  document.getElementById('btnDeleteMode').textContent = '删除';
+  _updateDeleteUI();
+}
+function onCancelOrExitDelete() {
+  if (_delConfirming) {
+    // 取消确认回到批量选择
+    if (_delLongPressTimer) { clearTimeout(_delLongPressTimer); _delLongPressTimer = null; }
+    if (_delMidTimer) { clearTimeout(_delMidTimer); _delMidTimer = null; }
+    _delConfirming = false;
+    _updateDeleteUI();
+  } else {
+    onExitDeleteMode();
+  }
+}
+function onToggleMatSelect(e) {
+  if (!_deleteMode) return;
+  if (_delConfirming) return;
+  var idx = parseInt(e.currentTarget.dataset.index);
+  matPriceRowsData[idx].selected = !matPriceRowsData[idx].selected;
+  renderMatPriceRows();
+  _updateDeleteUI();
+}
+function onToggleSelectAll() {
+  if (!_deleteMode) return;
+  var allSel = true;
+  for (var i = 0; i < matPriceRowsData.length; i++) { if (!matPriceRowsData[i].selected) { allSel = false; break; } }
+  allSel = !allSel;
+  for (var j = 0; j < matPriceRowsData.length; j++) matPriceRowsData[j].selected = allSel;
+  renderMatPriceRows();
+  _updateDeleteUI();
+}
+function onConfirmDeleteRows() {
+  var selCount = 0;
+  for (var i = 0; i < matPriceRowsData.length; i++) { if (matPriceRowsData[i].selected) selCount++; }
+  if (selCount === 0) return;
+  if (selCount === 1) { _doDeleteRows(); return; }
+  // 批量→进入长按确认
+  if (!_delConfirming) { _delConfirming = true; _updateDeleteUI(); return; }
+}
+function onDelConfirmDown(e) {
+  _delLongPressDone = false;
+  var btn = document.getElementById('btnDelConfirm');
+  var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  var rect = btn.getBoundingClientRect();
+  var x = clientX - rect.left;
+  if (_delConfirming) {
+    if (navigator.vibrate) navigator.vibrate(30);
+    var ripple = _createRippleDom(btn, x, 'ripple-hold');
+    ripple.style.background = 'rgba(0,0,0,0.22)';
+    _delMidTimer = setTimeout(function() { if (navigator.vibrate) navigator.vibrate(15); }, 650);
+    _delLongPressTimer = setTimeout(function() {
+      _delLongPressDone = true;
+      if (navigator.vibrate) navigator.vibrate(50);
+      _doDeleteRows();
+    }, 1200);
+  } else {
+    _createRippleDom(btn, x);
+  }
+}
+function onDelConfirmUp() {
+  if (_delLongPressTimer) { clearTimeout(_delLongPressTimer); _delLongPressTimer = null; }
+  if (_delMidTimer) { clearTimeout(_delMidTimer); _delMidTimer = null; }
+  _fadeRipples(document.getElementById('btnDelConfirm'));
+  _delLongPressDone = false;
+}
+function _doDeleteRows() {
+  matPriceRowsData = matPriceRowsData.filter(function(r) { return !r.selected; });
+  if (matPriceRowsData.length === 0) matPriceRowsData.push({ ovr: '', price: 0, priceDisplay: '0', priceUnit: '亿', selected: false });
+  _deleteMode = false; _delConfirming = false;
+  if (_delLongPressTimer) { clearTimeout(_delLongPressTimer); _delLongPressTimer = null; }
+  if (_delMidTimer) { clearTimeout(_delMidTimer); _delMidTimer = null; }
+  renderMatPriceRows();
+  document.getElementById('btnRowAddDel').classList.remove('btn-row-hidden');
+  document.getElementById('btnRowSave').classList.remove('btn-row-hidden');
+  document.getElementById('deleteBar').classList.remove('delete-bar-show');
+  document.getElementById('advColHeadsRight').classList.remove('heads-hidden');
+  document.getElementById('selectAllInline').classList.remove('show');
+  document.getElementById('btnDeleteMode').textContent = '删除';
+  if (document.getElementById('btnSaveMatPrices').textContent === '已保存') {
+    document.getElementById('btnSaveMatPrices').textContent = '保存';
+    document.getElementById('btnSaveMatPrices').classList.remove('saved');
+  }
+  _updateDeleteUI();
+}
+
+// ===== 等级价值表 =====
+var _lvTableOpen = false;
+var _lvModified = false;
+
+function onToggleLevelValues() {
+  _lvTableOpen = !_lvTableOpen;
+  document.getElementById('lvTable').style.display = _lvTableOpen ? '' : 'none';
+  document.getElementById('lvToggleText').textContent = _lvTableOpen ? '▾ 收起主卡等级价格设置' : '▸ 展开主卡等级价格设置';
+  document.getElementById('lvToggleHint').style.display = _lvTableOpen ? 'none' : '';
+}
+
+function onLvPriceInput(el) {
+  var lv = parseInt(el.dataset.lv);
+  var raw = el.value.replace(/^0+(\d)/, '$1');
+  if (document.getElementById('btnSaveLvValues').textContent === '已保存') {
+    document.getElementById('btnSaveLvValues').textContent = '保存';
+    document.getElementById('btnSaveLvValues').classList.remove('saved');
+  }
+  _lvModified = true;
+  if (lv === currentLevel) {
+    var valYi = parseFloat(raw) || 0;
+    document.getElementById('inpPlayerValue').value = valYi;
+    _refreshAdvancedBP();
+  }
+}
+
+function onLvPriceBlur(el) {
+  var lv = parseInt(el.dataset.lv);
+  var val = el.value;
+  if (!val || val === '') { el.value = '0'; val = '0'; }
+  var numVal = parseFloat(val) || 0;
+  if (numVal >= 10000) {
+    var pu = _updatePriceUnit(numVal);
+    el.value = pu.display;
+  }
+  if (lv === currentLevel) {
+    var valYi = parseFloat(el.value) || 0;
+    document.getElementById('inpPlayerValue').value = valYi;
+    _refreshAdvancedBP();
+  }
+}
+
+function onSaveLevelValues() {
+  if (!_lvModified) return;
+  var btn = document.getElementById('btnSaveLvValues');
   if (btn.textContent === '已保存') {
-    // 取消保存：清除localStorage
-    localStorage.removeItem('fc-mat-prices');
-    btn.textContent = '保存';
-    btn.style.background = '';
-    btn.style.border = '';
-    btn.style.color = '';
+    localStorage.removeItem('fc-level-values');
+    for (var lv = 8; lv <= 13; lv++) document.getElementById('lvVal' + lv).value = '0';
+    btn.textContent = '保存'; btn.classList.remove('saved');
+    document.getElementById('inpPlayerValue').value = '0';
+    _lvModified = false;
+    _refreshAdvancedBP();
     return;
   }
-  cleanIncompleteRows();
-  var rows = document.getElementById('matPriceRows').querySelectorAll('.adv-row');
-  var data = [];
-  rows.forEach(function(row) {
-    var ovrInp = row.querySelector('.adv-mat-ovr');
-    var priceInp = row.querySelector('.adv-mat-price');
-    var ovrVal = parseInt(ovrInp.value) || 0;
-    var priceVal = getPriceYi(priceInp);
-    if (ovrVal > 0 && priceVal > 0) {
-      data.push({ ovr: ovrVal, price: priceVal });
-    }
-  });
-  localStorage.setItem('fc-mat-prices', JSON.stringify(data));
-  btn.textContent = '已保存';
-  btn.style.background = '#00c853';
-  btn.style.border = '1px solid #00c853';
-  btn.style.color = '#fff';
-}
-
-function getSavedMatPrices() {
-  try {
-    var raw = localStorage.getItem('fc-mat-prices');
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  return [];
-}
-
-function loadSavedMatPrices() {
-  var raw = localStorage.getItem('fc-mat-prices');
-  if (!raw) return;
-  try {
-    var data = JSON.parse(raw);
-    // Ensure enough rows exist
-    while (matPriceRowCount < data.length) {
-      addMatPriceRow();
-    }
-    var rows = document.getElementById('matPriceRows').querySelectorAll('.adv-row');
-    data.forEach(function(d, i) {
-      if (rows[i]) {
-        rows[i].querySelector('.adv-mat-ovr').value = d.ovr || '';
-        var priceInp = rows[i].querySelector('.adv-mat-price');
-        var rawYi = d.price || 0;
-        var unitEl = rows[i].querySelector('.mat-price-unit');
-        if (rawYi >= 10000) {
-          priceInp.dataset.rawYi = rawYi;
-          priceInp.value = (rawYi / 10000).toFixed(2);
-          if (unitEl) unitEl.textContent = '兆';
-        } else {
-          delete priceInp.dataset.rawYi;
-          priceInp.value = rawYi;
-          if (unitEl) unitEl.textContent = '亿';
-        }
-      }
-    });
-    onMatPriceChange();
-    sortMatPriceRows();
-  } catch(e) {}
-}
-
-function applyAdvancedSettings() {
-  if (_deleteMode) exitDeleteMode();
-  cleanIncompleteRows();
-  document.getElementById('advancedSettingsOverlay').classList.remove('show');
-  refreshAll();
-}
-
-function openAdvancedSettings() {
-  document.getElementById('advancedSettingsOverlay').classList.add('show');
-  // 强化等级<8时BP保护板块灰色禁用
-  var bpSection = document.getElementById('bpProtectSection');
-  if (currentLevel < 8) {
-    bpSection.classList.add('bp-disabled');
-  } else {
-    bpSection.classList.remove('bp-disabled');
+  var lvValues = {};
+  for (var lv = 8; lv <= 13; lv++) {
+    var v = parseFloat(document.getElementById('lvVal' + lv).value) || 0;
+    if (v > 0) lvValues[lv] = v;
   }
-  loadLevelValues();
-  applyLevelValue();
-  loadSavedMatPrices();
-  onPlayerValueChange();
+  localStorage.setItem('fc-level-values', JSON.stringify(lvValues));
+  btn.textContent = '已保存'; btn.classList.add('saved');
+  _lvModified = false;
+}
+
+function _refreshAdvancedBP() {
+  var pvYi = parseFloat(document.getElementById('inpPlayerValue').value) || 0;
+  var fullProtect = pvYi * 0.4;
+  document.getElementById('inpFullProtectBP').textContent = formatCurrency(fullProtect);
+  document.getElementById('neededBP').textContent = formatCurrency(fullProtect * (protectCount / 100));
+}
+
+// ===== 材料价格保存 =====
+function onSaveMatPrices() {
+  var btn = document.getElementById('btnSaveMatPrices');
+  if (btn.textContent === '已保存') {
+    _matPricesStore = {};
+    localStorage.removeItem('fc-mat-prices');
+    _initMatPriceRows();
+    renderMatPriceRows();
+    btn.textContent = '保存'; btn.classList.remove('saved');
+    return;
+  }
+  // 过滤有效行
+  var prices = {};
+  for (var i = 0; i < matPriceRowsData.length; i++) {
+    var ovr = parseInt(matPriceRowsData[i].ovr) || 0;
+    var price = matPriceRowsData[i].price || _getPriceYiFromRow(matPriceRowsData[i].priceDisplay, matPriceRowsData[i].priceUnit);
+    if (ovr > 0 && price > 0) prices[ovr] = price;
+  }
+  _matPricesStore = prices;
+  localStorage.setItem('fc-mat-prices', JSON.stringify(prices));
+  btn.textContent = '已保存'; btn.classList.add('saved');
+}
+
+// ===== 高级设置打开/关闭 =====
+function openAdvancedSettings() {
+  // 加载存储的价格
+  try { var raw = localStorage.getItem('fc-mat-prices'); if (raw) _matPricesStore = JSON.parse(raw); } catch(e) { _matPricesStore = {}; }
+  try { var rawLv = localStorage.getItem('fc-level-values'); if (rawLv) { var lvVals = JSON.parse(rawLv); for (var lv = 8; lv <= 13; lv++) { if (lvVals[lv]) document.getElementById('lvVal' + lv).value = lvVals[lv]; else document.getElementById('lvVal' + lv).value = '0'; } } } catch(e) {}
+  _initMatPriceRows();
+  renderMatPriceRows();
+  _deleteMode = false; _delConfirming = false;
+  document.getElementById('btnRowAddDel').classList.remove('btn-row-hidden');
+  document.getElementById('btnRowSave').classList.remove('btn-row-hidden');
+  document.getElementById('deleteBar').classList.remove('delete-bar-show');
+  document.getElementById('advColHeadsRight').classList.remove('heads-hidden');
+  document.getElementById('selectAllInline').classList.remove('show');
+  document.getElementById('btnDeleteMode').textContent = '删除';
+  _updateDeleteUI();
+  // BP保护
+  var bpSection = document.getElementById('bpProtectSection');
+  if (currentLevel < 8) { bpSection.classList.add('bp-disabled'); } else { bpSection.classList.remove('bp-disabled'); }
+  // 等级价值
+  _lvTableOpen = false; _lvModified = false;
+  document.getElementById('lvTable').style.display = 'none';
+  document.getElementById('lvToggleText').textContent = '▸ 展开主卡等级价格设置';
+  document.getElementById('lvToggleHint').style.display = '';
+  document.getElementById('btnSaveLvValues').textContent = '保存';
+  document.getElementById('btnSaveLvValues').classList.remove('saved');
+  document.getElementById('btnSaveMatPrices').textContent = '保存';
+  document.getElementById('btnSaveMatPrices').classList.remove('saved');
+  // 球员价值
+  var curLvVal = 0;
+  try { var lvSaved = JSON.parse(localStorage.getItem('fc-level-values') || '{}'); if (lvSaved[currentLevel]) curLvVal = parseFloat(lvSaved[currentLevel]) || 0; } catch(e) {}
+  document.getElementById('inpPlayerValue').value = curLvVal;
+  _refreshAdvancedBP();
+  document.getElementById('advancedSettingsOverlay').style.display = 'flex';
 }
 
 function closeAdvancedSettings(e) {
   if (e && e.target !== document.getElementById('advancedSettingsOverlay')) return;
-  if (_deleteMode) exitDeleteMode();
-  cleanIncompleteRows();
-  document.getElementById('advancedSettingsOverlay').classList.remove('show');
+  onExitDeleteMode();
+  document.getElementById('advancedSettingsOverlay').style.display = 'none';
 }
 
-function closeAdvancedSettingsDirect() {
-  document.getElementById('advancedSettingsOverlay').classList.remove('show');
+function applyAdvancedSettings() {
+  if (_deleteMode) onExitDeleteMode();
+  document.getElementById('advancedSettingsOverlay').style.display = 'none';
+  refreshAll();
 }
 
 function closeSettings(e) {
