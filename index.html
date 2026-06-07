@@ -5357,6 +5357,17 @@ function _fadePlayerRowRipple(opt) {
 var matPriceRowsData = []; // [{ovr, price, priceDisplay, priceUnit, selected}]
 var _matPricesStore = {}; // localStorage同步
 
+function getSavedMatPrices() {
+  // 新版存储格式 {ovr: price} → 旧版调用方期望 [{ovr, price}]
+  var store = _matPricesStore || {};
+  var keys = Object.keys(store);
+  if (!keys.length) {
+    try { var raw = localStorage.getItem('fc-mat-prices'); if (raw) store = JSON.parse(raw); } catch(e) {}
+    keys = Object.keys(store);
+  }
+  return keys.map(function(k) { return { ovr: parseInt(k) || 0, price: store[k] || 0 }; });
+}
+
 function _updatePriceUnit(val) {
   if (!val || val <= 0) return { display: '0', unit: '亿' };
   if (val >= 10000) return { display: (val / 10000).toFixed(2), unit: '兆' };
