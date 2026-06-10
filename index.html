@@ -3675,7 +3675,7 @@ function refreshRate() {
     document.getElementById('btnEnhance').textContent = '已满级';
     document.getElementById('btnAuto').disabled = true;
   } else {
-    var nextD = data(currentLevel + 1);
+    var nextD = data(currentLevel);
     var r = (getFinalRate(nextD.rate) * 100).toFixed(0) + '%';
     var boost = getMaterialBoost();
     var boostStr = boost > 0 ? ' <span style="color:#2979ff;font-size:11px;">(含材料+' + boost + '%)</span>' : '';
